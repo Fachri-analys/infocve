@@ -1,0 +1,262 @@
+@import "tailwindcss";
+
+/*
+  InfoCVE design tokens.
+  Dark is the primary/default identity (a deep ink-navy, not pure black —
+  this is a working "systems" surface, not a generic dark-mode invert).
+  The ".light" class overrides tokens for the light theme.
+
+  Severity *background/border/dot* colors stay the same hex across themes
+  (recognizable, consistent "this is red" branding regardless of theme).
+  Severity *text* colors do NOT — a same-hue text-on-12%-tint combination
+  that comfortably passes WCAG AA on the dark background fails badly on
+  the light one (verified by computing actual contrast ratios, not just
+  eyeballed), because the same tint opacity produces a near-white
+  background in light mode instead of a near-black one. The "-fg" tokens
+  below are deliberately darker, same-hue-family shades used only for
+  severity text in light mode; dark mode's "-fg" tokens equal the base
+  color since no adjustment is needed there.
+*/
+:root {
+  --color-background: #0a0e1a;
+  --color-background-raised: #0d1220;
+  --color-foreground: #e8ecf7;
+  --color-muted-foreground: #8b95ac;
+  --color-surface: #121a2e;
+  --color-surface-hover: #182444;
+  --color-border: #232f4d;
+  --color-border-hover: #37456b;
+  --color-accent: #7c9bff;
+  --color-accent-foreground: #0a0e1a;
+  --color-ring: #7c9bff;
+
+  --color-severity-critical: #f0453b;
+  --color-severity-high: #fb923c;
+  --color-severity-medium: #facc15;
+  --color-severity-low: #38bdf8;
+  --color-severity-none: #8992a8;
+
+  --color-severity-critical-fg: var(--color-severity-critical);
+  --color-severity-high-fg: var(--color-severity-high);
+  --color-severity-medium-fg: var(--color-severity-medium);
+  --color-severity-low-fg: var(--color-severity-low);
+  --color-severity-none-fg: var(--color-severity-none);
+
+  --shadow-glass: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+}
+
+.light {
+  --color-background: #f6f7fb;
+  --color-background-raised: #ffffff;
+  --color-foreground: #12172a;
+  --color-muted-foreground: #565f78;
+  --color-surface: #ffffff;
+  --color-surface-hover: #eef1f9;
+  --color-border: #e1e5f0;
+  --color-border-hover: #c7cde0;
+  --color-accent: #4a5fd6;
+  --color-accent-foreground: #ffffff;
+  --color-ring: #4a5fd6;
+
+  /* Verified >= 4.5:1 (WCAG AA, normal text) against each color's own
+     12%-opacity badge background — see the audit summary for the exact
+     computed ratios (5.20:1 to 7.81:1). */
+  --color-severity-critical-fg: #b91c1c;
+  --color-severity-high-fg: #9a3412;
+  --color-severity-medium-fg: #854d0e;
+  --color-severity-low-fg: #075985;
+  --color-severity-none-fg: #3f4759;
+
+  --shadow-glass: 0 1px 0 0 rgba(255, 255, 255, 0.6) inset, 0 20px 40px -24px rgba(18, 23, 42, 0.18);
+}
+
+@theme inline {
+  --color-background: var(--color-background);
+  --color-background-raised: var(--color-background-raised);
+  --color-foreground: var(--color-foreground);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-surface: var(--color-surface);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-border: var(--color-border);
+  --color-border-hover: var(--color-border-hover);
+  --color-accent: var(--color-accent);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --color-ring: var(--color-ring);
+
+  --color-severity-critical: var(--color-severity-critical);
+  --color-severity-high: var(--color-severity-high);
+  --color-severity-medium: var(--color-severity-medium);
+  --color-severity-low: var(--color-severity-low);
+  --color-severity-none: var(--color-severity-none);
+
+  --color-severity-critical-fg: var(--color-severity-critical-fg);
+  --color-severity-high-fg: var(--color-severity-high-fg);
+  --color-severity-medium-fg: var(--color-severity-medium-fg);
+  --color-severity-low-fg: var(--color-severity-low-fg);
+  --color-severity-none-fg: var(--color-severity-none-fg);
+
+  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --animate-ticker: ticker 42s linear infinite;
+  --animate-fade-up: fade-up 0.5s ease-out both;
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent),
+    radial-gradient(1px 1px at 20px 30px, color-mix(in srgb, var(--color-foreground) 6%, transparent) 1px, transparent 1px),
+    radial-gradient(1px 1px at 65px 90px, color-mix(in srgb, var(--color-foreground) 5%, transparent) 1px, transparent 1px),
+    radial-gradient(1px 1px at 110px 45px, color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px, transparent 1px);
+  background-size: 100% 640px, 140px 140px, 140px 140px, 140px 140px;
+  background-repeat: no-repeat, repeat, repeat, repeat;
+  background-attachment: fixed;
+}
+
+::selection {
+  background-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  color: var(--color-foreground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* Glass surface used by cards throughout the app */
+.glass {
+  background-color: color-mix(in srgb, var(--color-surface) 68%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  box-shadow: var(--shadow-glass);
+}
+
+/* CVE ID / technical data treatment used across cards, hero, detail pages */
+.data-tag {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-accent);
+  color: var(--color-accent-foreground);
+  border-radius: 0 0 0.5rem 0;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes sheet-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.sheet-content[data-state="open"] {
+  animation: sheet-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sheet-content[data-state="closed"] {
+  animation: sheet-out 0.18s ease-in forwards;
+}
+.sheet-overlay[data-state="open"] {
+  animation: overlay-in 0.2s ease-out;
+}
+.sheet-overlay[data-state="closed"] {
+  animation: overlay-in 0.15s ease-in reverse forwards;
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+.accordion-content[data-state="open"] {
+  animation: accordion-down 0.25s ease-out;
+}
+.accordion-content[data-state="closed"] {
+  animation: accordion-up 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

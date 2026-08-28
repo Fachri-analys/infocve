@@ -1,0 +1,60 @@
+﻿name: Scheduled Sync & Health Check
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: "Force full sync"
+        type: boolean
+        default: false
+
+jobs:
+  sync:
+    name: Trigger Data Sync
+    if: ${{ vars.DEPLOY_URL != '' && secrets.ADMIN_SECRET != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DEPLOY_URL: ${{ vars.DEPLOY_URL }}
+      ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
+
+    steps:
+      - name: Trigger sync endpoint
+        run: |
+          echo "🔄 Triggering InfoCVE data sync..."
+          RESPONSE=$(curl -sS -w "\n%{http_code}" \
+            -X POST "${DEPLOY_URL}/api/sync" \
+            -H "Authorization: Bearer ${ADMIN_SECRET}" \
+            -H "Content-Type: application/json")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "Status: $HTTP_CODE"
+          echo "$BODY" | head -20
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "❌ Sync failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+
+          echo "✅ Sync completed successfully"
+
+      - name: Health check
+        run: |
+          echo "🏥 Running health check..."
+          RESPONSE=$(curl -sS -w "\n%{http_code}" "${DEPLOY_URL}/api/health")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "Status: $HTTP_CODE"
+          echo "$BODY" | head -10
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "❌ Health check failed"
+            exit 1
+          fi
+
+          echo "✅ Application is healthy"
