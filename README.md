@@ -17,13 +17,6 @@ integrasi AI.
 - **Glosarium** (`/glossary`) — 20 istilah keamanan siber dengan pencarian instan di sisi klien.
 - **Tentang, Privasi, Syarat & Ketentuan** — halaman informasi standar.
 
-## Tumpukan Teknologi
-
-Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · komponen
-bergaya shadcn/ui (ditulis manual — lihat catatan di bawah) · Lucide React ·
-React Server Components · **NVD REST API v2.0** untuk data CVE sungguhan.
-Tanpa Express/NestJS/Laravel, tanpa basis data, sesuai batasan proyek.
-
 ## Mulai Cepat
 
 ```bash
