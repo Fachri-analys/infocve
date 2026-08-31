@@ -11,7 +11,7 @@ const Accordion = AccordionPrimitive.Root;
 function AccordionItem({ className, ...props }: React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>) {
   return (
     <AccordionPrimitive.Item
-      className={cn("glass rounded-2xl overflow-hidden", className)}
+      className={cn("glass rounded-xl overflow-hidden", className)}
       {...props}
     />
   );
@@ -26,7 +26,7 @@ function AccordionTrigger({
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
         className={cn(
-          "group flex flex-1 items-center justify-between gap-4 px-5 py-4 text-left font-display text-base font-medium transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-2xl",
+          "group flex flex-1 items-center justify-between gap-4 rounded-xl px-5 py-4 text-left font-display text-base font-medium transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           className
         )}
         {...props}

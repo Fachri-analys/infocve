@@ -26,7 +26,7 @@ export function CisaKevCard({ cisaKev }: { cisaKev?: CisaKevStatus }) {
             <ShieldAlert className="size-5" />
             Peringatan CISA KEV: Dieksploitasi Aktif di Dunia Nyata
           </CardTitle>
-          <span className="rounded-full border border-red-500/30 bg-red-500/20 px-2.5 py-0.5 text-xs font-bold text-red-600 dark:text-red-400">
+          <span className="rounded-md border border-red-500/30 bg-red-500/20 px-2.5 py-0.5 text-xs font-bold text-red-600 dark:text-red-400">
             CISA KEV ACTIVE
           </span>
         </div>

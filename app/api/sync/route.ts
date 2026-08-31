@@ -5,11 +5,13 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const adminSecret = process.env.ADMIN_SECRET;
-  if (adminSecret) {
-    const authHeader = req.headers.get("authorization");
-    if (authHeader !== `Bearer ${adminSecret}`) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  if (!adminSecret) {
+    return NextResponse.json({ error: "Sync endpoint is disabled: ADMIN_SECRET is not configured." }, { status: 403 });
+  }
+
+  const authHeader = req.headers.get("authorization");
+  if (authHeader !== `Bearer ${adminSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {

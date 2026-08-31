@@ -11,13 +11,16 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <Breadcrumb items={[{ label: "Kebijakan Privasi" }]} />
 
-      <h1 className="font-display text-2xl font-medium text-foreground sm:text-3xl">Kebijakan Privasi</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Terakhir diperbarui: 30 Juli 2026</p>
+      <div className="page-intro">
+        <p className="eyebrow mb-3 text-[10px]">Transparansi & kepercayaan</p>
+        <h1 className="content-heading font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Kebijakan Privasi</h1>
+        <p className="mt-3 text-sm text-muted-foreground">Terakhir diperbarui: 30 Juli 2026</p>
+      </div>
 
-      <div className="mt-8 space-y-6 text-sm leading-relaxed text-muted-foreground">
+      <div className="prose-info mt-10 space-y-8">
         <section>
           <h2 className="mb-2 font-display text-base font-medium text-foreground">1. Ringkasan</h2>
           <p>

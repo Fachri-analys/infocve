@@ -1,5 +1,5 @@
-import { VulnerabilitySourceAdapter, SourceMetadata } from "./base";
-import type { EPSSScore } from "@/types/cve";
+import { BaseVulnerabilitySource, SourceConfig, SourceMetadata } from "./base";
+import type { CVE, EPSSScore } from "@/types/cve";
 
 export interface EpssApiResponseItem {
   cve: string;
@@ -15,29 +15,32 @@ export interface EpssApiResponse {
   data: EpssApiResponseItem[];
 }
 
-export class EpssSourceAdapter implements VulnerabilitySourceAdapter {
-  metadata: SourceMetadata = {
-    id: "EPSS",
-    name: "FIRST Exploit Prediction Scoring System (EPSS)",
-    description: "Model probabilitas berbasis data untuk memprediksi kemungkinan suatu kerentanan dieksploitasi dalam 30 hari ke depan.",
-    homepage: "https://www.first.org/epss/",
-    license: "Open Data (FIRST.org)",
-    updateFrequency: "Harian",
-  };
+const EPSS_METADATA: SourceMetadata = {
+  id: "EPSS",
+  name: "FIRST Exploit Prediction Scoring System (EPSS)",
+  description: "Model probabilitas berbasis data untuk memprediksi kemungkinan suatu kerentanan dieksploitasi dalam 30 hari ke depan.",
+  homepage: "https://www.first.org/epss/",
+  license: "Open Data (FIRST.org)",
+  updateFrequency: "Harian",
+};
 
+export class EpssSourceAdapter extends BaseVulnerabilitySource<EpssApiResponse, EPSSScore> {
   private static readonly API_BASE = "https://api.first.org/data/v1/epss";
+
+  constructor(config?: SourceConfig) {
+    super(EPSS_METADATA, {
+      baseUrl: "https://api.first.org/data/v1/epss",
+      cacheTtlSeconds: 86400,
+      timeoutMs: 10000,
+      rateLimit: { maxRequests: 100, windowMs: 60000 },
+      ...config,
+    });
+  }
 
   async fetchById(cveId: string): Promise<EPSSScore | null> {
     try {
-      const url = `${EpssSourceAdapter.API_BASE}?cve=${encodeURIComponent(cveId.toUpperCase())}`;
-      const response = await fetch(url, {
-        next: { revalidate: 86400 }, // 24h
-        headers: { "User-Agent": "InfoCVE/0.1.0" },
-      });
-
-      if (!response.ok) return null;
-
-      const json = (await response.json()) as EpssApiResponse;
+      const url = `${this.config.baseUrl || EpssSourceAdapter.API_BASE}?cve=${encodeURIComponent(cveId.toUpperCase())}`;
+      const json = await this.fetchHttp<EpssApiResponse>(url);
       const item = json.data?.[0];
       if (!item) return null;
 
@@ -58,15 +61,9 @@ export class EpssSourceAdapter implements VulnerabilitySourceAdapter {
 
     try {
       const queryList = cveIds.slice(0, 100).join(",");
-      const url = `${EpssSourceAdapter.API_BASE}?cve=${encodeURIComponent(queryList)}`;
-      const response = await fetch(url, {
-        next: { revalidate: 86400 },
-        headers: { "User-Agent": "InfoCVE/0.1.0" },
-      });
+      const url = `${this.config.baseUrl || EpssSourceAdapter.API_BASE}?cve=${encodeURIComponent(queryList)}`;
+      const json = await this.fetchHttp<EpssApiResponse>(url);
 
-      if (!response.ok) return result;
-
-      const json = (await response.json()) as EpssApiResponse;
       for (const item of json.data || []) {
         result.set(item.cve.toUpperCase(), {
           score: parseFloat(item.epss),
@@ -82,10 +79,8 @@ export class EpssSourceAdapter implements VulnerabilitySourceAdapter {
 
   async fetchLatest(limit = 10): Promise<EpssApiResponseItem[]> {
     try {
-      const url = `${EpssSourceAdapter.API_BASE}?limit=${limit}&order=desc`;
-      const response = await fetch(url, { next: { revalidate: 86400 } });
-      if (!response.ok) return [];
-      const json = (await response.json()) as EpssApiResponse;
+      const url = `${this.config.baseUrl || EpssSourceAdapter.API_BASE}?limit=${limit}&order=desc`;
+      const json = await this.fetchHttp<EpssApiResponse>(url);
       return json.data || [];
     } catch {
       return [];
@@ -99,5 +94,19 @@ export class EpssSourceAdapter implements VulnerabilitySourceAdapter {
     } catch {
       return false;
     }
+  }
+
+  override async enrichCve(cve: CVE): Promise<CVE> {
+    const score = await this.fetchById(cve.id).catch(() => null);
+    if (!score) return cve;
+
+    const sources = new Set(cve.sources || ["NVD"]);
+    sources.add("EPSS");
+
+    return {
+      ...cve,
+      epss: score,
+      sources: Array.from(sources),
+    };
   }
 }

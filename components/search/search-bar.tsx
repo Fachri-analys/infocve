@@ -17,7 +17,7 @@ interface SearchBarProps {
  */
 export function SearchBar({ defaultValue = "", size = "md", className }: SearchBarProps) {
   return (
-    <form action="/search" method="GET" className={cn("relative flex w-full items-center", className)}>
+    <form action="/search" method="GET" className={cn("relative flex w-full items-center", className)} role="search">
       <Search
         className={cn(
           "pointer-events-none absolute left-4 text-muted-foreground",
@@ -31,15 +31,16 @@ export function SearchBar({ defaultValue = "", size = "md", className }: SearchB
         placeholder="Cari CVE ID, vendor, produk, atau kata kunci…"
         aria-label="Cari CVE"
         className={cn(
-          "data-tag w-full rounded-full border border-border bg-surface text-foreground placeholder:text-muted-foreground/70",
+          "w-full rounded-xl border border-border bg-surface text-foreground placeholder:text-muted-foreground/70",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent",
           size === "lg" ? "h-14 pl-12 pr-32 text-base" : "h-11 pl-10 pr-24 text-sm"
         )}
       />
       <button
         type="submit"
+        aria-label="Cari CVE"
         className={cn(
-          "absolute right-1.5 inline-flex items-center justify-center rounded-full bg-accent font-medium text-accent-foreground transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "absolute right-1.5 inline-flex items-center justify-center rounded-lg bg-accent font-medium text-accent-foreground transition-colors hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           size === "lg" ? "h-11 px-6 text-sm" : "h-8 px-4 text-xs"
         )}
       >

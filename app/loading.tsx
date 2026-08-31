@@ -7,12 +7,15 @@ export default function HomeLoading() {
       <div className="border-b border-border/70 py-2.5">
         <Skeleton className="mx-4 h-4 w-1/3" />
       </div>
-      <section className="px-4 pb-16 pt-14 sm:px-6 sm:pt-20 lg:px-8">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4">
-          <Skeleton className="h-6 w-56 rounded-full" />
-          <Skeleton className="h-12 w-full max-w-xl" />
-          <Skeleton className="h-4 w-2/3" />
-          <Skeleton className="h-14 w-full max-w-xl rounded-full" />
+      <section className="border-b border-border/70 px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)] lg:gap-16">
+          <div className="flex max-w-2xl flex-col gap-4">
+            <Skeleton className="h-3 w-56" />
+            <Skeleton className="h-12 w-full max-w-2xl sm:h-16" />
+            <Skeleton className="h-4 w-5/6" />
+            <Skeleton className="h-14 w-full max-w-2xl rounded-2xl" />
+          </div>
+          <Skeleton className="h-64 w-full rounded-2xl" />
         </div>
       </section>
       <section className="px-4 py-12 sm:px-6 lg:px-8">

@@ -68,14 +68,15 @@ const DATA_SOURCES = [
 
 export default function SourcesPage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <Breadcrumb items={[{ label: "Sumber Data" }]} />
 
-      <div className="mb-10">
-        <h1 className="font-display text-2xl font-medium text-foreground sm:text-4xl">
+      <div className="page-intro mb-10">
+        <p className="eyebrow mb-3 text-[10px]">Transparansi data</p>
+        <h1 className="content-heading font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
           Transparansi & Metodologi Sumber Data
         </h1>
-        <p className="mt-2 text-base text-muted-foreground">
+        <p className="mt-4 max-w-3xl text-base leading-8 text-muted-foreground">
           InfoCVE berkomitmen pada keterbukaan penuh terhadap asal-usul (provenance) dan integritas data intelijen kerentanan yang kami sajikan.
         </p>
       </div>

@@ -12,12 +12,26 @@ const idDateShortFormatter = new Intl.DateTimeFormat("id-ID", {
 
 /** "10 Desember 2021" */
 export function formatDateId(iso: string): string {
-  return idDateFormatter.format(new Date(iso));
+  if (!iso) return "-";
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return idDateFormatter.format(d);
+  } catch {
+    return iso;
+  }
 }
 
 /** "10 Des 2021" — used in tight card layouts */
 export function formatDateShortId(iso: string): string {
-  return idDateShortFormatter.format(new Date(iso));
+  if (!iso) return "-";
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return idDateShortFormatter.format(d);
+  } catch {
+    return iso;
+  }
 }
 
 export function formatCvssScore(score: number): string {

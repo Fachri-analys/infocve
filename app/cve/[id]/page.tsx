@@ -105,53 +105,54 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(jsonLd) }} />
 
       <Breadcrumb items={[{ label: "Cari CVE", href: "/search" }, { label: cve.id }]} />
 
-      <Alert variant="info" className="mb-6">
+      <div className="mb-7 border-y border-border bg-surface/35 p-5 sm:p-7">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p className="eyebrow mb-3 text-[10px]">Detail kerentanan</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="data-tag font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">{cve.id}</h1>
+              <CopyCveIdButton id={cve.id} />
+              {cve.hasPoc && (
+                <span className="rounded-md border border-severity-high/30 bg-severity-high/10 px-2.5 py-0.5 text-xs font-semibold text-severity-high-fg">
+                  PoC / Exploit tersedia
+                </span>
+              )}
+            </div>
+            <p className="mt-2 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">{cve.title}</p>
+            <SourceBadge sources={cve.sources} className="mt-4" />
+          </div>
+          <div className="sm:pt-7">
+            <SeverityBadge severity={cve.cvss.severity} size="md" />
+          </div>
+        </div>
+      </div>
+
+      <Alert variant="info" className="mb-7">
         <Info />
         <AlertDescription>
-          Data kerentanan ini diperkaya secara otomatis dari berbagai sumber intelijen resmi:{" "}
-          <strong className="text-foreground">NVD (NIST)</strong>, <strong className="text-foreground">CISA KEV</strong>,{" "}
-          <strong className="text-foreground">FIRST EPSS</strong>, dan <strong className="text-foreground">GitHub Advisories</strong>.
-          Lihat{" "}
-          <Link href="/sources" className="underline hover:text-foreground">
+          Data ini diperkaya dari NVD (NIST), CISA KEV, FIRST EPSS, dan GitHub Advisories. Lihat{" "}
+          <Link href="/sources" className="font-medium underline underline-offset-2 hover:text-foreground">
             transparansi sumber data
           </Link>{" "}
           untuk metodologi lengkap.
         </AlertDescription>
       </Alert>
 
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="data-tag font-display text-2xl font-medium text-foreground sm:text-3xl">{cve.id}</h1>
-            <CopyCveIdButton id={cve.id} />
-            {cve.hasPoc && (
-              <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-xs font-semibold text-amber-500">
-                PoC / Exploit Tersedia
-              </span>
-            )}
-          </div>
-          <p className="mt-1 text-base text-muted-foreground">{cve.title}</p>
-          <div className="mt-3">
-            <SourceBadge sources={cve.sources} />
-          </div>
-        </div>
-        <SeverityBadge severity={cve.cvss.severity} size="md" />
-      </div>
-
       <div className="mb-6">
         <CisaKevCard cisaKev={cve.cisaKev} />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start">
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Deskripsi</CardTitle>
+              <p className="eyebrow text-[10px]">Ringkasan teknis</p>
+              <CardTitle className="mt-1">Deskripsi</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -174,11 +175,11 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
                 Produk Terdampak
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {cve.affected.map((item) => (
+            <CardContent className="space-y-0">
+              {cve.affected.map((item, idx) => (
                 <div
-                  key={`${item.vendor}-${item.product}`}
-                  className="flex flex-col gap-1 rounded-xl border border-border bg-surface-hover/40 p-4 sm:flex-row sm:items-center sm:justify-between"
+                  key={`${item.vendor}-${item.product}-${idx}`}
+                  className="flex flex-col gap-1 border-b border-border py-4 first:border-t sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="flex items-center gap-1.5 text-sm font-medium text-foreground">
@@ -189,7 +190,7 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
                   </div>
                   <div className="data-tag flex flex-wrap gap-1.5">
                     {item.versions.map((v) => (
-                      <span key={v} className="rounded-full border border-border bg-background px-2 py-0.5 text-xs text-foreground">
+                      <span key={v} className="rounded-md border border-border bg-background px-2 py-0.5 text-xs text-foreground">
                         {v}
                       </span>
                     ))}
@@ -203,9 +204,13 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
           <EPSSCard epss={cve.epss} />
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 lg:sticky lg:top-24">
           <Card>
-            <CardContent className="space-y-3 pt-5">
+            <CardHeader className="pb-3">
+              <p className="eyebrow text-[10px]">Ringkasan</p>
+              <CardTitle className="mt-1 text-base">Metadata CVE</CardTitle>
+            </CardHeader>
+            <CardContent className="divide-y divide-border/70 pt-0">
               <InfoRow icon={CalendarDays} label="Dipublikasikan" value={formatDateId(cve.publishedDate)} />
               <InfoRow icon={CalendarDays} label="Diperbarui" value={formatDateId(cve.lastModifiedDate)} />
               <InfoRow icon={Building2} label="Vendor" value={cve.vendor} />
@@ -224,12 +229,12 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
 
 function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 text-sm">
+    <div className="flex items-start justify-between gap-4 py-3 text-sm first:pt-0 last:pb-0">
       <span className="flex items-center gap-1.5 text-muted-foreground">
         <Icon className="size-3.5" />
         {label}
       </span>
-      <span className="text-right font-medium text-foreground">{value}</span>
+      <span className="max-w-[58%] text-right font-medium leading-relaxed text-foreground">{value}</span>
     </div>
   );
 }

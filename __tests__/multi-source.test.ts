@@ -72,4 +72,54 @@ describe("Multi-Source Intelligence & PoC Classification", () => {
     expect(enriched.sources).toBeDefined();
     expect(enriched.sources?.length).toBeGreaterThanOrEqual(1);
   });
+
+  it("manages adapters and health checks via SourceRegistry", async () => {
+    const { sourceRegistry, VulnerabilitySourceRegistry } = await import("@/lib/sources/registry");
+    const { BaseVulnerabilitySource, SourceApiError } = await import("@/lib/sources/base");
+
+    const customRegistry = new VulnerabilitySourceRegistry();
+
+    class MockSource extends BaseVulnerabilitySource<unknown, { tested: boolean }> {
+      constructor() {
+        super({
+          id: "MOCK_SOURCE",
+          name: "Mock Security Source",
+          description: "Mock source for testing architecture",
+          homepage: "https://example.com",
+          license: "MIT",
+          updateFrequency: "Test",
+        });
+      }
+
+      async fetchById(id: string) {
+        if (id === "INVALID") {
+          throw new SourceApiError(this.metadata.id, "Invalid ID requested", { statusCode: 404 });
+        }
+        return { tested: true };
+      }
+
+      async fetchLatest() {
+        return [];
+      }
+
+      async testConnection() {
+        return true;
+      }
+    }
+
+    const mock = new MockSource();
+    customRegistry.register(mock);
+
+    expect(customRegistry.get("MOCK_SOURCE")).toBeDefined();
+    expect(customRegistry.getAll().length).toBe(1);
+
+    const health = await customRegistry.checkHealth();
+    expect(health.length).toBe(1);
+    expect(health[0]?.healthy).toBe(true);
+
+    // Global registry has default sources registered
+    expect(sourceRegistry.get("CISA_KEV")).toBeDefined();
+    expect(sourceRegistry.get("EPSS")).toBeDefined();
+    expect(sourceRegistry.get("GHSA")).toBeDefined();
+  });
 });

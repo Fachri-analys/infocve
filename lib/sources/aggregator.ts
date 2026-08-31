@@ -4,10 +4,16 @@ import { EpssSourceAdapter } from "./epss";
 import { GhsaSourceAdapter } from "./ghsa";
 import { PocClassifier } from "./poc";
 import { CveRepository } from "@/lib/db/cve-repository";
+import { sourceRegistry } from "./registry";
 
 const cisaKevAdapter = new CisaKevSourceAdapter();
 const epssAdapter = new EpssSourceAdapter();
 const ghsaAdapter = new GhsaSourceAdapter();
+
+// Register default auxiliary sources
+sourceRegistry.register(cisaKevAdapter);
+sourceRegistry.register(epssAdapter);
+sourceRegistry.register(ghsaAdapter);
 
 export interface EnrichedVulnerabilityIntelligence {
   cve: CVE;

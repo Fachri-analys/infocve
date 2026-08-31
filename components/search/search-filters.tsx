@@ -2,7 +2,7 @@ import { SlidersHorizontal } from "lucide-react";
 
 import type { CVECategory, Severity } from "@/types/cve";
 import type { FacetCount } from "@/lib/nvd";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { SEVERITY_CLASSES, SEVERITY_LABEL_ID, SEVERITY_ORDER } from "@/utils/severity";
@@ -66,18 +66,19 @@ function DateRangeFieldset({ legend, fromName, toName, fromValue, toValue, input
 export function SearchFilters({ query, years, vendors, products, cwes, selected }: SearchFiltersProps) {
   const sortValue = `${selected.sortBy}-${selected.sortOrder}`;
   const dateInputClasses =
-    "h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+    "h-10 w-full rounded-xl border border-border bg-background/50 px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   return (
-    <Card className="sticky top-24">
-      <CardHeader>
+    <Card className="lg:sticky lg:top-24">
+      <CardHeader className="border-b border-border/70 pb-4">
         <CardTitle className="flex items-center gap-2">
           <SlidersHorizontal className="size-4 text-accent" />
           Filter Pencarian
         </CardTitle>
+        <CardDescription>Pilih kriteria untuk mempersempit hasil.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action="/search" method="GET" className="flex flex-col gap-5">
+        <form action="/search" method="GET" className="flex flex-col gap-6">
           <input type="hidden" name="q" value={query} />
 
           <fieldset>
@@ -86,13 +87,13 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
               {SEVERITY_ORDER.map((tier) => {
                 const classes = SEVERITY_CLASSES[tier];
                 return (
-                  <label key={tier} className="flex items-center gap-2.5 text-sm text-foreground">
-                    <input
+                    <label key={tier} className="group flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-foreground transition-colors hover:bg-surface-hover">
+                      <input
                       type="checkbox"
                       name="severity"
                       value={tier}
                       defaultChecked={selected.severity.includes(tier)}
-                      className="size-4 rounded border-border accent-accent"
+                      className="size-4 rounded border-border accent-accent focus-visible:ring-2 focus-visible:ring-ring"
                     />
                     <span className={cn("size-2 rounded-full", classes.dot)} aria-hidden="true" />
                     {SEVERITY_LABEL_ID[tier]}
@@ -198,8 +199,8 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
 
           {selected.category && <input type="hidden" name="category" value={selected.category} />}
           {selected.category && (
-            <p className="text-xs text-muted-foreground">
-              Kategori: <span className="text-foreground">{CATEGORY_META[selected.category].name}</span>
+            <p className="rounded-lg border border-accent/20 bg-accent/8 px-3 py-2 text-xs text-muted-foreground">
+              Kategori aktif: <span className="font-medium text-accent">{CATEGORY_META[selected.category].name}</span>
             </p>
           )}
 

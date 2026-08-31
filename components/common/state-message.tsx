@@ -18,7 +18,7 @@ interface StateMessageProps {
  */
 export function StateMessage({ icon: Icon, title, description, tone = "neutral", action, className }: StateMessageProps) {
   return (
-    <div className={cn("glass flex flex-col items-center gap-3 rounded-2xl px-6 py-16 text-center", className)}>
+    <div className={cn("flex flex-col items-center gap-3 rounded-xl border border-border bg-surface px-6 py-16 text-center", className)}>
       <span
         className={cn(
           "flex size-12 items-center justify-center rounded-full",

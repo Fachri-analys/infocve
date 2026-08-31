@@ -8,7 +8,7 @@ export interface BreadcrumbItem {
 
 export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   return (
-    <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
+    <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-1.5 text-xs text-muted-foreground sm:text-sm">
       <Link href="/" className="flex items-center gap-1 hover:text-foreground" aria-label="Beranda">
         <Home className="size-3.5" />
       </Link>
@@ -20,7 +20,7 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
               {item.label}
             </Link>
           ) : (
-            <span className="data-tag text-foreground">{item.label}</span>
+            <span className="data-tag text-foreground" aria-current="page">{item.label}</span>
           )}
         </span>
       ))}

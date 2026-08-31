@@ -48,8 +48,8 @@ docs/        Dokumen ini dan panduan lainnya
 
 ## Masalah Umum
 
-- **Font:** Proyek ini memakai paket `@fontsource/*` (Space Grotesk, Plus
-  Jakarta Sans, JetBrains Mono) yang menyertakan berkas font langsung di
+- **Font:** Proyek ini memakai paket `@fontsource/*` (IBM Plex Sans dan IBM Plex
+  Mono) yang menyertakan berkas font langsung di
   `node_modules` — bukan `next/font/google`, yang mengunduh font dari
   `fonts.googleapis.com` saat build. Ini disengaja: lingkungan sandbox
   tempat proyek ini pertama kali dibangun tidak memiliki akses ke domain

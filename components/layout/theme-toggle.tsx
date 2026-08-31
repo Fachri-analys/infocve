@@ -14,6 +14,7 @@ export function ThemeToggle() {
       size="icon"
       onClick={toggleTheme}
       aria-label={theme === "dark" ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
+      title={theme === "dark" ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
       className="shrink-0"
     >
       {!mounted ? null : theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}

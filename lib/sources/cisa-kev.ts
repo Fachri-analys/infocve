@@ -1,5 +1,5 @@
-import { VulnerabilitySourceAdapter, SourceMetadata } from "./base";
-import type { CisaKevStatus } from "@/types/cve";
+import { BaseVulnerabilitySource, SourceConfig, SourceMetadata } from "./base";
+import type { CisaKevStatus, CVE } from "@/types/cve";
 
 export interface CisaKevEntry {
   cveID: string;
@@ -22,21 +22,29 @@ export interface CisaKevResponse {
   vulnerabilities: CisaKevEntry[];
 }
 
-export class CisaKevSourceAdapter implements VulnerabilitySourceAdapter {
-  metadata: SourceMetadata = {
-    id: "CISA_KEV",
-    name: "CISA Known Exploited Vulnerabilities Catalog",
-    description: "Daftar resmi kerentanan keamanan yang telah terbukti dieksploitasi di dunia nyata oleh penyerang siber.",
-    homepage: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
-    license: "Public Domain (US Government)",
-    updateFrequency: "Harian / Berkala",
-  };
+const CISA_KEV_METADATA: SourceMetadata = {
+  id: "CISA_KEV",
+  name: "CISA Known Exploited Vulnerabilities Catalog",
+  description: "Daftar resmi kerentanan keamanan yang telah terbukti dieksploitasi di dunia nyata oleh penyerang siber.",
+  homepage: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+  license: "Public Domain (US Government)",
+  updateFrequency: "Harian / Berkala",
+};
 
+export class CisaKevSourceAdapter extends BaseVulnerabilitySource<CisaKevResponse, CisaKevStatus> {
   private static cache: Map<string, CisaKevEntry> = new Map();
   private static lastFetched: number = 0;
   private static readonly TTL_MS = 1000 * 60 * 60 * 4; // 4 hours
 
   private static readonly FEED_URL = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
+
+  constructor(config?: SourceConfig) {
+    super(CISA_KEV_METADATA, {
+      cacheTtlSeconds: 14400,
+      timeoutMs: 15000,
+      ...config,
+    });
+  }
 
   async fetchCatalog(): Promise<Map<string, CisaKevEntry>> {
     const now = Date.now();
@@ -45,16 +53,7 @@ export class CisaKevSourceAdapter implements VulnerabilitySourceAdapter {
     }
 
     try {
-      const response = await fetch(CisaKevSourceAdapter.FEED_URL, {
-        next: { revalidate: 14400 },
-        headers: { "User-Agent": "InfoCVE/0.1.0" },
-      });
-
-      if (!response.ok) {
-        throw new Error(`CISA KEV HTTP error: ${response.status}`);
-      }
-
-      const data = (await response.json()) as CisaKevResponse;
+      const data = await this.fetchHttp<CisaKevResponse>(CisaKevSourceAdapter.FEED_URL);
       const map = new Map<string, CisaKevEntry>();
       for (const vuln of data.vulnerabilities || []) {
         map.set(vuln.cveID.toUpperCase(), vuln);
@@ -95,5 +94,20 @@ export class CisaKevSourceAdapter implements VulnerabilitySourceAdapter {
     } catch {
       return false;
     }
+  }
+
+  override async enrichCve(cve: CVE): Promise<CVE> {
+    const status = await this.fetchById(cve.id).catch(() => null);
+    if (!status?.isKev) return cve;
+
+    const sources = new Set(cve.sources || ["NVD"]);
+    sources.add("CISA_KEV");
+
+    return {
+      ...cve,
+      cisaKev: status,
+      hasPoc: cve.hasPoc || true,
+      sources: Array.from(sources),
+    };
   }
 }

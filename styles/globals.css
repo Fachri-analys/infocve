@@ -18,17 +18,17 @@
   color since no adjustment is needed there.
 */
 :root {
-  --color-background: #0a0e1a;
-  --color-background-raised: #0d1220;
-  --color-foreground: #e8ecf7;
-  --color-muted-foreground: #8b95ac;
-  --color-surface: #121a2e;
-  --color-surface-hover: #182444;
-  --color-border: #232f4d;
-  --color-border-hover: #37456b;
-  --color-accent: #7c9bff;
-  --color-accent-foreground: #0a0e1a;
-  --color-ring: #7c9bff;
+  --color-background: #080c16;
+  --color-background-raised: #0c1220;
+  --color-foreground: #edf2ff;
+  --color-muted-foreground: #98a5bd;
+  --color-surface: #111a2b;
+  --color-surface-hover: #19263d;
+  --color-border: #273650;
+  --color-border-hover: #4a5f84;
+  --color-accent: #91a9ff;
+  --color-accent-foreground: #0a1020;
+  --color-ring: #91a9ff;
 
   --color-severity-critical: #f0453b;
   --color-severity-high: #fb923c;
@@ -42,21 +42,21 @@
   --color-severity-low-fg: var(--color-severity-low);
   --color-severity-none-fg: var(--color-severity-none);
 
-  --shadow-glass: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+  --shadow-glass: none;
 }
 
 .light {
-  --color-background: #f6f7fb;
+  --color-background: #f7f8fc;
   --color-background-raised: #ffffff;
   --color-foreground: #12172a;
-  --color-muted-foreground: #565f78;
+  --color-muted-foreground: #58637c;
   --color-surface: #ffffff;
-  --color-surface-hover: #eef1f9;
-  --color-border: #e1e5f0;
-  --color-border-hover: #c7cde0;
-  --color-accent: #4a5fd6;
+  --color-surface-hover: #eef2fa;
+  --color-border: #dfe5f0;
+  --color-border-hover: #c1cbe0;
+  --color-accent: #5369dc;
   --color-accent-foreground: #ffffff;
-  --color-ring: #4a5fd6;
+  --color-ring: #5369dc;
 
   /* Verified >= 4.5:1 (WCAG AA, normal text) against each color's own
      12%-opacity badge background — see the audit summary for the exact
@@ -67,7 +67,7 @@
   --color-severity-low-fg: #075985;
   --color-severity-none-fg: #3f4759;
 
-  --shadow-glass: 0 1px 0 0 rgba(255, 255, 255, 0.6) inset, 0 20px 40px -24px rgba(18, 23, 42, 0.18);
+  --shadow-glass: none;
 }
 
 @theme inline {
@@ -95,9 +95,9 @@
   --color-severity-low-fg: var(--color-severity-low-fg);
   --color-severity-none-fg: var(--color-severity-none-fg);
 
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
   --animate-ticker: ticker 42s linear infinite;
   --animate-fade-up: fade-up 0.5s ease-out both;
@@ -138,15 +138,8 @@ html.light {
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
-  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent),
-    radial-gradient(1px 1px at 20px 30px, color-mix(in srgb, var(--color-foreground) 6%, transparent) 1px, transparent 1px),
-    radial-gradient(1px 1px at 65px 90px, color-mix(in srgb, var(--color-foreground) 5%, transparent) 1px, transparent 1px),
-    radial-gradient(1px 1px at 110px 45px, color-mix(in srgb, var(--color-foreground) 4%, transparent) 1px, transparent 1px);
-  background-size: 100% 640px, 140px 140px, 140px 140px, 140px 140px;
-  background-repeat: no-repeat, repeat, repeat, repeat;
-  background-attachment: fixed;
+  font-family: var(--font-body);
+  line-height: 1.5;
 }
 
 ::selection {
@@ -159,18 +152,64 @@ body {
   outline-offset: 2px;
 }
 
-/* Glass surface used by cards throughout the app */
+/* Kept as a compatibility utility for legacy surfaces; cards use solid surfaces. */
 .glass {
-  background-color: color-mix(in srgb, var(--color-surface) 68%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
-  box-shadow: var(--shadow-glass);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.page-intro {
+  max-width: 46rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.content-heading {
+  text-wrap: balance;
+}
+
+.prose-info {
+  color: var(--color-muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.8;
+}
+
+.prose-info h2,
+.prose-info h3 {
+  color: var(--color-foreground);
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.prose-info h2 {
+  font-size: 1.1rem;
+}
+
+.prose-info h3 {
+  font-size: 0.95rem;
+}
+
+.prose-info a {
+  color: var(--color-accent);
+  text-decoration-line: underline;
+  text-underline-offset: 0.18em;
 }
 
 /* CVE ID / technical data treatment used across cards, hero, detail pages */
 .data-tag {
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: var(--font-mono);
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
 }

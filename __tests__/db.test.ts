@@ -47,6 +47,8 @@ describe("Database & CVE Repository", () => {
     expect(retrieved?.title).toBe("SQL Injection in Test App");
     expect(retrieved?.cvss.baseScore).toBe(9.2);
     expect(retrieved?.cvss.severity).toBe("CRITICAL");
+    expect(retrieved?.cvss.attackVector).toBe("NETWORK");
+    expect(retrieved?.cvss.confidentialityImpact).toBe("HIGH");
     expect(retrieved?.cisaKev?.isKev).toBe(true);
     expect(retrieved?.epss?.score).toBe(0.85);
     expect(retrieved?.hasPoc).toBe(true);

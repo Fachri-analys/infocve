@@ -1,4 +1,4 @@
-﻿name: Scheduled Sync & Health Check
+name: Scheduled Sync & Health Check
 
 on:
   schedule:
@@ -27,7 +27,8 @@ jobs:
           RESPONSE=$(curl -sS -w "\n%{http_code}" \
             -X POST "${DEPLOY_URL}/api/sync" \
             -H "Authorization: Bearer ${ADMIN_SECRET}" \
-            -H "Content-Type: application/json")
+            -H "Content-Type: application/json" \
+            -d "{\"force\": ${{ github.event.inputs.force_sync || 'false' }}}")
 
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | head -n -1)

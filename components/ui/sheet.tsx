@@ -40,7 +40,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof DialogPrimitive.Co
           <DialogPrimitive.Title className="font-display text-base font-medium">
             {title}
           </DialogPrimitive.Title>
-          <DialogPrimitive.Close className="rounded-full p-1.5 text-muted-foreground hover:bg-surface-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+      <DialogPrimitive.Close className="rounded-lg p-1.5 text-muted-foreground hover:bg-surface-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <X className="size-4" />
             <span className="sr-only">Tutup menu</span>
           </DialogPrimitive.Close>

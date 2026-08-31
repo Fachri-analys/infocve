@@ -36,19 +36,22 @@ const values = [
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <Breadcrumb items={[{ label: "Tentang" }]} />
 
-      <h1 className="font-display text-2xl font-medium text-foreground sm:text-3xl">Tentang InfoCVE</h1>
-      <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+      <div className="page-intro">
+        <p className="eyebrow mb-3 text-[10px]">Mengenal InfoCVE</p>
+        <h1 className="content-heading font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Tentang InfoCVE</h1>
+      <p className="mt-4 text-base leading-8 text-muted-foreground">
         InfoCVE adalah proyek edukasi yang bertujuan membantu pelajar, developer, dan siapa pun di Indonesia memahami
         kerentanan keamanan siber (CVE) dengan lebih mudah. Alih-alih hanya menyalin data teknis mentah, setiap
         kerentanan dilengkapi penjelasan Bahasa Indonesia yang ramah pemula, di samping deskripsi aslinya.
       </p>
+      </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {values.map((value) => (
-          <Card key={value.title} className="p-5">
+          <Card key={value.title} className="p-5 transition-[border-color,background-color] hover:border-accent/35 hover:bg-surface-hover/25 sm:p-6">
             <span className="flex size-9 items-center justify-center rounded-xl bg-accent/12 text-accent">
               <value.icon className="size-4" />
             </span>

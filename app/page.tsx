@@ -1,11 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, ShieldAlert } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Database } from "lucide-react";
 
 import { SearchBar } from "@/components/search/search-bar";
 import { CVECard } from "@/components/cve/cve-card";
-import { CVETicker } from "@/components/cve/cve-ticker";
 import { CategoryCard } from "@/components/cve/category-card";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   getCategories,
@@ -33,39 +31,46 @@ export default async function HomePage() {
   const featuredTerms = glossaryTerms.slice(0, 4);
 
   return (
-    <div>
-      <CVETicker cves={latest} />
-
+    <div className="min-h-full">
       {/* HERO */}
-      <section className="relative overflow-hidden px-4 pb-16 pt-14 sm:px-6 sm:pt-20 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="data-tag inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs text-muted-foreground">
-            <ShieldAlert className="size-3.5 text-accent" />
-            Dibuat untuk pengguna Indonesia
-          </span>
-          <h1 className="mt-5 font-display text-4xl font-medium leading-[1.1] tracking-tight text-foreground sm:text-5xl">
-            Pahami kerentanan siber,{" "}
-            <span className="text-accent">tanpa harus jadi ahli</span> dulu.
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">{SITE_DESCRIPTION}</p>
+      <section className="border-b border-border bg-background-raised/35">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-20 lg:px-8 lg:py-24">
+          <div className="max-w-3xl">
+            <p className="eyebrow mb-5 text-[10px]">Basis pengetahuan keamanan siber</p>
+            <h1 className="content-heading max-w-2xl font-display text-4xl font-medium leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
+              Pahami kerentanan siber dengan lebih jelas.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">{SITE_DESCRIPTION}</p>
 
-          <div className="mx-auto mt-8 max-w-xl">
-            <SearchBar size="lg" />
+            <div className="mt-8 max-w-2xl">
+              <SearchBar size="lg" />
+              <p className="mt-3 text-xs text-muted-foreground">
+                Cari berdasarkan CVE ID, vendor, produk, atau kata kunci.
+              </p>
+            </div>
+
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+              <Link href="/search?severity=CRITICAL" className="inline-flex items-center gap-1 text-accent underline-offset-4 hover:underline">
+                Jelajahi CVE kritis <ArrowUpRight className="size-3.5" />
+              </Link>
+              <Link href="/glossary" className="inline-flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+                Pelajari istilah <ArrowUpRight className="size-3.5" />
+              </Link>
+            </div>
           </div>
 
-          <div className="mx-auto mt-8 flex max-w-md items-center justify-around gap-4 text-center">
-            <div>
-              <p className="font-display text-xl font-medium text-foreground">{formatNumberId(stats.total)}</p>
-              <p className="text-xs text-muted-foreground">CVE Tersedia</p>
-            </div>
-            <div>
-              <p className="font-display text-xl font-medium text-severity-critical-fg">{formatNumberId(stats.critical)}</p>
-              <p className="text-xs text-muted-foreground">Tingkat Kritis</p>
-            </div>
-            <div>
-              <p className="font-display text-xl font-medium text-foreground">{formatNumberId(stats.vendors)}</p>
-              <p className="text-xs text-muted-foreground">Vendor</p>
-            </div>
+          <div className="border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+            <p className="eyebrow text-[10px]">Ringkasan data</p>
+            <dl className="mt-5 divide-y divide-border border-y border-border">
+              <StatItem value={formatNumberId(stats.total)} label="CVE tersedia" />
+              <StatItem value={formatNumberId(stats.critical)} label="tingkat kritis" tone="critical" />
+              <StatItem value={formatNumberId(stats.vendors)} label="vendor" />
+            </dl>
+            <Link href="/sources" className="mt-5 inline-flex items-center gap-1.5 text-xs text-muted-foreground underline-offset-4 hover:text-accent hover:underline">
+              <Database className="size-3.5" />
+              Lihat sumber data
+              <ArrowRight className="size-3.5" />
+            </Link>
           </div>
         </div>
       </section>
@@ -83,8 +88,8 @@ export default async function HomePage() {
         </div>
       </SectionShell>
 
-      {/* CRITICAL CVEs — tinted band */}
-      <div className="border-y border-severity-critical/15 bg-severity-critical/[0.04]">
+      {/* CRITICAL CVEs */}
+      <div className="border-y border-border">
         <SectionShell
           title="CVE Tingkat Kritis"
           description="Kerentanan dengan dampak paling parah — perlu perhatian dan penambalan segera."
@@ -98,8 +103,8 @@ export default async function HomePage() {
         </SectionShell>
       </div>
 
-      {/* HIGH SEVERITY CVEs — tinted band */}
-      <div className="border-b border-severity-high/15 bg-severity-high/[0.04]">
+      {/* HIGH SEVERITY CVEs */}
+      <div className="border-b border-border">
         <SectionShell
           title="CVE Tingkat Tinggi"
           description="Signifikan dan patut diwaspadai, meski tidak seekstrem tingkat kritis."
@@ -115,35 +120,9 @@ export default async function HomePage() {
 
       {/* VENDORS & PRODUCTS */}
       <SectionShell title="Vendor & Produk" description="Jelajahi kerentanan berdasarkan vendor atau produk tertentu.">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <Card className="p-5 sm:p-6">
-            <h3 className="mb-4 font-display text-sm font-medium text-foreground">Vendor Terbaru</h3>
-            <div className="flex flex-wrap gap-2">
-              {vendors.map((v) => (
-                <Link
-                  key={v.value}
-                  href={`/search?vendor=${encodeURIComponent(v.value)}`}
-                  className="rounded-full border border-border bg-surface-hover/50 px-3 py-1.5 text-xs text-foreground transition-colors hover:border-accent/40 hover:text-accent"
-                >
-                  {v.value} <span className="text-muted-foreground">({v.count})</span>
-                </Link>
-              ))}
-            </div>
-          </Card>
-          <Card className="p-5 sm:p-6">
-            <h3 className="mb-4 font-display text-sm font-medium text-foreground">Produk Terbaru</h3>
-            <div className="flex flex-wrap gap-2">
-              {products.map((p) => (
-                <Link
-                  key={p.value}
-                  href={`/search?product=${encodeURIComponent(p.value)}`}
-                  className="rounded-full border border-border bg-surface-hover/50 px-3 py-1.5 text-xs text-foreground transition-colors hover:border-accent/40 hover:text-accent"
-                >
-                  {p.value} <span className="text-muted-foreground">({p.count})</span>
-                </Link>
-              ))}
-            </div>
-          </Card>
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-16">
+          <FacetList title="Vendor terbaru" items={vendors} parameter="vendor" />
+          <FacetList title="Produk terbaru" items={products} parameter="product" />
         </div>
       </SectionShell>
 
@@ -157,31 +136,28 @@ export default async function HomePage() {
       </SectionShell>
 
       {/* LEARNING SECTION */}
-      <section className="px-4 py-16 sm:px-6 lg:px-8">
+      <section className="border-t border-border/70 px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
-          <Card className="grid grid-cols-1 gap-8 p-6 sm:p-10 lg:grid-cols-2 lg:items-center">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-accent/12 px-3 py-1 text-xs font-medium text-accent">
-                <BookOpen className="size-3.5" />
-                Belajar Keamanan Siber
-              </span>
-              <h2 className="mt-4 font-display text-2xl font-medium leading-snug text-foreground">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
+            <div className="max-w-md">
+              <p className="eyebrow text-[10px]">Belajar keamanan siber</p>
+              <h2 className="content-heading mt-4 font-display text-2xl font-medium leading-snug text-foreground">
                 Bingung dengan istilah seperti RCE atau IDOR?
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                 Glosarium kami menjelaskan istilah-istilah keamanan siber yang paling sering muncul, dengan bahasa
                 Indonesia yang sederhana — cocok untuk pemula sekalipun.
               </p>
-              <Button asChild className="mt-6">
+              <Button asChild variant="link" className="mt-5">
                 <Link href="/glossary">
                   Buka Glosarium
                   <ArrowRight />
                 </Link>
               </Button>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-0 border-y border-border sm:grid-cols-2 sm:gap-x-8">
               {featuredTerms.map((term) => (
-                <div key={term.slug} className="rounded-xl border border-border bg-surface-hover/40 p-4">
+                <div key={term.slug} className="border-b border-border py-4 last:border-b-0">
                   <p className="data-tag text-sm font-medium text-accent">{term.term}</p>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                     {truncate(term.definitionId, 90)}
@@ -189,7 +165,7 @@ export default async function HomePage() {
                 </div>
               ))}
             </div>
-          </Card>
+          </div>
         </div>
       </section>
     </div>
@@ -210,9 +186,9 @@ function SectionShell({
   return (
     <section className="px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
           <div>
-            <h2 className="font-display text-xl font-medium text-foreground sm:text-2xl">{title}</h2>
+            <h2 className="content-heading font-display text-xl font-medium text-foreground sm:text-2xl">{title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{description}</p>
           </div>
           {href && (
@@ -225,5 +201,39 @@ function SectionShell({
         {children}
       </div>
     </section>
+  );
+}
+
+function StatItem({ value, label, tone = "default" }: { value: string; label: string; tone?: "default" | "critical" }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 py-4">
+      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dd className={tone === "critical" ? "data-tag text-xl font-medium text-severity-critical-fg" : "data-tag text-xl font-medium text-foreground"}>
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+function FacetList({ title, items, parameter }: { title: string; items: { value: string; count: number }[]; parameter: "vendor" | "product" }) {
+  return (
+    <div>
+      <h3 className="font-display text-base font-medium text-foreground">{title}</h3>
+      <ul className="mt-3 divide-y divide-border border-y border-border">
+        {items.map((item) => (
+          <li key={item.value}>
+            <Link
+              href={`/search?${parameter}=${encodeURIComponent(item.value)}`}
+              className="group flex items-center justify-between gap-4 py-3 text-sm transition-colors hover:text-accent"
+            >
+              <span className="truncate text-foreground group-hover:text-accent">{item.value}</span>
+              <span className="inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground group-hover:text-accent">
+                {item.count} CVE <ArrowUpRight className="size-3" />
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

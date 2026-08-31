@@ -32,16 +32,16 @@ export function CategoryCard({ slug, name, descriptionId, count }: CategoryCardP
   const Icon = CATEGORY_ICONS[slug];
 
   return (
-    <Link href={`/search?category=${slug}`} className="block h-full">
-      <Card className="flex h-full flex-col gap-3 p-5 transition-transform duration-200 hover:-translate-y-0.5 hover:border-border-hover">
+    <Link href={`/search?category=${slug}`} className="group block h-full">
+      <Card className="flex h-full flex-col gap-3 p-5 transition-colors duration-200 hover:border-accent/45 hover:bg-surface-hover/25">
         <div className="flex items-center justify-between">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-accent/12 text-accent">
+          <span className="flex size-10 items-center justify-center rounded-lg bg-accent/12 text-accent">
             <Icon className="size-5" />
           </span>
-          <span className="data-tag text-xs text-muted-foreground">{count} CVE</span>
+          <span className="data-tag rounded-md border border-border bg-background/50 px-2 py-1 text-[11px] text-muted-foreground">{count} CVE</span>
         </div>
         <div>
-          <h3 className="font-display text-sm font-medium text-foreground">{name}</h3>
+          <h3 className="font-display text-sm font-medium text-foreground transition-colors group-hover:text-accent">{name}</h3>
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{descriptionId}</p>
         </div>
       </Card>

@@ -44,7 +44,7 @@ export function Footer() {
               ))}
               <li>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/Fachri-analys/infocve"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"

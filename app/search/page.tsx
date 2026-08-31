@@ -115,21 +115,24 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <Breadcrumb items={[{ label: "Cari CVE" }]} />
 
-      <h1 className="font-display text-2xl font-medium text-foreground sm:text-3xl">Cari CVE</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <div className="page-intro">
+        <p className="eyebrow mb-3 text-[10px]">Eksplorasi kerentanan</p>
+        <h1 className="content-heading font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Cari CVE</h1>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
         {result.total > 0
           ? `Menampilkan ${result.results.length} dari ${result.total} hasil.`
           : "Masukkan kata kunci atau gunakan filter di samping."}
       </p>
+      </div>
 
-      <div className="mt-6">
+      <div className="mt-7 max-w-3xl">
         <SearchBar defaultValue={params.query} />
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr]">
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
         <aside>
           <SearchFilters
             query={params.query ?? ""}
@@ -154,7 +157,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           />
         </aside>
 
-        <div>
+        <section aria-label="Hasil pencarian">
+          <div className="mb-5 flex items-center justify-between gap-4 border-y border-border py-3">
+            <div>
+              <p className="text-sm font-medium text-foreground">Hasil pencarian</p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {params.query ? `Untuk “${params.query}”` : "Semua kerentanan yang tersedia"}
+              </p>
+            </div>
+            <span className="data-tag rounded-md bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
+              {result.total} CVE
+            </span>
+          </div>
           {result.results.length === 0 ? (
             <EmptyState />
           ) : (
@@ -169,7 +183,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               </div>
             </>
           )}
-        </div>
+        </section>
       </div>
     </div>
   );

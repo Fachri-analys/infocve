@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 import type { GlossaryTerm } from "@/types";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -25,16 +25,32 @@ export function GlossaryFilter({ terms }: { terms: GlossaryTerm[] }) {
 
   return (
     <div>
-      <div className="relative mb-6">
+      <div className="relative mb-3">
         <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <input
+          id="glossary-search"
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Cari istilah, misalnya “XSS” atau “akses”…"
           aria-label="Cari istilah glosarium"
-          className="h-12 w-full rounded-full border border-border bg-surface pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-12 w-full rounded-xl border border-border bg-surface pl-11 pr-12 text-sm text-foreground placeholder:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
+        {query && (
+          <button
+            type="button"
+            onClick={() => setQuery("")}
+            aria-label="Hapus pencarian istilah"
+            className="absolute right-3 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-surface-hover hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+      </div>
+
+      <div className="mb-5 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+        <span>{filtered.length} istilah ditampilkan</span>
+        <span className="hidden sm:inline">Pilih istilah untuk membuka penjelasan</span>
       </div>
 
       {filtered.length === 0 ? (
