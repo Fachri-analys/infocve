@@ -34,52 +34,103 @@ const CISA_KEV_METADATA: SourceMetadata = {
 export class CisaKevSourceAdapter extends BaseVulnerabilitySource<CisaKevResponse, CisaKevStatus> {
   private static cache: Map<string, CisaKevEntry> = new Map();
   private static lastFetched: number = 0;
+  private static pendingPromise: Promise<Map<string, CisaKevEntry>> | null = null;
   private static readonly TTL_MS = 1000 * 60 * 60 * 4; // 4 hours
 
   private static readonly FEED_URL = "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
 
   constructor(config?: SourceConfig) {
     super(CISA_KEV_METADATA, {
-      cacheTtlSeconds: 14400,
+      baseUrl: "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+      cacheTtlSeconds: 14400, // 4 hours
       timeoutMs: 15000,
+      rateLimit: { maxRequests: 30, windowMs: 60000 },
       ...config,
     });
   }
 
+  /** For test harness only: clear in-memory state */
+  static resetState(): void {
+    CisaKevSourceAdapter.cache = new Map();
+    CisaKevSourceAdapter.lastFetched = 0;
+    CisaKevSourceAdapter.pendingPromise = null;
+  }
+
+  /**
+   * Fetch the full CISA KEV catalog with in-memory caching and in-flight request deduplication
+   * to ensure minimal network requests to CISA CDN.
+   */
   async fetchCatalog(): Promise<Map<string, CisaKevEntry>> {
     const now = Date.now();
     if (CisaKevSourceAdapter.cache.size > 0 && now - CisaKevSourceAdapter.lastFetched < CisaKevSourceAdapter.TTL_MS) {
       return CisaKevSourceAdapter.cache;
     }
 
-    try {
-      const data = await this.fetchHttp<CisaKevResponse>(CisaKevSourceAdapter.FEED_URL);
-      const map = new Map<string, CisaKevEntry>();
-      for (const vuln of data.vulnerabilities || []) {
-        map.set(vuln.cveID.toUpperCase(), vuln);
-      }
-
-      CisaKevSourceAdapter.cache = map;
-      CisaKevSourceAdapter.lastFetched = now;
-      return map;
-    } catch (err) {
-      console.error("[CISA_KEV] Failed to fetch catalog:", err);
-      return CisaKevSourceAdapter.cache;
+    if (CisaKevSourceAdapter.pendingPromise) {
+      return CisaKevSourceAdapter.pendingPromise;
     }
+
+    CisaKevSourceAdapter.pendingPromise = (async () => {
+      try {
+        const feedUrl = this.config.baseUrl || CisaKevSourceAdapter.FEED_URL;
+        const data = await this.fetchHttp<unknown>(feedUrl, {
+          next: { revalidate: this.config.cacheTtlSeconds, tags: ["cisa-kev"] },
+        });
+
+        if (
+          !data ||
+          typeof data !== "object" ||
+          !("vulnerabilities" in data) ||
+          !Array.isArray((data as { vulnerabilities: unknown }).vulnerabilities)
+        ) {
+          return CisaKevSourceAdapter.cache;
+        }
+
+        const response = data as CisaKevResponse;
+        const map = new Map<string, CisaKevEntry>();
+        for (const vuln of response.vulnerabilities || []) {
+          if (vuln && vuln.cveID) {
+            map.set(vuln.cveID.trim().toUpperCase(), vuln);
+          }
+        }
+
+        CisaKevSourceAdapter.cache = map;
+        CisaKevSourceAdapter.lastFetched = Date.now();
+        return map;
+      } catch (err) {
+        console.error("[CISA_KEV] Failed to fetch catalog feed:", err);
+        return CisaKevSourceAdapter.cache;
+      } finally {
+        CisaKevSourceAdapter.pendingPromise = null;
+      }
+    })();
+
+    return CisaKevSourceAdapter.pendingPromise;
   }
 
   async fetchById(cveId: string): Promise<CisaKevStatus | null> {
-    const map = await this.fetchCatalog();
-    const entry = map.get(cveId.toUpperCase());
-    if (!entry) return null;
+    const normalizedId = cveId?.trim().toUpperCase();
+    if (!normalizedId || !/^CVE-\d{4}-\d{4,}$/.test(normalizedId)) {
+      return null;
+    }
 
-    return {
-      isKev: true,
-      dateAdded: entry.dateAdded,
-      dueDate: entry.dueDate,
-      requiredAction: entry.requiredAction,
-      notes: entry.notes,
-    };
+    try {
+      const map = await this.fetchCatalog();
+      const entry = map.get(normalizedId);
+      if (!entry) {
+        return { isKev: false };
+      }
+
+      return {
+        isKev: true,
+        dateAdded: entry.dateAdded,
+        dueDate: entry.dueDate,
+        requiredAction: entry.requiredAction,
+        notes: entry.notes,
+      };
+    } catch {
+      return { isKev: false };
+    }
   }
 
   async fetchLatest(limit = 10): Promise<CisaKevEntry[]> {
@@ -98,7 +149,12 @@ export class CisaKevSourceAdapter extends BaseVulnerabilitySource<CisaKevRespons
 
   override async enrichCve(cve: CVE): Promise<CVE> {
     const status = await this.fetchById(cve.id).catch(() => null);
-    if (!status?.isKev) return cve;
+    if (!status || !status.isKev) {
+      return {
+        ...cve,
+        cisaKev: status || { isKev: false },
+      };
+    }
 
     const sources = new Set(cve.sources || ["NVD"]);
     sources.add("CISA_KEV");
