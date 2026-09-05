@@ -3,10 +3,35 @@ import "server-only";
 import type { NvdCveApiResponse, NvdErrorResponse, NvdQueryParams } from "@/lib/nvd-types";
 
 const NVD_BASE_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0";
-const DEFAULT_TIMEOUT_MS = 10_000;
+const DEFAULT_TIMEOUT_MS = 15_000;
 const MAX_ATTEMPTS = 4; // 1 initial try + up to 3 retries
 const BASE_RETRY_DELAY_MS = 800;
 const MAX_RETRY_DELAY_MS = 12_000;
+
+class NvdRateLimiter {
+  private timestamps: number[] = [];
+
+  async acquire(hasApiKey: boolean): Promise<void> {
+    const maxRequests = hasApiKey ? 45 : 5;
+    const windowMs = 30_000;
+    const now = Date.now();
+
+    this.timestamps = this.timestamps.filter((t) => now - t < windowMs);
+
+    if (this.timestamps.length >= maxRequests) {
+      const oldest = this.timestamps[0] ?? now;
+      const waitTime = windowMs - (now - oldest) + 100;
+      if (waitTime > 0) {
+        await sleep(waitTime);
+      }
+      return this.acquire(hasApiKey);
+    }
+
+    this.timestamps.push(Date.now());
+  }
+}
+
+const nvdRateLimiter = new NvdRateLimiter();
 
 export type NvdErrorKind =
   | "timeout"
@@ -137,9 +162,14 @@ export async function fetchNvd(params: NvdQueryParams, options: FetchNvdOptions 
   const revalidate = options.revalidateSeconds ?? 3600;
   const url = buildUrl(params);
   const apiKey = process.env.NVD_API_KEY?.trim();
-  const headers: HeadersInit = apiKey ? { apiKey } : {};
+  const headers: HeadersInit = {
+    "User-Agent": "InfoCVE/0.1.0 (Security Intelligence Platform)",
+    ...(apiKey ? { apiKey } : {}),
+  };
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    await nvdRateLimiter.acquire(Boolean(apiKey));
+
     const controller = new AbortController();
     const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
 
