@@ -14,6 +14,7 @@ import { ReferenceCard } from "@/components/cve/reference-card";
 import { Timeline } from "@/components/cve/timeline";
 import { EPSSCard } from "@/components/cve/epss-card";
 import { CisaKevCard } from "@/components/cve/cisa-kev-card";
+import { PriorityCard } from "@/components/cve/priority-card";
 import { SourceBadge } from "@/components/cve/source-badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -200,6 +201,7 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
             </CardContent>
           </Card>
 
+          <PriorityCard priority={cve.priority} />
           <CVSSCard cvss={cve.cvss} />
           <EPSSCard epss={cve.epss} />
         </div>

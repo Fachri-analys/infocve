@@ -84,6 +84,24 @@ export interface CisaKevStatus {
   notes?: string;
 }
 
+export type PriorityLevel = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+
+export interface PriorityAssessment {
+  level: PriorityLevel;
+  tier: "P1" | "P2" | "P3" | "P4";
+  labelId: string;
+  reasons: string[];
+  factors: {
+    inCisaKev: boolean;
+    cvssScore?: number;
+    cvssSeverity?: Severity;
+    epssScore?: number;
+    epssPercentile?: number;
+    hasPoc: boolean;
+  };
+  disclaimer: string;
+}
+
 export interface CVE {
   id: string; // "CVE-2021-44228"
   title: string;
@@ -102,6 +120,7 @@ export interface CVE {
   epss?: EPSSScore;
   cisaKev?: CisaKevStatus;
   hasPoc?: boolean;
+  priority?: PriorityAssessment;
   sources?: string[]; // e.g. ["NVD", "CISA_KEV", "EPSS", "GHSA"]
 }
 

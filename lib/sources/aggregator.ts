@@ -5,6 +5,7 @@ import { GhsaSourceAdapter } from "./ghsa";
 import { PocClassifier } from "./poc";
 import { CveRepository } from "@/lib/db/cve-repository";
 import { sourceRegistry } from "./registry";
+import { calculatePriority } from "@/lib/priority";
 
 const cisaKevAdapter = new CisaKevSourceAdapter();
 const epssAdapter = new EpssSourceAdapter();
@@ -66,13 +67,19 @@ export class ThreatIntelligenceAggregator {
       sourcesSet.add("EPSS");
     }
 
-    const enrichedCve: CVE = {
+    const preliminaryCve: CVE = {
       ...cve,
       references: enrichedRefs,
       cisaKev: cisaKev || cve.cisaKev,
       epss: epss || cve.epss,
       hasPoc: hasPoc || cve.hasPoc || (cisaKev?.isKev ?? false),
       sources: Array.from(sourcesSet),
+    };
+
+    const priority = calculatePriority(preliminaryCve);
+    const enrichedCve: CVE = {
+      ...preliminaryCve,
+      priority,
     };
 
     // 3. Persist to local database with provenance tracking if requested
@@ -119,13 +126,19 @@ export class ThreatIntelligenceAggregator {
       if (cisaKev?.isKev) sourcesSet.add("CISA_KEV");
       if (epss) sourcesSet.add("EPSS");
 
-      const enrichedItem: CVE = {
+      const preliminaryItem: CVE = {
         ...cve,
         references: enrichedRefs,
         cisaKev,
         epss: epss || cve.epss,
         hasPoc: hasPoc || cve.hasPoc || (cisaKev?.isKev ?? false),
         sources: Array.from(sourcesSet),
+      };
+
+      const priority = calculatePriority(preliminaryItem);
+      const enrichedItem: CVE = {
+        ...preliminaryItem,
+        priority,
       };
 
       if (saveToDb) {
