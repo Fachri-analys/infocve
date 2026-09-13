@@ -382,7 +382,7 @@ export async function getCVEsByYear(year: number, limit = 50): Promise<CVE[]> {
 // accuracy tradeoff this implies versus a true global count.
 // ---------------------------------------------------------------------------
 
-async function getFacetSample(): Promise<CVE[]> {
+export async function getFacetSample(): Promise<CVE[]> {
   const end = new Date();
   const start = new Date(end.getTime() - MAX_DATE_RANGE_DAYS * 24 * 60 * 60 * 1000);
   const { cves } = await fetchNormalized(

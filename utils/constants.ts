@@ -9,6 +9,7 @@ export const DEFAULT_PAGE_SIZE = 6;
 
 export const NAV_LINKS: NavLink[] = [
   { href: "/", label: "Beranda" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/search", label: "Cari CVE" },
   { href: "/sources", label: "Sumber Data" },
   { href: "/glossary", label: "Glosarium" },
