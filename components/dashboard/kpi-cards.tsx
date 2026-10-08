@@ -74,18 +74,18 @@ export function KpiCards({ data }: KpiCardsProps) {
         const content = (
           <Card
             key={card.label}
-            className="border-border transition-all duration-300 ease-out hover:border-accent/40 hover:bg-background-raised/50 hover:shadow-md hover:shadow-black/5"
+            className="border-border transition-all duration-300 ease-out hover:border-accent/40 hover:bg-background-raised/50 hover:shadow-md hover:shadow-black/5 h-full flex flex-col justify-between"
           >
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground">{card.label}</p>
-                  <h3 className="mt-2 font-mono text-3xl font-semibold tracking-tight text-foreground">
+            <CardContent className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium text-muted-foreground truncate">{card.label}</p>
+                  <h3 className="mt-2 font-mono text-2xl sm:text-3xl font-semibold tracking-tight text-foreground truncate">
                     {card.value}
                   </h3>
-                  <p className="mt-1.5 text-xs text-muted-foreground">{card.subtext}</p>
+                  <p className="mt-1.5 text-xs text-muted-foreground line-clamp-1">{card.subtext}</p>
                 </div>
-                <div className={`flex size-10 items-center justify-center rounded-lg ${card.bgColor} transition-transform duration-300 ease-out group-hover:scale-110`}>
+                <div className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${card.bgColor} transition-transform duration-300 ease-out group-hover:scale-110`}>
                   <Icon className={`size-5 ${card.iconColor}`} />
                 </div>
               </div>
@@ -95,13 +95,13 @@ export function KpiCards({ data }: KpiCardsProps) {
 
         if (card.href) {
           return (
-            <Link key={card.label} href={card.href} className="group block transition-transform duration-300 ease-out hover:-translate-y-1">
+            <Link key={card.label} href={card.href} className="group block h-full transition-transform duration-300 ease-out hover:-translate-y-1">
               {content}
             </Link>
           );
         }
 
-        return <div key={card.label}>{content}</div>;
+        return <div key={card.label} className="h-full">{content}</div>;
       })}
     </div>
   );

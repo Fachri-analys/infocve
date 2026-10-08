@@ -23,12 +23,12 @@ export function CisaKevCard({ cisaKev }: { cisaKev?: CisaKevStatus }) {
   return (
     <Card className="border-red-500/30 bg-red-500/5">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle className="flex items-center gap-2 text-base text-red-600 dark:text-red-400">
-            <ShieldAlert className="size-5" />
-            Tercantum dalam Katalog CISA KEV
+            <ShieldAlert className="size-5 shrink-0" />
+            <span>Tercantum dalam Katalog CISA KEV</span>
           </CardTitle>
-          <span className="rounded-md border border-red-500/30 bg-red-500/20 px-2.5 py-0.5 text-xs font-bold text-red-600 dark:text-red-400">
+          <span className="rounded-md border border-red-500/30 bg-red-500/20 px-2.5 py-0.5 text-xs font-bold text-red-600 dark:text-red-400 shrink-0">
             TERDAFTAR DALAM KEV
           </span>
         </div>

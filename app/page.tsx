@@ -217,13 +217,13 @@ function SectionShell({
   return (
     <section className="px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-7 flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
+        <div className="mb-7 flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-border pb-4">
           <div>
-            <h2 className="content-heading font-display text-xl font-medium text-foreground sm:text-2xl">{title}</h2>
+            <h2 className="content-heading font-display text-xl font-semibold text-foreground sm:text-2xl">{title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{description}</p>
           </div>
           {href && (
-            <Link href={href} className="flex items-center gap-1 text-sm font-medium text-accent hover:underline">
+            <Link href={href} className="inline-flex items-center gap-1 text-sm font-medium text-accent hover:underline shrink-0 self-start sm:self-auto">
               Lihat semua
               <ArrowRight className="size-3.5" />
             </Link>
@@ -237,9 +237,9 @@ function SectionShell({
 
 function StatItem({ value, label, tone = "default" }: { value: string; label: string; tone?: "default" | "critical" }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 py-4">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className={tone === "critical" ? "data-tag text-xl font-medium text-severity-critical-fg" : "data-tag text-xl font-medium text-foreground"}>
+    <div className="flex flex-col sm:flex-row lg:flex-row items-start sm:items-baseline lg:items-baseline justify-between gap-1 sm:gap-4 py-3 sm:py-4">
+      <dt className="text-xs sm:text-sm text-muted-foreground">{label}</dt>
+      <dd className={tone === "critical" ? "data-tag text-lg sm:text-xl font-semibold text-severity-critical-fg" : "data-tag text-lg sm:text-xl font-semibold text-foreground"}>
         {value}
       </dd>
     </div>

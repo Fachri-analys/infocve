@@ -14,7 +14,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Top Vendors */}
-      <Card className="border-border">
+      <Card className="border-border flex flex-col justify-between h-full">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Building2 className="size-4 text-blue-500" />
@@ -24,7 +24,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
             Vendor dengan frekuensi kemunculan kerentanan terbanyak dalam sampel 120 hari.
           </p>
         </CardHeader>
-        <CardContent className="pt-1">
+        <CardContent className="pt-1 flex-1">
           <div className="space-y-2">
             {topVendors.map((item, index) => (
               <Link
@@ -33,7 +33,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
                 className="flex items-center justify-between rounded-md border border-border/60 bg-background/50 p-2 text-xs transition-colors hover:border-foreground/20 hover:bg-background-raised"
               >
                 <div className="flex items-center gap-2 min-w-0 pr-2">
-                  <span className="font-mono text-muted-foreground w-4 text-[11px] shrink-0">
+                  <span className="font-mono text-muted-foreground w-5 text-right text-[11px] shrink-0">
                     #{index + 1}
                   </span>
                   <span className="font-medium text-foreground truncate">{item.name}</span>
@@ -51,7 +51,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
       </Card>
 
       {/* Top Products */}
-      <Card className="border-border">
+      <Card className="border-border flex flex-col justify-between h-full">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Package className="size-4 text-emerald-500" />
@@ -61,7 +61,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
             Produk atau komponen perangkat lunak yang paling sering dilaporkan memiliki CVE.
           </p>
         </CardHeader>
-        <CardContent className="pt-1">
+        <CardContent className="pt-1 flex-1">
           <div className="space-y-2">
             {topProducts.map((item, index) => (
               <Link
@@ -70,7 +70,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
                 className="flex items-center justify-between rounded-md border border-border/60 bg-background/50 p-2 text-xs transition-colors hover:border-foreground/20 hover:bg-background-raised"
               >
                 <div className="flex items-center gap-2 min-w-0 pr-2">
-                  <span className="font-mono text-muted-foreground w-4 text-[11px] shrink-0">
+                  <span className="font-mono text-muted-foreground w-5 text-right text-[11px] shrink-0">
                     #{index + 1}
                   </span>
                   <span className="font-medium text-foreground truncate">{item.name}</span>
@@ -88,7 +88,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
       </Card>
 
       {/* Top CWE Weaknesses */}
-      <Card className="border-border">
+      <Card className="border-border flex flex-col justify-between h-full">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <AlertCircle className="size-4 text-amber-500" />
@@ -98,7 +98,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
             Pola kelemahan keamanan (Common Weakness Enumeration) yang paling sering menjadi akar masalah.
           </p>
         </CardHeader>
-        <CardContent className="pt-1">
+        <CardContent className="pt-1 flex-1">
           <div className="space-y-2">
             {topCwes.map((item, index) => (
               <Link
@@ -108,7 +108,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
                 title={`${item.id}: ${item.name}`}
               >
                 <div className="flex items-center gap-2 min-w-0 pr-2">
-                  <span className="font-mono text-muted-foreground w-4 text-[11px] shrink-0">
+                  <span className="font-mono text-muted-foreground w-5 text-right text-[11px] shrink-0">
                     #{index + 1}
                   </span>
                   <div className="min-w-0">

@@ -281,11 +281,11 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
 function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-4 py-3 text-sm first:pt-0 last:pb-0">
-      <span className="flex items-center gap-1.5 text-muted-foreground">
+      <span className="flex items-center gap-1.5 text-muted-foreground shrink-0">
         <Icon className="size-3.5" />
         {label}
       </span>
-      <span className="max-w-[58%] text-right font-medium leading-relaxed text-foreground">{value}</span>
+      <span className="max-w-[62%] text-right font-medium leading-relaxed text-foreground break-words">{value}</span>
     </div>
   );
 }

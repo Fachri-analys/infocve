@@ -18,12 +18,12 @@ import { cn } from "@/lib/utils";
 
 function MetricRow({ label, value, explanation }: { label: string; value: string; explanation: string }) {
   return (
-    <div className="flex flex-col gap-1 border-b border-border/70 py-3 last:border-none sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-      <span className="text-sm font-medium text-foreground sm:w-48 sm:shrink-0">{label}</span>
-      <div className="sm:flex-1">
-        <span className="data-tag text-sm text-accent">{value}</span>
-        <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{explanation}</p>
+    <div className="flex flex-col gap-1.5 border-b border-border/60 py-3.5 last:border-none sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+      <div className="sm:w-52 sm:shrink-0">
+        <span className="text-sm font-medium text-foreground block">{label}</span>
+        <span className="data-tag mt-0.5 inline-block text-xs font-semibold text-accent">{value}</span>
       </div>
+      <p className="text-sm leading-relaxed text-muted-foreground sm:flex-1">{explanation}</p>
     </div>
   );
 }

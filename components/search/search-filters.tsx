@@ -2,7 +2,6 @@ import { SlidersHorizontal } from "lucide-react";
 
 import type { CVECategory, Severity } from "@/types/cve";
 import type { FacetCount } from "@/lib/nvd";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { SEVERITY_CLASSES, SEVERITY_LABEL_ID, SEVERITY_ORDER } from "@/utils/severity";
@@ -68,17 +67,43 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
   const dateInputClasses =
     "h-10 w-full rounded-xl border border-border bg-background/50 px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
+  const activeCount =
+    selected.severity.length +
+    (selected.year ? 1 : 0) +
+    (selected.vendor ? 1 : 0) +
+    (selected.product ? 1 : 0) +
+    (selected.cwe ? 1 : 0) +
+    (selected.category ? 1 : 0) +
+    (selected.publishedFrom || selected.publishedTo ? 1 : 0) +
+    (selected.modifiedFrom || selected.modifiedTo ? 1 : 0);
+
   return (
-    <Card className="lg:sticky lg:top-24">
-      <CardHeader className="border-b border-border/70 pb-4">
-        <CardTitle className="flex items-center gap-2">
+    <details
+      className="group block rounded-xl border border-border bg-surface text-foreground lg:sticky lg:top-24"
+      open={true}
+    >
+      <summary className="flex cursor-pointer items-center justify-between p-4 font-display text-sm font-semibold text-foreground select-none lg:cursor-default lg:border-b lg:border-border/70">
+        <div className="flex items-center gap-2">
           <SlidersHorizontal className="size-4 text-accent" />
-          Filter Pencarian
-        </CardTitle>
-        <CardDescription>Pilih kriteria untuk mempersempit hasil.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form action="/search" method="GET" className="flex flex-col gap-6">
+          <span>Filter Pencarian</span>
+          {activeCount > 0 && (
+            <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">
+              {activeCount}
+            </span>
+          )}
+        </div>
+        <span className="text-xs text-muted-foreground lg:hidden">
+          <span className="group-open:hidden">Buka Filter ▾</span>
+          <span className="hidden group-open:inline">Tutup Filter ▴</span>
+        </span>
+      </summary>
+
+      <div className="hidden border-b border-border/70 px-5 py-2.5 lg:block">
+        <p className="text-xs text-muted-foreground">Pilih kriteria untuk mempersempit hasil.</p>
+      </div>
+
+      <div className="p-4 sm:p-5">
+        <form action="/search" method="GET" className="flex flex-col gap-5">
           <input type="hidden" name="q" value={query} />
 
           <fieldset>
@@ -231,7 +256,7 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </details>
   );
 }

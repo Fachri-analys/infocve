@@ -53,14 +53,14 @@ export function EPSSCard({ epss }: { epss?: EPSSScore }) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 border-y border-border">
-          <div className="py-3 pr-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 border-y border-border divide-y sm:divide-y-0 sm:divide-x divide-border">
+          <div className="py-3 sm:pr-4">
             <p className="text-xs text-muted-foreground">Probabilitas Eksploitasi (30 Hari)</p>
             <p className="data-tag mt-1 text-2xl font-bold text-foreground">{scorePct}%</p>
             <p className="mt-1 text-[11px] text-muted-foreground">Nilai mentah: {epss.score.toFixed(5)}</p>
           </div>
 
-          <div className="border-l border-border py-3 pl-3">
+          <div className="py-3 sm:pl-4">
             <p className="text-xs text-muted-foreground">Persentil Global</p>
             <p className="data-tag mt-1 text-2xl font-bold text-foreground">{percentilePct}%</p>
             <p className="mt-1 text-[11px] text-muted-foreground">Lebih berisiko dari {percentilePct}% kerentanan CVE lainnya</p>

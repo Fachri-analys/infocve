@@ -230,6 +230,15 @@ body {
   text-underline-offset: 0.18em;
 }
 
+/* Modern text wrapping standards for balanced, aligned typography */
+h1, h2, h3, .content-heading {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
 /* CVE ID / technical data treatment used across cards, hero, detail pages */
 .data-tag {
   font-family: var(--font-mono);
