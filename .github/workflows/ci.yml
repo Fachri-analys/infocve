@@ -18,6 +18,7 @@ permissions:
 env:
   NODE_VERSION: "22"
   NEXT_PUBLIC_SITE_URL: https://infocve.com
+  VITE_CONFIG_NATIVE_IGNORE_WARNING: "true"
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -55,12 +56,14 @@ jobs:
         run: npm run build
 
       - name: Upload build artifacts
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: next-build
-          path: .next/
-          if-no-files-found: error
+          path: |
+            .next
+            !.next/cache
+          if-no-files-found: warn
           retention-days: 7
 
   security:
@@ -88,7 +91,7 @@ jobs:
   deploy-preview:
     name: Deploy Preview (Vercel)
     needs: quality
-    if: ${{ github.event_name == 'pull_request' && secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -96,10 +99,26 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Check Vercel credentials
+        id: check-token
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ Rahasia Vercel (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID) belum dikonfigurasi. Melewati deployment preview."
+          fi
+
       - name: Checkout repository
+        if: steps.check-token.outputs.configured == 'true'
         uses: actions/checkout@v4
 
       - name: Deploy to Vercel Preview
+        if: steps.check-token.outputs.configured == 'true'
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
@@ -110,15 +129,31 @@ jobs:
   deploy-production:
     name: Deploy Production (Vercel)
     needs: quality
-    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
+      - name: Check Vercel credentials
+        id: check-token
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ Rahasia Vercel (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID) belum dikonfigurasi. Melewati deployment produksi."
+          fi
+
       - name: Checkout repository
+        if: steps.check-token.outputs.configured == 'true'
         uses: actions/checkout@v4
 
       - name: Deploy to Vercel Production
+        if: steps.check-token.outputs.configured == 'true'
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}

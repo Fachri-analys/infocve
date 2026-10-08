@@ -13,17 +13,33 @@ on:
 jobs:
   sync:
     name: Trigger Data Sync
-    if: ${{ vars.DEPLOY_URL != '' && secrets.ADMIN_SECRET != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      DEPLOY_URL: ${{ vars.DEPLOY_URL }}
-      ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
 
     steps:
-      - name: Trigger sync endpoint
+      - name: Check configuration
+        id: check-config
+        env:
+          DEPLOY_URL: ${{ vars.DEPLOY_URL }}
+          ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
         run: |
-          echo "🔄 Triggering InfoCVE data sync..."
+          if [ -z "$DEPLOY_URL" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ DEPLOY_URL belum dikonfigurasi pada Repository Variables. Melewati sinkronisasi."
+          elif [ -z "$ADMIN_SECRET" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "ℹ️ ADMIN_SECRET belum dikonfigurasi pada Repository Secrets. Melewati sinkronisasi."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger sync endpoint
+        if: steps.check-config.outputs.skip != 'true'
+        env:
+          DEPLOY_URL: ${{ vars.DEPLOY_URL }}
+          ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
+        run: |
+          echo "🔄 Memicu sinkronisasi data InfoCVE..."
           RESPONSE=$(curl -sS -w "\n%{http_code}" \
             -X POST "${DEPLOY_URL}/api/sync" \
             -H "Authorization: Bearer ${ADMIN_SECRET}" \
@@ -37,15 +53,18 @@ jobs:
           echo "$BODY" | head -20
 
           if [ "$HTTP_CODE" -ge 400 ]; then
-            echo "❌ Sync failed with HTTP $HTTP_CODE"
+            echo "❌ Sinkronisasi gagal dengan kode HTTP $HTTP_CODE"
             exit 1
           fi
 
-          echo "✅ Sync completed successfully"
+          echo "✅ Sinkronisasi berhasil diselesaikan"
 
       - name: Health check
+        if: steps.check-config.outputs.skip != 'true'
+        env:
+          DEPLOY_URL: ${{ vars.DEPLOY_URL }}
         run: |
-          echo "🏥 Running health check..."
+          echo "🏥 Menjalankan pengecekan kesehatan server..."
           RESPONSE=$(curl -sS -w "\n%{http_code}" "${DEPLOY_URL}/api/health")
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | head -n -1)
@@ -54,8 +73,8 @@ jobs:
           echo "$BODY" | head -10
 
           if [ "$HTTP_CODE" -ge 400 ]; then
-            echo "❌ Health check failed"
+            echo "❌ Pemeriksaan kesehatan gagal"
             exit 1
           fi
 
-          echo "✅ Application is healthy"
+          echo "✅ Aplikasi dalam kondisi sehat"
