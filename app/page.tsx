@@ -65,7 +65,7 @@ export default async function HomePage() {
 
       {/* HERO */}
       <section className="border-b border-border bg-background-raised/35">
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-20 lg:px-8 lg:py-24">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-20 lg:px-8 lg:py-24 animate-fade-up">
           <div className="max-w-3xl">
             <p className="eyebrow mb-5 text-[10px]">Basis pengetahuan keamanan siber</p>
             <h1 className="content-heading max-w-2xl font-display text-4xl font-medium leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">

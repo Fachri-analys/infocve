@@ -74,7 +74,7 @@ export function KpiCards({ data }: KpiCardsProps) {
         const content = (
           <Card
             key={card.label}
-            className="border-border transition-colors hover:border-foreground/20 hover:bg-background-raised/30"
+            className="border-border transition-all duration-300 ease-out hover:border-accent/40 hover:bg-background-raised/50 hover:shadow-md hover:shadow-black/5"
           >
             <CardContent className="p-5">
               <div className="flex items-start justify-between">
@@ -85,7 +85,7 @@ export function KpiCards({ data }: KpiCardsProps) {
                   </h3>
                   <p className="mt-1.5 text-xs text-muted-foreground">{card.subtext}</p>
                 </div>
-                <div className={`flex size-10 items-center justify-center rounded-lg ${card.bgColor}`}>
+                <div className={`flex size-10 items-center justify-center rounded-lg ${card.bgColor} transition-transform duration-300 ease-out group-hover:scale-110`}>
                   <Icon className={`size-5 ${card.iconColor}`} />
                 </div>
               </div>
@@ -95,7 +95,7 @@ export function KpiCards({ data }: KpiCardsProps) {
 
         if (card.href) {
           return (
-            <Link key={card.label} href={card.href} className="block transition-transform hover:-translate-y-0.5">
+            <Link key={card.label} href={card.href} className="group block transition-transform duration-300 ease-out hover:-translate-y-1">
               {content}
             </Link>
           );

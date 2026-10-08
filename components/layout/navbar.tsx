@@ -12,10 +12,10 @@ export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md transition-colors duration-200">
       <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="group flex min-w-0 items-center gap-2.5" aria-label={`${SITE_NAME}, kembali ke beranda`}>
-          <span className="flex size-8 shrink-0 items-center justify-center text-accent transition-colors group-hover:text-foreground">
+          <span className="flex size-8 shrink-0 items-center justify-center text-accent transition-all duration-200 group-hover:scale-105 group-hover:text-foreground">
             <Logo className="size-7" />
           </span>
           <span className="min-w-0">
@@ -37,8 +37,8 @@ export function Navbar() {
               aria-current={isActive ? "page" : undefined}
               className={
                 isActive
-                  ? "border-b-2 border-accent px-0.5 py-2.5 text-sm font-medium text-foreground"
-                  : "border-b-2 border-transparent px-0.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-border-hover hover:text-foreground"
+                  ? "border-b-2 border-accent px-0.5 py-2.5 text-sm font-medium text-foreground transition-all duration-200"
+                  : "border-b-2 border-transparent px-0.5 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:border-border-hover hover:text-foreground"
               }
             >
               {link.label}

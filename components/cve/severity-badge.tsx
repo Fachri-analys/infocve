@@ -20,7 +20,7 @@ export function SeverityBadge({ severity, size = "md", showDot = true, className
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border font-medium",
+        "inline-flex items-center gap-1.5 rounded-full border font-medium select-none transition-colors duration-200",
         classes.bg,
         classes.text,
         classes.border,

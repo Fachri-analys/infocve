@@ -24,7 +24,7 @@ export default async function DashboardPage() {
   const data = await getDashboardData();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 animate-fade-in">
       <Breadcrumb items={[{ label: "Dashboard" }]} />
 
       {/* Page Header */}

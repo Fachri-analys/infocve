@@ -68,10 +68,10 @@ export function ReferenceCard({ references }: { references: CVEReference[] }) {
               href={ref.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 transition-colors hover:border-accent/40 hover:bg-surface-hover"
+              className="group flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover hover:shadow-sm"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-foreground">{ref.source}</p>
+                <p className="truncate text-sm font-medium text-foreground transition-colors group-hover:text-accent">{ref.source}</p>
                 <p className="truncate text-xs text-muted-foreground">{ref.url}</p>
                 {ref.tags && ref.tags.length > 0 && (
                   <div className="mt-1.5 flex flex-wrap gap-1">
@@ -81,7 +81,7 @@ export function ReferenceCard({ references }: { references: CVEReference[] }) {
                   </div>
                 )}
               </div>
-              <ExternalLink className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-accent" />
+              <ExternalLink className="size-4 shrink-0 text-muted-foreground transition-all duration-200 group-hover:text-accent group-hover:translate-x-0.5" />
             </a>
           );
         })}
