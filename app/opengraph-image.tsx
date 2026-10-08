@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 import { SITE_DESCRIPTION, SITE_NAME } from "@/utils/constants";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const alt = `${SITE_NAME} — Basis Pengetahuan Kerentanan Siber`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

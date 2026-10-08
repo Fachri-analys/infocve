@@ -33,6 +33,9 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  // Enables Gzip and Brotli compression for production asset delivery.
+  compress: true,
+
   // Avoids advertising the framework in responses — a minor fingerprinting
   // reduction, not a real barrier, but a standard, free hardening step.
   poweredByHeader: false,

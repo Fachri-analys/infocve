@@ -15,8 +15,10 @@ import {
   getVendors,
 } from "@/lib/nvd";
 import { glossaryTerms } from "@/lib/glossary-data";
-import { formatNumberId, truncate } from "@/utils/format";
-import { SITE_DESCRIPTION } from "@/utils/constants";
+import { formatNumberId, safeJsonLdStringify, truncate } from "@/utils/format";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/utils/constants";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export default async function HomePage() {
   const [latest, critical, high, vendors, products, categories, stats] = await Promise.all([
@@ -30,8 +32,37 @@ export default async function HomePage() {
   ]);
   const featuredTerms = glossaryTerms.slice(0, 4);
 
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    url: siteUrl,
+    description: SITE_DESCRIPTION,
+    inLanguage: "id-ID",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteUrl}/search?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: siteUrl,
+    logo: `${siteUrl}/icon.svg`,
+    description: SITE_DESCRIPTION,
+  };
+
   return (
     <div className="min-h-full">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(organizationJsonLd) }} />
+
       {/* HERO */}
       <section className="border-b border-border bg-background-raised/35">
         <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-20 lg:px-8 lg:py-24">

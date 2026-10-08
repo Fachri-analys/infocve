@@ -382,15 +382,46 @@ export async function getCVEsByYear(year: number, limit = 50): Promise<CVE[]> {
 // accuracy tradeoff this implies versus a true global count.
 // ---------------------------------------------------------------------------
 
+let inMemoryFacetSample: CVE[] | null = null;
+let facetSampleFetchedAt = 0;
+let inFlightFacetSample: Promise<CVE[]> | null = null;
+const FACET_SAMPLE_CACHE_TTL_MS = REVALIDATE.facetSample * 1000;
+
+/** For testing or cache invalidation */
+export function clearFacetSampleCache(): void {
+  inMemoryFacetSample = null;
+  facetSampleFetchedAt = 0;
+  inFlightFacetSample = null;
+}
+
 export async function getFacetSample(): Promise<CVE[]> {
-  const end = new Date();
-  const start = new Date(end.getTime() - MAX_DATE_RANGE_DAYS * 24 * 60 * 60 * 1000);
-  const { cves } = await fetchNormalized(
-    { pubStartDate: start.toISOString(), pubEndDate: end.toISOString(), resultsPerPage: FACET_SAMPLE_SIZE },
-    REVALIDATE.facetSample,
-    ["nvd:facet-sample"]
-  );
-  return cves;
+  const now = Date.now();
+  if (inMemoryFacetSample && now - facetSampleFetchedAt < FACET_SAMPLE_CACHE_TTL_MS) {
+    return inMemoryFacetSample;
+  }
+
+  if (inFlightFacetSample) {
+    return inFlightFacetSample;
+  }
+
+  inFlightFacetSample = (async () => {
+    try {
+      const end = new Date();
+      const start = new Date(end.getTime() - MAX_DATE_RANGE_DAYS * 24 * 60 * 60 * 1000);
+      const { cves } = await fetchNormalized(
+        { pubStartDate: start.toISOString(), pubEndDate: end.toISOString(), resultsPerPage: FACET_SAMPLE_SIZE },
+        REVALIDATE.facetSample,
+        ["nvd:facet-sample"]
+      );
+      inMemoryFacetSample = cves;
+      facetSampleFetchedAt = Date.now();
+      return cves;
+    } finally {
+      inFlightFacetSample = null;
+    }
+  })();
+
+  return inFlightFacetSample;
 }
 
 export interface FacetCount {

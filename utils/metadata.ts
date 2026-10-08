@@ -7,28 +7,38 @@ interface PageMetadataInput {
   description: string;
   /** Path starting with "/", e.g. "/about" — used for the canonical URL. */
   path: string;
+  type?: "website" | "article";
+  keywords?: string[];
 }
 
 /**
  * Builds a consistent per-page `Metadata` object, including matching
- * OpenGraph/Twitter titles.
- *
- * Without this, a page that only sets `title`/`description` silently
- * inherits the ROOT layout's `openGraph`/`twitter` blocks wholesale
- * (Next.js does not merge them field-by-field) — so sharing, say, `/about`
- * would show the homepage's title and description in the social preview
- * card instead of the About page's own. The root layout's `title` template
- * (`%s | InfoCVE`) already applies automatically to the plain `<title>`
- * tag, but OpenGraph/Twitter titles need it applied manually since they
- * aren't covered by that template mechanism.
+ * OpenGraph/Twitter titles, canonical URL, and card settings.
  */
-export function buildPageMetadata({ title, description, path }: PageMetadataInput): Metadata {
+export function buildPageMetadata({
+  title,
+  description,
+  path,
+  type = "website",
+  keywords,
+}: PageMetadataInput): Metadata {
   const fullTitle = `${title} | ${SITE_NAME}`;
   return {
     title,
     description,
+    keywords,
     alternates: { canonical: path },
-    openGraph: { title: fullTitle, description },
-    twitter: { title: fullTitle, description },
+    openGraph: {
+      type,
+      title: fullTitle,
+      description,
+      siteName: SITE_NAME,
+      locale: "id_ID",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: fullTitle,
+      description,
+    },
   };
 }

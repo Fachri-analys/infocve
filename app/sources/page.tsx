@@ -3,6 +3,7 @@ import { Database, ShieldAlert, Activity, GitFork, ExternalLink, CheckCircle2 } 
 import { Breadcrumb } from "@/components/common/breadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildPageMetadata } from "@/utils/metadata";
+import { safeJsonLdStringify } from "@/utils/format";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Transparansi Sumber Data Intelijen Kerentanan",
@@ -66,9 +67,42 @@ const DATA_SOURCES = [
   },
 ];
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export default function SourcesPage() {
+  const catalogJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DataCatalog",
+    name: "Katalog Sumber Data Intelijen Kerentanan InfoCVE",
+    description:
+      "Katalog resmi sumber data intelijen kerentanan yang digunakan InfoCVE, mencakup NVD NIST, CISA KEV, FIRST EPSS, dan GHSA.",
+    url: `${siteUrl}/sources`,
+    dataset: DATA_SOURCES.map((s) => ({
+      "@type": "Dataset",
+      name: s.name,
+      description: s.description,
+      license: s.license,
+      creator: {
+        "@type": "Organization",
+        name: s.provider,
+        url: s.url,
+      },
+    })),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Beranda", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "Sumber Data", item: `${siteUrl}/sources` },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(catalogJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(breadcrumbJsonLd) }} />
       <Breadcrumb items={[{ label: "Sumber Data" }]} />
 
       <div className="page-intro mb-10">

@@ -43,30 +43,38 @@ interface CVEPageProps {
 // getCVEById(), which returns null (-> notFound()) for IDs NVD confirms
 // don't exist, or throws (-> app/error.tsx) if NVD couldn't be reached.
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export async function generateMetadata({ params }: CVEPageProps): Promise<Metadata> {
   const { id } = await params;
 
-  // Deliberately swallows failures rather than propagating them: metadata
-  // is supplementary, and the page component below (which runs regardless
-  // of what happens here) is the single source of truth for whether a
-  // request ends in notFound() or the error boundary. Letting a metadata
-  // fetch failure influence that would be surprising and hard to reason
-  // about — this keeps the two concerns independent.
   try {
     const cve = await getCve(id);
     if (!cve) return { title: "CVE Tidak Ditemukan" };
 
+    const pageTitle = `${cve.id} — ${cve.title}`;
+    const pageDesc = cve.descriptionId.slice(0, 160);
+    const ogTitle = `${cve.id} (Skor CVSS ${cve.cvss.baseScore.toFixed(1)} - ${cve.cvss.severity})`;
+
     return {
-      title: `${cve.id} — ${cve.title}`,
-      description: cve.descriptionId.slice(0, 155),
+      title: pageTitle,
+      description: pageDesc,
       alternates: { canonical: `/cve/${cve.id}` },
       openGraph: {
-        title: `${cve.id} — Tingkat ${cve.cvss.severity}`,
-        description: cve.descriptionId.slice(0, 155),
+        type: "article",
+        title: ogTitle,
+        description: pageDesc,
+        url: `${siteUrl}/cve/${cve.id}`,
+        siteName: "InfoCVE",
+        publishedTime: cve.publishedDate,
+        modifiedTime: cve.lastModifiedDate,
+        authors: ["InfoCVE"],
+        tags: [cve.id, cve.vendor, cve.product, cve.cvss.severity, ...cve.cwe.map((w) => w.id)],
       },
       twitter: {
-        title: `${cve.id} — Tingkat ${cve.cvss.severity}`,
-        description: cve.descriptionId.slice(0, 155),
+        card: "summary_large_image",
+        title: ogTitle,
+        description: pageDesc,
       },
     };
   } catch {
@@ -81,11 +89,6 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
   try {
     cve = await getCve(id);
   } catch {
-    // getCve() throws NvdApiError for anything that isn't a confirmed
-    // "this ID doesn't exist" (network/timeout/rate-limit/server issues —
-    // see lib/nvd.ts). That's normally left to bubble up to app/error.tsx,
-    // but is handled explicitly here as well so a transient NVD failure
-    // reliably shows the friendly error state on this route regardless.
     return (
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
         <ErrorState />
@@ -95,19 +98,65 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
 
   if (!cve) notFound();
 
-  const jsonLd = {
+  const techArticleJsonLd = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
     headline: `${cve.id} — ${cve.title}`,
+    name: cve.id,
     datePublished: cve.publishedDate,
     dateModified: cve.lastModifiedDate,
     description: cve.descriptionId,
-    about: cve.id,
+    mainEntityOfPage: `${siteUrl}/cve/${cve.id}`,
+    author: {
+      "@type": "Organization",
+      name: "InfoCVE",
+      url: siteUrl,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "InfoCVE",
+      url: siteUrl,
+    },
+    about: {
+      "@type": "SoftwareApplication",
+      name: cve.product,
+      operatingSystem: cve.category,
+      author: {
+        "@type": "Organization",
+        name: cve.vendor,
+      },
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Beranda",
+        item: siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Cari CVE",
+        item: `${siteUrl}/search`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: cve.id,
+        item: `${siteUrl}/cve/${cve.id}`,
+      },
+    ],
   };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(techArticleJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(breadcrumbJsonLd) }} />
 
       <Breadcrumb items={[{ label: "Cari CVE", href: "/search" }, { label: cve.id }]} />
 
