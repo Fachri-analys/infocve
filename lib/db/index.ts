@@ -26,7 +26,11 @@ export function getDbPath(): string {
   if (process.env.NODE_ENV === "test" && process.env.TEST_DB === "memory") {
     return ":memory:";
   }
-  const dataDir = path.join(process.cwd(), "data");
+  const customDataDir = process.env.INFOCVE_DATA_DIR?.trim();
+  const dataDir = customDataDir
+    ? path.resolve(/*turbopackIgnore: true*/ process.cwd(), customDataDir)
+    : path.join(process.cwd(), "data");
+
   if (!fs.existsSync(dataDir)) {
     try {
       fs.mkdirSync(dataDir, { recursive: true });

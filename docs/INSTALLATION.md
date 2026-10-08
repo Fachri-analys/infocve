@@ -1,76 +1,90 @@
-# Panduan Instalasi
+# Panduan Instalasi InfoCVE
 
-## Prasyarat
+Panduan langkah-demi-langkah untuk menyiapkan dan menjalankan InfoCVE di lingkungan lokal Anda setelah melakukan clone dari repositori.
 
-- Node.js 20.9 atau lebih baru — versi ini dipatok lewat field `engines` di `package.json`
-- npm (proyek ini memakai npm; lockfile-nya adalah `package-lock.json`)
+---
 
-## Langkah-langkah
+## 📋 Prasyarat Sistem
 
+1. **Node.js $\ge$ 22.5.0**:
+   - InfoCVE menggunakan modul database bawaan Node.js (`node:sqlite DatabaseSync`) yang membutuhkan Node.js versi 22.5.0 atau yang lebih baru.
+   - Cek versi Anda dengan perintah:
+     ```bash
+     node -v
+     ```
+   - Jika versi Anda di bawah 22.5.0, perbarui Node.js melalui [nodejs.org](https://nodejs.org) atau manajer versi seperti `nvm` / `fnm`.
+
+2. **npm $\ge$ 10.x**:
+   - Manajer paket bawaan Node.js. File lockfile proyek adalah `package-lock.json`.
+
+3. **Git**:
+   - Untuk mengunduh kode sumber proyek.
+
+---
+
+## 🚀 Langkah-Langkah Pemasangan
+
+### 1. Kloning Repositori
 ```bash
-# 1. Masuk ke folder proyek
+git clone https://github.com/Fachri-analys/infocve.git
 cd infocve
+```
 
-# 2. Pasang dependency
+### 2. Memasang Dependensi
+```bash
 npm install
+```
 
-# 3. Salin berkas environment variable
+> **Catatan Dependensi Font**: Proyek menggunakan font self-hosted IBM Plex melalui `@fontsource/*` yang terpasang di `node_modules`. Tidak ada koneksi ke Google Fonts eksternal yang diperlukan saat proses build.
+
+### 3. Menyiapkan Konfigurasi Lingkungan
+Salin file template `.env.example` menjadi `.env.local`:
+```bash
 cp .env.example .env.local
-# lalu sesuaikan NEXT_PUBLIC_SITE_URL bila perlu
+```
 
-# 4. Jalankan server pengembangan
+File `.env.local` Anda akan memuat konfigurasi awal:
+```env
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+# NVD_API_KEY=kunci_api_anda (opsional)
+# GITHUB_TOKEN=token_anda (opsional)
+# ADMIN_SECRET=token_rahasia_admin (direkomendasikan untuk sync)
+# INFOCVE_DATA_DIR=./data (opsional)
+```
+
+> **Aplikasi Siap Digunakan Tanpa Kunci API**: Anda dapat langsung menjalankan InfoCVE tanpa mengisi `NVD_API_KEY`. InfoCVE akan otomatis beroperasi dalam mode gratis tanpa autentikasi (rate limit 5 req / 30 detik).
+
+### 4. Menjalankan Server Pengembangan
+```bash
 npm run dev
 ```
 
-Buka <http://localhost:3000> di browser.
+Buka peramban di [http://localhost:3000](http://localhost:3000). Basis data SQLite lokal di `./data/infocve.sqlite` akan diinisialisasi otomatis saat pertama kali dibuka.
 
-## Skrip yang Tersedia
+---
 
-| Perintah | Kegunaan |
-|---|---|
-| `npm run dev` | Menjalankan server pengembangan (Turbopack) |
-| `npm run build` | Build produksi |
-| `npm run start` | Menjalankan hasil build produksi secara lokal |
-| `npm run lint` | Menjalankan ESLint |
+## 🛠️ Perintah Skrip yang Tersedia
 
-## Struktur Folder
+| Perintah | Fungsi |
+| :--- | :--- |
+| `npm run dev` | Menjalankan server lokal pengembangan (Next.js dengan Turbopack) |
+| `npm run typecheck` | Menjalankan validasi tipe TypeScript (`tsc --noEmit`) |
+| `npm run lint` | Menjalankan pengecekan linter ESLint |
+| `npm test` | Menjalankan seluruh pengujian unit otomatis dengan Vitest |
+| `npm run build` | Mengompilasi dan mengoptimasi aplikasi untuk produksi |
+| `npm run start` | Menjalankan server hasil kompilasi produksi di lingkungan lokal |
+| `npm run sync` | Menjalankan sinkronisasi data feed terbaru melalui CLI helper |
 
-```
-app/         Rute halaman (App Router) — homepage, /search, /cve/[id], dst.
-components/  Komponen UI, dikelompokkan per domain (ui, layout, cve, search, common)
-lib/         Layanan data & logika domain (lib/nvd.ts + nvd-client/nvd-normalize/nvd-types.ts, dictionary.ts)
-types/       Tipe TypeScript bersama
-utils/       Fungsi bantu generik (format tanggal, konstanta, dsb.)
-hooks/       Custom React hooks
-styles/      globals.css — token desain & gaya global
-docs/        Dokumen ini dan panduan lainnya
-```
+---
 
-## Masalah Umum
+## ❓ Pemecahan Masalah Umum (Troubleshooting)
 
-- **Font:** Proyek ini memakai paket `@fontsource/*` (IBM Plex Sans dan IBM Plex
-  Mono) yang menyertakan berkas font langsung di
-  `node_modules` — bukan `next/font/google`, yang mengunduh font dari
-  `fonts.googleapis.com` saat build. Ini disengaja: lingkungan sandbox
-  tempat proyek ini pertama kali dibangun tidak memiliki akses ke domain
-  Google Fonts, dan pendekatan self-hosted ini sekaligus lebih andal untuk
-  produksi (tidak bergantung pada ketersediaan CDN pihak ketiga saat build).
-  Tidak ada tindakan tambahan yang diperlukan — `npm install` sudah cukup.
-- **Ingin memakai CLI shadcn/ui untuk menambah komponen baru:** proyek ini
-  sudah menyertakan `components.json` yang valid, jadi `npx shadcn@latest add <komponen>`
-  bisa langsung dipakai di lingkungan dengan akses internet penuh ke
-  `ui.shadcn.com` (juga tidak dapat diakses dari sandbox awal proyek ini).
-- **Halaman kosong / "Tidak ada hasil ditemukan" di mana-mana:** aplikasi
-  tidak bisa menjangkau `services.nvd.nist.gov`. Coba jalankan
-  `curl https://services.nvd.nist.gov/rest/json/cves/2.0?resultsPerPage=1`
-  langsung dari mesin/server yang sama untuk memastikan domain itu tidak
-  diblokir firewall/proxy jaringan Anda. Fungsi-fungsi daftar di `lib/nvd.ts`
-  sengaja tidak melempar error saat NVD gagal dihubungi (lihat
-  `docs/API_INTEGRATION.md` §7) — jadi aplikasi tetap tampil, hanya
-  datanya kosong. Cek log server (`console.error` dari `[lib/nvd]`) untuk
-  pesan error yang lebih spesifik.
-- **Kena limit permintaan NVD (`429` / pesan "Terlalu banyak permintaan"):**
-  wajar tanpa `NVD_API_KEY` di bawah trafik yang cukup ramai (limitnya
-  5 permintaan/30 detik). Tambahkan kunci gratis dari
-  <https://nvd.nist.gov/developers/request-an-api-key> ke `.env.local`
-  untuk naik ke 50/30 detik.
+1. **Error: Cannot find module 'node:sqlite'**:
+   - Pastikan versi Node.js Anda adalah **22.5.0 atau lebih tinggi**. Jalankan `node -v` untuk memastikan.
+2. **Limit Permintaan NVD (HTTP 429)**:
+   - Jika Anda sering mencari CVE secara intensif dan terkena rate limit, daftarkan kunci API gratis di [NIST NVD Developer Portal](https://nvd.nist.gov/developers/request-an-api-key) dan tambahkan ke `.env.local`:
+     ```env
+     NVD_API_KEY=kunci_dari_nist
+     ```
+3. **Database Lock Timeout**:
+   - InfoCVE telah dikonfigurasi dengan mode WAL (*Write-Ahead Logging*) dan `PRAGMA busy_timeout = 5000;` sehingga aman dari benturan akses multi-proses.

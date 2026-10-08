@@ -20,7 +20,7 @@ export function getServerConfig(): ServerConfig {
     nvdApiKey: process.env.NVD_API_KEY || undefined,
     githubToken: process.env.GITHUB_TOKEN || undefined,
     syncIntervalMinutes: parseInt(process.env.SYNC_INTERVAL_MINUTES || "60", 10),
-    notificationsEnabled: process.env.NOTIFICATIONS_ENABLED !== "false" && process.env.NOTIFICATIONS_ENABLED !== "0",
+    notificationsEnabled: process.env.NOTIFICATIONS_ENABLED === "true" || process.env.NOTIFICATIONS_ENABLED === "1",
     notificationWebhookUrl: process.env.NOTIFICATION_WEBHOOK_URL || undefined,
     dataDir: process.env.INFOCVE_DATA_DIR || "./data",
     adminSecret: process.env.ADMIN_SECRET || undefined,

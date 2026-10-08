@@ -1,60 +1,86 @@
-# Panduan Deployment (Vercel)
+# Panduan Deployment InfoCVE
 
-Proyek ini adalah aplikasi Next.js standar tanpa basis data dan tanpa
-kebutuhan infrastruktur khusus, sehingga deploy ke Vercel tidak memerlukan
-konfigurasi tambahan di luar variabel environment.
+Panduan deployment InfoCVE ke berbagai lingkungan produksi: server mandiri (VPS / Linux Server / Docker) dan platform serverless (Vercel).
 
-## Lewat Dashboard Vercel
+---
 
-1. Push kode ini ke sebuah repositori Git (GitHub/GitLab/Bitbucket).
-2. Di [vercel.com](https://vercel.com), pilih **Add New → Project**, lalu
-   impor repositori tersebut.
-3. Framework preset akan terdeteksi otomatis sebagai **Next.js** — tidak
-   perlu mengubah build command (`next build`) atau output directory.
-4. Tambahkan environment variable:
-   - `NEXT_PUBLIC_SITE_URL` → domain produksi Anda, mis. `https://infocve.id`
-     (dipakai oleh `sitemap.xml`, `robots.txt`, canonical URL, dan gambar
-     Open Graph).
-5. Klik **Deploy**.
+## 🏗️ 1. Deployment ke Server Mandiri (VPS / Ubuntu / Debian / Docker)
 
-## Lewat Vercel CLI
+Deployment ke server mandiri adalah opsi paling direkomendasikan karena basis data SQLite (`node:sqlite`) dapat disimpan di media penyimpanan permanen (*persistent volume*).
+
+### Langkah-langkah:
+
+1. **Persiapan Server**:
+   Pastikan Node.js $\ge$ 22.5.0 dan Git terpasang:
+   ```bash
+   node -v # Harus v22.5.0 atau lebih tinggi
+   ```
+
+2. **Kloning Kode Sumber**:
+   ```bash
+   git clone https://github.com/Fachri-analys/infocve.git
+   cd infocve
+   npm ci
+   ```
+
+3. **Konfigurasi Lingkungan Produksi**:
+   ```bash
+   cp .env.example .env.local
+   ```
+   Edit `.env.local` dengan nilai domain produksi Anda:
+   ```env
+   NEXT_PUBLIC_SITE_URL=https://infocve.id
+   NVD_API_KEY=kunci_api_nist_anda
+   ADMIN_SECRET=buat_token_acak_panjang_untuk_sync
+   INFOCVE_DATA_DIR=/var/data/infocve
+   ```
+
+4. **Build dan Jalankan**:
+   ```bash
+   npm run build
+   npm run start
+   ```
+
+5. **Menjalankan di Latar Belakang (Process Manager)**:
+   Gunakan `pm2` untuk menjaga aplikasi selalu aktif:
+   ```bash
+   npm install -g pm2
+   pm2 start npm --name "infocve" -- start
+   pm2 save
+   pm2 startup
+   ```
+
+---
+
+## ⚡ 2. Deployment ke Vercel (Serverless)
+
+InfoCVE sepenuhnya kompatibel dengan platform Vercel.
+
+### Langkah-langkah:
+
+1. **Hubungkan Repositori ke Vercel**:
+   - Buka [vercel.com](https://vercel.com) dan pilih **Add New → Project**.
+   - Pilih repositori `Fachri-analys/infocve`.
+   - Framework preset akan terdeteksi otomatis sebagai **Next.js**.
+
+2. **Pengaturan Environment Variables**:
+   Di tab **Environment Variables**, tambahkan:
+   - `NEXT_PUBLIC_SITE_URL` = `https://nama-proyek-anda.vercel.app` (atau domain kustom Anda).
+   - `INFOCVE_DATA_DIR` = `/tmp` *(Wajib pada Vercel karena lingkungan serverless hanya memperbolehkan penulisan file pada direktori `/tmp`)*.
+   - `NVD_API_KEY` (Opsional, untuk menaikkan limit kuota NIST).
+   - `ADMIN_SECRET` (Opsional, untuk mengamankan trigger sync).
+
+3. **Deploy**:
+   - Klik tombol **Deploy**.
+   - Halaman statis, ISR, dan dynamic route seperti `/cve/[id]` dan `/dashboard` akan di-deploy secara otomatis.
+
+---
+
+## 🔄 3. Menjalankan Sinkronisasi Terjadwal (Cron Job)
+
+Untuk memperbarui data CVE terbaru ke dalam basis data secara berkala, Anda dapat memasang cron job di server atau GitHub Actions:
 
 ```bash
-npm install -g vercel
-vercel        # deploy preview
-vercel --prod # deploy produksi
+# Contoh cron job setiap 6 jam
+0 */6 * * * curl -X POST https://domain-anda.com/api/sync -H "Authorization: Bearer <ADMIN_SECRET>" -H "Content-Type: application/json"
 ```
-
-## Setup CI/CD di GitHub
-
-Untuk memanfaatkan pipeline otomatis yang sudah disiapkan di `.github/workflows/`:
-
-1. Masuk ke repository GitHub → **Settings → Secrets and variables → Actions**.
-2. Tambahkan secret berikut bila Anda menggunakan deploy ke Vercel:
-   - `VERCEL_TOKEN`
-   - `VERCEL_ORG_ID`
-   - `VERCEL_PROJECT_ID`
-3. Jika endpoint sinkronisasi dipakai, tambahkan:
-   - `ADMIN_SECRET`
-   - repository variable `DEPLOY_URL` (mis. `https://infocve.example.com`)
-4. Pastikan branch `main` memiliki deploy production aktif dan branch `develop`
-   dapat menerima preview deployment untuk PR.
-
-## Setelah Deploy
-
-- Verifikasi `/sitemap.xml` dan `/robots.txt` menunjuk ke domain yang benar.
-- Verifikasi gambar Open Graph tampil benar lewat pratinjau tautan (mis.
-  [opengraph.xyz](https://www.opengraph.xyz)) — dihasilkan otomatis oleh
-  `app/opengraph-image.tsx`, tidak memerlukan berkas gambar statis.
-- Custom domain dapat ditambahkan lewat tab **Domains** pada proyek Vercel.
-- Setiap push ke branch non-utama otomatis mendapat Preview Deployment
-  terpisah — berguna untuk meninjau perubahan sebelum digabungkan.
-
-## Catatan
-
-- Tidak ada database, sehingga tidak ada langkah migrasi atau seed data
-  saat deploy.
-- Jika/ketika integrasi NVD API sungguhan aktif (lihat
-  `docs/API_INTEGRATION.md`), tambahkan `NVD_API_KEY` sebagai environment
-  variable di Vercel dan pertimbangkan Vercel Data Cache / ISR untuk
-  membatasi frekuensi pemanggilan API.
