@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 
 import type { CVECategory } from "@/types/cve";
-import { Card } from "@/components/ui/card";
 
 const CATEGORY_ICONS: Record<CVECategory, LucideIcon> = {
   "web-application": Globe,
@@ -32,19 +31,20 @@ export function CategoryCard({ slug, name, descriptionId, count }: CategoryCardP
   const Icon = CATEGORY_ICONS[slug];
 
   return (
-    <Link href={`/search?category=${slug}`} className="group block h-full">
-      <Card className="flex h-full flex-col justify-between p-4 sm:p-5 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent/50 hover:bg-surface-hover/30 hover:shadow-md hover:shadow-black/10">
-        <div className="flex items-center justify-between gap-2">
-          <span className="flex size-9 sm:size-10 items-center justify-center rounded-lg bg-accent/12 text-accent transition-transform duration-300 ease-out group-hover:scale-110">
-            <Icon className="size-4.5 sm:size-5" />
-          </span>
-          <span className="data-tag rounded-md border border-border bg-background/50 px-2 py-0.5 text-[11px] font-medium text-muted-foreground shrink-0">{count} CVE</span>
+    <Link
+      href={`/search?category=${slug}`}
+      className="group flex min-w-0 items-start gap-3 border-b border-border py-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+    >
+      <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center border border-border bg-surface text-muted-foreground transition-colors group-hover:border-accent/40 group-hover:bg-accent/10 group-hover:text-accent">
+        <Icon className="size-4.5" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="font-display text-sm font-semibold text-foreground transition-colors group-hover:text-accent">{name}</h3>
+          <span className="data-tag shrink-0 text-[10px] text-muted-foreground group-hover:text-accent">{count} CVE</span>
         </div>
-        <div className="mt-3">
-          <h3 className="font-display text-sm font-semibold text-foreground transition-colors duration-150 group-hover:text-accent">{name}</h3>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground line-clamp-2">{descriptionId}</p>
-        </div>
-      </Card>
+        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{descriptionId}</p>
+      </div>
     </Link>
   );
 }

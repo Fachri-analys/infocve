@@ -68,7 +68,7 @@ export function ReferenceCard({ references }: { references: CVEReference[] }) {
               href={ref.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/40 hover:bg-surface-hover hover:shadow-sm"
+              className="group flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-3 transition-[background-color,border-color] duration-200 ease-out hover:border-accent/40 hover:bg-surface-hover"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-foreground transition-colors group-hover:text-accent">{ref.source}</p>
@@ -81,7 +81,7 @@ export function ReferenceCard({ references }: { references: CVEReference[] }) {
                   </div>
                 )}
               </div>
-              <ExternalLink className="size-4 shrink-0 text-muted-foreground transition-all duration-200 group-hover:text-accent group-hover:translate-x-0.5" />
+              <ExternalLink className="size-4 shrink-0 text-muted-foreground transition-colors duration-200 group-hover:text-accent" />
             </a>
           );
         })}

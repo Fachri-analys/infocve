@@ -31,7 +31,7 @@ export function SearchBar({ defaultValue = "", size = "md", className }: SearchB
         placeholder="Cari CVE ID, vendor, produk, atau kata kunci…"
         aria-label="Cari CVE"
         className={cn(
-          "w-full rounded-xl border border-border bg-surface text-foreground placeholder:text-muted-foreground/70 transition-all duration-200 ease-out",
+          "w-full rounded-xl border border-border bg-surface text-foreground placeholder:text-muted-foreground/70 transition-[background-color,border-color,color,box-shadow] duration-200 ease-out",
           "hover:border-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent",
           size === "lg" ? "h-14 pl-12 pr-32 text-base" : "h-11 pl-10 pr-24 text-sm"
         )}
@@ -40,7 +40,7 @@ export function SearchBar({ defaultValue = "", size = "md", className }: SearchB
         type="submit"
         aria-label="Cari CVE"
         className={cn(
-          "absolute right-1.5 inline-flex items-center justify-center rounded-lg bg-accent font-medium text-accent-foreground transition-all duration-200 ease-out hover:bg-accent/90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "absolute right-1.5 inline-flex items-center justify-center rounded-lg bg-accent font-medium text-accent-foreground transition-[background-color,color,box-shadow,transform] duration-200 ease-out hover:bg-accent/90 active:bg-accent/80 active:scale-[0.985] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
           size === "lg" ? "h-11 px-6 text-sm" : "h-8 px-4 text-xs"
         )}
       >

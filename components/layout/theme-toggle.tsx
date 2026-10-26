@@ -15,12 +15,12 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={theme === "dark" ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
       title={theme === "dark" ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
-      className="shrink-0 transition-transform active:scale-90"
+      className="shrink-0 transition-[background-color,color,transform] duration-200 active:scale-[0.96]"
     >
       {!mounted ? null : theme === "dark" ? (
-        <Sun className="size-4 transition-transform duration-300 ease-out hover:rotate-45" />
+        <Sun className="size-4 transition-colors duration-200" />
       ) : (
-        <Moon className="size-4 transition-transform duration-300 ease-out hover:-rotate-12" />
+        <Moon className="size-4 transition-colors duration-200" />
       )}
     </Button>
   );

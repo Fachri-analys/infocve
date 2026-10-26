@@ -17,8 +17,8 @@ export function KpiCards({ data }: KpiCardsProps) {
       value: formatNumberId(totalSampleCves),
       subtext: "Sampel publikasi terkini NVD NIST",
       icon: Database,
-      iconColor: "text-blue-500",
-      bgColor: "bg-blue-500/10",
+      iconColor: "text-accent",
+      bgColor: "bg-accent/10",
       href: "/search",
     },
     {
@@ -26,8 +26,8 @@ export function KpiCards({ data }: KpiCardsProps) {
       value: formatNumberId(highlights.criticalCount),
       subtext: `${data.severityDistribution.find((s) => s.severity === "CRITICAL")?.percentage ?? 0}% dari total sampel`,
       icon: AlertTriangle,
-      iconColor: "text-red-500",
-      bgColor: "bg-red-500/10",
+      iconColor: "text-severity-critical-fg",
+      bgColor: "bg-severity-critical/10",
       href: "/search?severity=CRITICAL",
     },
     {
@@ -35,8 +35,8 @@ export function KpiCards({ data }: KpiCardsProps) {
       value: formatNumberId(highlights.cisaKevCount),
       subtext: "Tercantum dalam katalog CISA KEV",
       icon: Flame,
-      iconColor: "text-rose-600",
-      bgColor: "bg-rose-500/10",
+      iconColor: "text-severity-high-fg",
+      bgColor: "bg-severity-high/10",
       href: "/sources",
     },
     {
@@ -44,8 +44,8 @@ export function KpiCards({ data }: KpiCardsProps) {
       value: formatNumberId(highlights.urgentCount),
       subtext: "Rekomendasi tindakan segera (24-48 jam)",
       icon: ShieldAlert,
-      iconColor: "text-red-600",
-      bgColor: "bg-red-500/10",
+      iconColor: "text-severity-critical-fg",
+      bgColor: "bg-severity-critical/10",
       href: "/search?severity=CRITICAL",
     },
     {
@@ -53,16 +53,16 @@ export function KpiCards({ data }: KpiCardsProps) {
       value: cvssStats.averageScore > 0 ? cvssStats.averageScore.toFixed(1) : "-",
       subtext: `Dari ${formatNumberId(cvssStats.ratedCount)} kerentanan bernilai`,
       icon: Activity,
-      iconColor: "text-amber-500",
-      bgColor: "bg-amber-500/10",
+      iconColor: "text-severity-medium-fg",
+      bgColor: "bg-severity-medium/10",
     },
     {
       label: "Ancaman Eksploitasi Tinggi (EPSS)",
       value: formatNumberId(highlights.epssHighThreatCount),
       subtext: "Probabilitas eksploitasi EPSS > 10%",
       icon: CheckCircle,
-      iconColor: "text-purple-500",
-      bgColor: "bg-purple-500/10",
+      iconColor: "text-severity-high-fg",
+      bgColor: "bg-severity-high/10",
       href: "/sources",
     },
   ];
@@ -71,10 +71,13 @@ export function KpiCards({ data }: KpiCardsProps) {
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {cards.map((card) => {
         const Icon = card.icon;
+        const interactiveCardClasses = card.href
+          ? "hover:border-accent/40 hover:bg-surface-hover"
+          : "";
         const content = (
           <Card
             key={card.label}
-            className="border-border transition-all duration-300 ease-out hover:border-accent/40 hover:bg-background-raised/50 hover:shadow-md hover:shadow-black/5 h-full flex flex-col justify-between"
+            className={`group h-full flex flex-col justify-between border-border transition-[background-color,border-color] duration-200 ${interactiveCardClasses}`}
           >
             <CardContent className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
               <div className="flex items-start justify-between gap-3">
@@ -85,8 +88,8 @@ export function KpiCards({ data }: KpiCardsProps) {
                   </h3>
                   <p className="mt-1.5 text-xs text-muted-foreground line-clamp-1">{card.subtext}</p>
                 </div>
-                <div className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${card.bgColor} transition-transform duration-300 ease-out group-hover:scale-110`}>
-                  <Icon className={`size-5 ${card.iconColor}`} />
+                <div className={`flex size-9 shrink-0 items-center justify-center border border-border ${card.bgColor} transition-colors ${card.href ? "group-hover:border-accent/30" : ""}`}>
+                  <Icon className={`size-4.5 ${card.iconColor}`} />
                 </div>
               </div>
             </CardContent>
@@ -95,7 +98,7 @@ export function KpiCards({ data }: KpiCardsProps) {
 
         if (card.href) {
           return (
-            <Link key={card.label} href={card.href} className="group block h-full transition-transform duration-300 ease-out hover:-translate-y-1">
+            <Link key={card.label} href={card.href} className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
               {content}
             </Link>
           );

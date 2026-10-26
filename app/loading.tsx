@@ -4,23 +4,37 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function HomeLoading() {
   return (
     <div>
-      <div className="border-b border-border/70 py-2.5">
-        <Skeleton className="mx-4 h-4 w-1/3" />
-      </div>
-      <section className="border-b border-border/70 px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)] lg:gap-16">
-          <div className="flex max-w-2xl flex-col gap-4">
-            <Skeleton className="h-3 w-56" />
+      <section className="border-b border-border bg-background-raised/35">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-20 lg:px-8 lg:py-24">
+          <div className="flex max-w-3xl flex-col items-start">
+            <Skeleton className="mb-5 h-3 w-52" />
             <Skeleton className="h-12 w-full max-w-2xl sm:h-16" />
-            <Skeleton className="h-4 w-5/6" />
-            <Skeleton className="h-14 w-full max-w-2xl rounded-2xl" />
+            <Skeleton className="mt-6 h-16 w-full max-w-2xl" />
+            <Skeleton className="mt-8 h-14 w-full max-w-2xl rounded-xl" />
+            <Skeleton className="mt-4 h-4 w-72 max-w-full" />
           </div>
-          <Skeleton className="h-64 w-full rounded-2xl" />
+          <div className="border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+            <Skeleton className="h-3 w-32" />
+            <div className="mt-5 divide-y divide-border border-y border-border">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between gap-4 py-4">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-6 w-20" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
       <section className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
-          <Skeleton className="mb-6 h-6 w-48" />
+          <div className="mb-7 flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-48" />
+              <Skeleton className="h-4 w-72 max-w-full" />
+            </div>
+            <Skeleton className="h-4 w-20" />
+          </div>
           <CVEGridSkeleton count={6} />
         </div>
       </section>

@@ -93,7 +93,7 @@ function PageLink({
   children: React.ReactNode;
 } & React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   const classes = cn(
-    "data-tag inline-flex h-9 min-w-9 items-center justify-center rounded-full border px-2 text-sm transition-all duration-200 ease-out active:scale-95",
+    "data-tag inline-flex h-9 min-w-9 items-center justify-center rounded-full border px-2 text-sm transition-[background-color,border-color,color,transform] duration-200 ease-out active:scale-[0.985]",
     active
       ? "border-transparent bg-accent text-accent-foreground shadow-sm"
       : "border-border text-foreground hover:bg-surface-hover hover:border-border-hover",

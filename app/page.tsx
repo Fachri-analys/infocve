@@ -67,11 +67,14 @@ export default async function HomePage() {
       <section className="border-b border-border bg-background-raised/35">
         <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-20 lg:px-8 lg:py-24 animate-fade-up">
           <div className="max-w-3xl">
-            <p className="eyebrow mb-5 text-[10px]">Basis pengetahuan keamanan siber</p>
+            <p className="eyebrow mb-5 text-[10px]">Pencarian kerentanan keamanan</p>
             <h1 className="content-heading max-w-2xl font-display text-4xl font-medium leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
-              Pahami kerentanan siber dengan lebih jelas.
+              Cari CVE, pahami dampaknya.
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">{SITE_DESCRIPTION}</p>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
+              Telusuri berdasarkan ID, vendor, produk, atau kata kunci. Bandingkan skor CVSS, peluang eksploitasi EPSS,
+              dan status KEV untuk menentukan prioritas.
+            </p>
 
             <div className="mt-8 max-w-2xl">
               <SearchBar size="lg" />
@@ -91,7 +94,7 @@ export default async function HomePage() {
           </div>
 
           <div className="border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-            <p className="eyebrow text-[10px]">Ringkasan data</p>
+            <p className="eyebrow text-[10px]">Dalam basis data</p>
             <dl className="mt-5 divide-y divide-border border-y border-border">
               <StatItem value={formatNumberId(stats.total)} label="CVE tersedia" />
               <StatItem value={formatNumberId(stats.critical)} label="tingkat kritis" tone="critical" />
@@ -158,8 +161,8 @@ export default async function HomePage() {
       </SectionShell>
 
       {/* SECURITY CATEGORIES */}
-      <SectionShell title="Kategori Keamanan" description="Kelompok kerentanan berdasarkan area sistem yang terdampak.">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <SectionShell title="Kategori Keamanan" description="Pilih area sistem untuk mempersempit pencarian.">
+        <div className="grid grid-cols-1 border-t border-border sm:grid-cols-2 sm:gap-x-10">
           {categories.map((cat) => (
             <CategoryCard key={cat.slug} slug={cat.slug} name={cat.name} descriptionId={cat.descriptionId} count={cat.count} />
           ))}
