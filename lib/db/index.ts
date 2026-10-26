@@ -46,11 +46,16 @@ export function getDb(): DatabaseSyncInstance {
     return dbInstance;
   }
 
-  // Dynamically require node:sqlite to ensure compatibility
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { DatabaseSync } = require("node:sqlite");
+  // Load the Node built-in directly so Next.js does not turn the `node:` URL
+  // into a bundled CommonJS reference in production route handlers.
+  const sqlite = process.getBuiltinModule("node:sqlite") as
+    | { DatabaseSync?: new (location: string) => DatabaseSyncInstance }
+    | undefined;
+  if (!sqlite?.DatabaseSync) {
+    throw new Error("This runtime does not provide node:sqlite (requires Node.js 22.5+).");
+  }
   const dbPath = getDbPath();
-  const db: DatabaseSyncInstance = new DatabaseSync(dbPath);
+  const db: DatabaseSyncInstance = new sqlite.DatabaseSync(dbPath);
 
   // Performance pragmas
   db.exec("PRAGMA busy_timeout = 5000;");
