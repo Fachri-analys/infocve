@@ -13,7 +13,7 @@ export function ThreatIntelSummary({ cisaKevStats, epssStats }: ThreatIntelSumma
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       {/* CISA KEV Intelligence */}
-      <Card className="border-border">
+      <Card className="border-border border-t-2 border-t-severity-critical">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -34,7 +34,7 @@ export function ThreatIntelSummary({ cisaKevStats, epssStats }: ThreatIntelSumma
           </p>
         </CardHeader>
         <CardContent className="space-y-4 pt-1">
-          <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-background-raised/30 p-3">
+          <div className="grid grid-cols-2 gap-3 border-y border-border bg-background-raised/30 p-3">
             <div>
               <p className="text-xs text-muted-foreground">Di Sampel 120 Hari</p>
               <div className="mt-1 flex items-baseline gap-1">
@@ -87,7 +87,7 @@ export function ThreatIntelSummary({ cisaKevStats, epssStats }: ThreatIntelSumma
       </Card>
 
       {/* EPSS Prediction Intelligence */}
-      <Card className="border-border">
+      <Card className="border-border border-t-2 border-t-accent">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -108,7 +108,7 @@ export function ThreatIntelSummary({ cisaKevStats, epssStats }: ThreatIntelSumma
           </p>
         </CardHeader>
         <CardContent className="space-y-4 pt-1">
-          <div className="grid grid-cols-2 gap-3 rounded-lg border border-border bg-background-raised/30 p-3">
+          <div className="grid grid-cols-2 gap-3 border-y border-border bg-background-raised/30 p-3">
             <div>
               <p className="text-xs text-muted-foreground">Risiko Kritis (EPSS &gt; 50%)</p>
               <div className="mt-1 flex items-baseline gap-1">

@@ -64,48 +64,57 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(organizationJsonLd) }} />
 
       {/* HERO */}
-      <section className="border-b border-border bg-background-raised/35">
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-20 lg:px-8 lg:py-24 animate-fade-up">
-          <div className="max-w-3xl">
-            <p className="eyebrow mb-5 text-[10px]">Pencarian kerentanan keamanan</p>
-            <h1 className="content-heading max-w-2xl font-display text-4xl font-medium leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem]">
-              Cari CVE, pahami dampaknya.
+      <section className="home-hero navy-panel border-b border-border">
+        <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-20 lg:px-8 lg:py-24 animate-fade-up">
+          <div className="max-w-4xl">
+            <p className="eyebrow mb-6 text-[10px]">
+              <span aria-hidden="true" className="inline-flex size-2 bg-accent" />
+              Basis pengetahuan kerentanan
+            </p>
+            <h1 className="content-heading max-w-4xl font-display text-[2.75rem] font-medium leading-[1.02] tracking-[-0.045em] text-foreground sm:text-6xl lg:text-[4.75rem]">
+              Kenali celahnya.
+              <br className="hidden sm:block" />
+              {" "}
+              <span className="text-accent">Pahami risikonya.</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-muted-foreground sm:text-lg">
-              Telusuri berdasarkan ID, vendor, produk, atau kata kunci. Bandingkan skor CVSS, peluang eksploitasi EPSS,
-              dan status KEV untuk menentukan prioritas.
+            <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+              Telusuri CVE berdasarkan ID, vendor, produk, atau kata kunci. Baca penjelasan dalam Bahasa Indonesia,
+              lalu nilai urgensinya dari CVSS, EPSS, dan CISA KEV.
             </p>
 
-            <div className="mt-8 max-w-2xl">
-              <SearchBar size="lg" />
+            <div className="home-search mt-8 max-w-3xl">
+              <SearchBar size="lg" appearance="hero" />
               <p className="mt-3 text-xs text-muted-foreground">
-                Cari berdasarkan CVE ID, vendor, produk, atau kata kunci.
+                Contoh: <span className="data-tag text-foreground">CVE-2021-44228</span>, vendor, atau nama produk
               </p>
             </div>
 
-            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-              <Link href="/search?severity=CRITICAL" className="inline-flex items-center gap-1 text-accent underline-offset-4 hover:underline">
+            <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm">
+              <Link href="/search?severity=CRITICAL" className="inline-flex items-center gap-1.5 text-foreground underline-offset-4 transition-colors hover:text-accent hover:underline">
                 Jelajahi CVE kritis <ArrowUpRight className="size-3.5" />
               </Link>
-              <Link href="/glossary" className="inline-flex items-center gap-1 text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+              <Link href="/glossary" className="inline-flex items-center gap-1.5 text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">
                 Pelajari istilah <ArrowUpRight className="size-3.5" />
               </Link>
             </div>
           </div>
 
-          <div className="border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
-            <p className="eyebrow text-[10px]">Dalam basis data</p>
-            <dl className="mt-5 divide-y divide-border border-y border-border">
-              <StatItem value={formatNumberId(stats.total)} label="CVE tersedia" />
+          <aside aria-label="Ringkasan cakupan data" className="self-end border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+            <div className="flex items-center justify-between gap-4">
+              <p className="eyebrow text-[10px]">Cakupan NVD</p>
+              <span className="data-tag text-[10px] text-muted-foreground">120 HARI</span>
+            </div>
+            <dl className="mt-4 divide-y divide-border border-y border-border">
+              <StatItem value={formatNumberId(stats.total)} label="CVE terbaru" />
               <StatItem value={formatNumberId(stats.critical)} label="tingkat kritis" tone="critical" />
               <StatItem value={formatNumberId(stats.vendors)} label="vendor" />
             </dl>
-            <Link href="/sources" className="mt-5 inline-flex items-center gap-1.5 text-xs text-muted-foreground underline-offset-4 hover:text-accent hover:underline">
+            <Link href="/sources" className="mt-5 inline-flex items-center gap-1.5 text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-accent hover:underline">
               <Database className="size-3.5" />
-              Lihat sumber data
+              Sumber dan metodologi
               <ArrowRight className="size-3.5" />
             </Link>
-          </div>
+          </aside>
         </div>
       </section>
 
@@ -116,14 +125,14 @@ export default async function HomePage() {
         href="/search"
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {latest.map((cve) => (
-            <CVECard key={cve.id} cve={cve} />
+          {latest.map((cve, index) => (
+            <CVECard key={cve.id} cve={cve} featured={index === 0} />
           ))}
         </div>
       </SectionShell>
 
       {/* CRITICAL CVEs */}
-      <div className="border-y border-border">
+      <div className="navy-panel border-y border-border">
         <SectionShell
           title="CVE Tingkat Kritis"
           description="Kerentanan dengan dampak paling parah — perlu perhatian dan penambalan segera."
@@ -222,7 +231,7 @@ function SectionShell({
       <div className="mx-auto max-w-6xl">
         <div className="mb-7 flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-border pb-4">
           <div>
-            <h2 className="content-heading font-display text-xl font-semibold text-foreground sm:text-2xl">{title}</h2>
+          <h2 className="content-heading font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">{title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{description}</p>
           </div>
           {href && (

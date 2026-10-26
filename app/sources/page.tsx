@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Database, ShieldAlert, Activity, GitFork, ExternalLink, CheckCircle2 } from "lucide-react";
 import { Breadcrumb } from "@/components/common/breadcrumb";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildPageMetadata } from "@/utils/metadata";
 import { safeJsonLdStringify } from "@/utils/format";
 
@@ -99,68 +98,140 @@ export default function SourcesPage() {
     ],
   };
 
+  const primarySource = DATA_SOURCES.find((source) => source.id === "NVD");
+  const supportingSources = DATA_SOURCES.filter((source) => source.id !== "NVD");
+
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 animate-fade-in">
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(catalogJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(breadcrumbJsonLd) }} />
       <Breadcrumb items={[{ label: "Sumber Data" }]} />
 
-      <div className="page-intro mb-10">
-        <p className="eyebrow mb-3 text-[10px]">Transparansi data</p>
-        <h1 className="content-heading font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-          Transparansi & Metodologi Sumber Data
-        </h1>
-        <p className="mt-4 max-w-3xl text-base leading-8 text-muted-foreground">
-          InfoCVE berkomitmen pada keterbukaan penuh terhadap asal-usul (provenance) dan integritas data intelijen kerentanan yang kami sajikan.
-        </p>
-      </div>
+      <header className="mb-12 grid gap-8 border-b border-border pb-8 sm:grid-cols-[minmax(0,1fr)_12rem] sm:items-end sm:pb-10">
+        <div>
+          <p className="eyebrow mb-4 text-[10px]">Jejak data / InfoCVE</p>
+          <h1 className="content-heading max-w-4xl font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            Setiap temuan punya <span className="text-accent">sumber.</span>
+          </h1>
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
+            Telusuri asal metadata CVE, sinyal eksploitasi, dan skor probabilitas yang membantu memberi konteks pada setiap kerentanan.
+          </p>
+        </div>
+        <div className="flex items-end gap-4 border-l-2 border-accent pl-4 sm:justify-end">
+          <span className="data-tag text-5xl font-medium leading-none text-accent">{String(DATA_SOURCES.length).padStart(2, "0")}</span>
+          <span className="max-w-20 pb-1 text-xs leading-5 text-muted-foreground">sumber data yang dirujuk</span>
+        </div>
+      </header>
 
-      <div className="space-y-6">
-        {DATA_SOURCES.map((source) => {
-          const Icon = source.icon;
-          return (
-            <Card key={source.id} className="border-border">
-              <CardHeader>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <CardTitle className="flex items-center gap-2.5 text-lg">
-                    <Icon className={`size-5 ${source.color}`} />
-                    {source.name}
-                  </CardTitle>
-                  <a
-                    href={source.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-accent"
-                  >
-                    Kunjungi Situs Resmi
-                    <ExternalLink className="size-3" />
-                  </a>
+      {primarySource && (
+        <section aria-labelledby="primary-source-title">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="eyebrow text-[10px]">Sumber primer / 01</p>
+            <span className="data-tag text-[10px] uppercase tracking-[0.14em] text-muted-foreground">Data inti CVE</span>
+          </div>
+          <article className="editorial-panel navy-panel border border-border">
+            <div className="relative grid gap-8 p-5 sm:p-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:p-10">
+              <div>
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="data-tag border border-accent/30 px-2 py-1 text-xs text-accent">{primarySource.id}</span>
+                  <primarySource.icon className={`size-5 ${primarySource.color}`} aria-hidden="true" />
                 </div>
-                <p className="text-xs text-muted-foreground">Penyedia: <strong className="text-foreground">{source.provider}</strong></p>
-              </CardHeader>
-              <CardContent className="space-y-3 pt-0 text-sm">
-                <p className="leading-relaxed text-foreground">{source.description}</p>
+                <h2 id="primary-source-title" className="max-w-3xl font-display text-3xl font-medium leading-tight tracking-tight text-foreground sm:text-4xl">
+                  {primarySource.name}
+                </h2>
+                <p className="mt-2 text-xs font-medium text-muted-foreground">{primarySource.provider}</p>
+                <p className="mt-5 max-w-3xl text-sm leading-7 text-muted-foreground">
+                  {primarySource.description}
+                </p>
+                <a
+                  href={primarySource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-flex items-center gap-2 border-b border-accent/50 pb-1 text-sm font-medium text-accent transition-colors hover:border-accent hover:text-foreground"
+                >
+                  Kunjungi situs resmi
+                  <ExternalLink className="size-3.5" />
+                </a>
+              </div>
 
-                <div className="grid grid-cols-1 gap-2 rounded-xl border border-border bg-surface-hover/30 p-3 sm:grid-cols-2">
-                  <div>
-                    <span className="text-xs font-semibold text-accent">Peran di InfoCVE</span>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{source.role}</p>
+              <dl className="grid gap-4 border-t border-border pt-5 text-sm lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+                <div>
+                  <dt className="eyebrow text-[9px]">Peran di InfoCVE</dt>
+                  <dd className="mt-2 leading-6 text-foreground">{primarySource.role}</dd>
+                </div>
+                <div className="border-t border-border pt-4">
+                  <dt className="eyebrow text-[9px]">Pembaruan</dt>
+                  <dd className="mt-2 leading-6 text-muted-foreground">{primarySource.cadence}</dd>
+                </div>
+                <div className="border-t border-border pt-4">
+                  <dt className="eyebrow text-[9px]">Lisensi</dt>
+                  <dd className="mt-2 flex items-start gap-2 leading-5 text-muted-foreground">
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-400" />
+                    {primarySource.license}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </article>
+        </section>
+      )}
+
+      <section aria-labelledby="supporting-sources-title" className="mt-12">
+        <header className="mb-5 flex flex-col gap-2 border-b border-border pb-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="eyebrow mb-2 text-[10px]">Sinyal pelengkap / 02—04</p>
+            <h2 id="supporting-sources-title" className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+              Lapisan intelijen tambahan
+            </h2>
+          </div>
+          <p className="max-w-sm text-xs leading-5 text-muted-foreground">Eksploitasi aktif, peluang eksploitasi, dan advisori ekosistem open-source.</p>
+        </header>
+
+        <div className="grid grid-cols-1 border-y border-border md:grid-cols-3 md:divide-x md:divide-border">
+          {supportingSources.map((source, index) => {
+            const Icon = source.icon;
+            return (
+              <article key={source.id} className="group flex flex-col border-b border-border py-6 transition-colors hover:bg-surface-hover/40 md:border-b-0 md:px-5 md:py-7 first:md:pl-0 last:md:pr-0">
+                <div className="mb-5 flex items-center justify-between gap-3">
+                  <span className="data-tag text-xs text-muted-foreground">0{index + 2} / {source.id}</span>
+                  <Icon className={`size-5 transition-transform duration-200 group-hover:-translate-y-0.5 ${source.color}`} aria-hidden="true" />
+                </div>
+                <h3 className="font-display text-xl font-medium leading-snug tracking-tight text-foreground">{source.name}</h3>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">{source.provider}</p>
+                <p className="mt-4 text-sm leading-6 text-muted-foreground">{source.description}</p>
+
+                <div className="mt-5 border-t border-border pt-4">
+                  <p className="eyebrow text-[9px]">Peran di InfoCVE</p>
+                  <p className="mt-2 text-xs leading-5 text-foreground">{source.role}</p>
+                </div>
+
+                <dl className="mt-auto grid gap-3 pt-5">
+                  <div className="border-t border-border pt-3">
+                    <dt className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Pembaruan</dt>
+                    <dd className="mt-1 text-xs leading-5 text-foreground">{source.cadence}</dd>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-accent">Frekuensi Pembaruan</span>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{source.cadence}</p>
+                    <dt className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Lisensi data</dt>
+                    <dd className="mt-1 flex items-start gap-2 text-xs leading-5 text-muted-foreground">
+                      <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />
+                      {source.license}
+                    </dd>
                   </div>
-                </div>
+                </dl>
 
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <CheckCircle2 className="size-3.5 text-emerald-500" />
-                  <span>Lisensi Data: {source.license}</span>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                <a
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex w-fit items-center gap-1.5 border-b border-border pb-1 text-xs font-medium text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+                >
+                  Sumber resmi <ExternalLink className="size-3" />
+                </a>
+              </article>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 }

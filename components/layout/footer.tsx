@@ -8,7 +8,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/70">
+    <footer className="navy-panel border-t border-border">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           <div className="col-span-2">
@@ -24,7 +24,7 @@ export function Footer() {
             <ul className="space-y-2">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground">
+                  <Link href={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                     {link.label}
                   </Link>
                 </li>
@@ -37,7 +37,7 @@ export function Footer() {
             <ul className="space-y-2">
               {FOOTER_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-foreground">
+                  <Link href={link.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                     {link.label}
                   </Link>
                 </li>
@@ -47,7 +47,7 @@ export function Footer() {
                   href="https://github.com/Fachri-analys/infocve"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-accent"
                 >
                   <Code2 className="size-3.5" />
                   Kode Sumber
@@ -67,7 +67,7 @@ export function Footer() {
             </em>{" "}
             (Produk ini memakai NVD API, namun tidak didukung atau disertifikasi oleh NVD.) Data CVE diambil
             langsung dari NVD REST API v2.0 resmi. Selalu rujuk sumber resmi seperti{" "}
-            <a href="https://nvd.nist.gov" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
+            <a href="https://nvd.nist.gov" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 transition-colors hover:text-accent">
               nvd.nist.gov
             </a>{" "}
             untuk keputusan keamanan yang sesungguhnya.

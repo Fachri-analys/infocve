@@ -7,21 +7,21 @@ export default function DashboardLoading() {
       {/* Breadcrumb skeleton */}
       <Skeleton className="mb-4 h-4 w-32" />
 
-      {/* Header skeleton */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-28" />
-          <Skeleton className="h-8 w-80" />
-          <Skeleton className="h-4 w-96 max-w-full" />
+      <div className="navy-panel mb-8 grid gap-6 border border-border p-5 sm:p-8 lg:grid-cols-[minmax(0,1fr)_15rem]">
+        <div className="space-y-4">
+          <Skeleton className="home-hero-skeleton h-3 w-32" />
+          <Skeleton className="home-hero-skeleton h-12 w-3/4 max-w-xl" />
+          <Skeleton className="home-hero-skeleton h-4 w-full max-w-2xl" />
+          <Skeleton className="home-hero-skeleton h-4 w-2/3 max-w-xl" />
         </div>
-        <Skeleton className="h-9 w-44 rounded-lg" />
+        <Skeleton className="home-hero-skeleton h-20 w-full" />
       </div>
 
       <div className="space-y-8">
         {/* KPI Cards (6 items) */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="border-border">
+            <Card key={i} className="rounded-none border-0">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">

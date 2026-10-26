@@ -27,29 +27,33 @@ export default async function DashboardPage() {
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 animate-fade-in">
       <Breadcrumb items={[{ label: "Dashboard" }]} />
 
-      {/* Page Header */}
-      <div className="mb-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="eyebrow mb-2 text-[10px]">Intelijen Kerentanan</p>
-            <h1 className="content-heading font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-              Dashboard Kerentanan &amp; Ancaman
-            </h1>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-              Ringkasan analitik kerentanan siber berdasarkan data aktual National Vulnerability Database (NVD),
-              katalog eksploitasi CISA KEV, dan skor probabilitas EPSS dari FIRST.org.
-            </p>
-          </div>
+      <header className="navy-panel mb-8 grid gap-7 border border-border p-5 sm:p-8 lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-end">
+        <div className="max-w-3xl">
+          <p className="eyebrow mb-4 text-[10px]">
+            <span aria-hidden="true" className="inline-flex size-2 bg-accent" />
+            Intelijen Kerentanan
+          </p>
+          <h1 className="content-heading font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            Risiko siber, terbaca lebih jelas.
+          </h1>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
+            Ringkasan analitik kerentanan dari National Vulnerability Database (NVD), katalog eksploitasi CISA KEV,
+            dan skor probabilitas EPSS dari FIRST.org.
+          </p>
+        </div>
 
-          <div className="flex items-center gap-2 self-start rounded-lg border border-border bg-background-raised/50 px-3 py-2 text-xs text-muted-foreground sm:self-auto">
-            <Calendar className="size-3.5 text-accent" />
-            <span>Sampel Cakupan: <strong>120 Hari Terakhir</strong></span>
+        <div className="flex gap-4 border-t border-border pt-4 sm:items-center lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+          <Calendar className="mt-1 size-4 shrink-0 text-accent" />
+          <div>
+            <p className="eyebrow text-[10px]">Rentang Analisis</p>
+            <p className="data-tag mt-2 text-lg font-medium text-foreground">120 hari terakhir</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Sampel NVD untuk ringkasan metrik.</p>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Dashboard Content */}
-      <div className="space-y-8">
+      <div className="space-y-10">
         {/* KPI Cards Section */}
         <section aria-label="Metrik Utama">
           <KpiCards data={data} />
@@ -96,7 +100,7 @@ export default async function DashboardPage() {
         </section>
 
         {/* Methodology & Data Provenance Notice */}
-        <div className="rounded-xl border border-border bg-background-raised/30 p-6">
+        <div className="navy-panel border border-border p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">

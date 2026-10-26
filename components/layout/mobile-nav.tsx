@@ -32,8 +32,8 @@ export function MobileNav({ links }: { links: NavLink[] }) {
                   aria-current={isActive ? "page" : undefined}
                   className={
                     isActive
-                      ? "rounded-xl bg-accent/12 px-3 py-2.5 text-sm font-medium text-accent"
-                      : "rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover"
+                      ? "rounded-md bg-accent/12 px-3 py-2.5 text-sm font-medium text-accent"
+                      : "rounded-md px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover"
                   }
                 >
                   {link.label}

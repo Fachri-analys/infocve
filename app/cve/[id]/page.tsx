@@ -160,12 +160,12 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
 
       <Breadcrumb items={[{ label: "Cari CVE", href: "/search" }, { label: cve.id }]} />
 
-      <div className="mb-7 border-y border-border bg-surface/35 p-5 sm:p-7">
+      <div className="navy-panel mb-7 border border-border border-l-4 border-l-accent p-6 sm:p-9">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="eyebrow mb-3 text-[10px]">Detail kerentanan</p>
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="data-tag font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">{cve.id}</h1>
+              <h1 className="data-tag font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">{cve.id}</h1>
               <CopyCveIdButton id={cve.id} />
               {cve.hasPoc && (
                 <span className="rounded-md border border-severity-high/30 bg-severity-high/10 px-2.5 py-0.5 text-xs font-semibold text-severity-high-fg">
@@ -176,7 +176,13 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
             <p className="mt-2 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">{cve.title}</p>
             <SourceBadge sources={cve.sources} className="mt-4" />
           </div>
-          <div className="sm:pt-7">
+          <div className="flex items-center gap-3 border-t border-border pt-4 sm:flex-col sm:items-end sm:border-t-0 sm:pt-7">
+            <div className="sm:text-right">
+              <p className="eyebrow text-[10px]">Skor CVSS {cve.cvss.version}</p>
+              <p className="data-tag mt-1 text-3xl font-medium leading-none text-foreground sm:text-4xl">
+                {cve.cvss.baseScore.toFixed(1)}
+              </p>
+            </div>
             <SeverityBadge severity={cve.cvss.severity} size="md" />
           </div>
         </div>
@@ -199,7 +205,7 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start">
         <div className="space-y-6 lg:col-span-2">
-          <Card>
+          <Card className="border-t-2 border-t-accent">
             <CardHeader>
               <p className="eyebrow text-[10px]">Ringkasan teknis</p>
               <CardTitle className="mt-1">Deskripsi</CardTitle>
@@ -209,11 +215,13 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
                 <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Deskripsi Asli (Bahasa Inggris)
                 </p>
-                <p className="text-sm leading-relaxed text-foreground">{cve.descriptionEn}</p>
+                <p className="text-sm leading-7 text-muted-foreground">{cve.descriptionEn}</p>
               </div>
               <div className="border-t border-border/70 pt-4">
                 <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-accent">Penjelasan Bahasa Indonesia</p>
-                <p className="text-sm leading-relaxed text-foreground">{cve.descriptionId}</p>
+                <p className="border-l-2 border-accent bg-accent/5 py-3 pl-4 text-sm leading-7 text-foreground">
+                  {cve.descriptionId}
+                </p>
               </div>
             </CardContent>
           </Card>

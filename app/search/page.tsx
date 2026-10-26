@@ -115,24 +115,44 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 animate-fade-in">
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 animate-fade-in">
       <Breadcrumb items={[{ label: "Cari CVE" }]} />
 
-      <div className="page-intro">
-        <p className="eyebrow mb-3 text-[10px]">Eksplorasi kerentanan</p>
-        <h1 className="content-heading font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Cari CVE</h1>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        {result.total > 0
-          ? `Menampilkan ${result.results.length} dari ${result.total} hasil.`
-          : "Masukkan kata kunci atau gunakan filter di samping."}
-      </p>
-      </div>
+      <section aria-labelledby="search-page-title" className="editorial-panel navy-panel -mx-4 mb-12 border-y border-border sm:mx-0 sm:border">
+        <div className="relative grid gap-8 px-4 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12 lg:px-10 lg:py-12">
+          <div className="max-w-3xl">
+            <p className="eyebrow mb-5 text-[10px] text-accent">01 / Direktori kerentanan</p>
+            <h1 id="search-page-title" className="content-heading font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+              Temukan celah.<br />
+              <span className="text-accent">Pahami dampaknya.</span>
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base">
+              Telusuri CVE berdasarkan ID, vendor, produk, atau kata kunci. Persempit hasil dengan tingkat keparahan, tanggal, dan CWE.
+            </p>
+            <SearchBar defaultValue={params.query} size="lg" appearance="hero" className="mt-7 max-w-3xl" />
+            <p className="mt-3 text-xs text-muted-foreground">
+              Coba <span className="data-tag text-foreground">CVE-2021-44228</span>, nama vendor, atau istilah seperti <span className="text-foreground">remote code execution</span>.
+            </p>
+          </div>
 
-      <div className="mt-7 max-w-3xl">
-        <SearchBar defaultValue={params.query} />
-      </div>
+          <aside aria-label="Ringkasan hasil pencarian" className="grid grid-cols-2 gap-5 border-t border-border pt-5 sm:gap-8 lg:grid-cols-1 lg:content-end lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+            <div>
+              <p className="data-tag text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Cocok dengan pencarian</p>
+              <p className="data-tag mt-2 text-4xl font-medium leading-none text-accent sm:text-5xl">{result.total.toLocaleString("id-ID")}</p>
+              <p className="mt-2 text-xs text-muted-foreground">kerentanan ditemukan</p>
+            </div>
+            <div className="border-l border-border pl-5 lg:border-l-0 lg:border-t lg:pl-0 lg:pt-5">
+              <p className="data-tag text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Halaman hasil</p>
+              <p className="data-tag mt-2 text-2xl font-medium text-foreground">
+                {result.total > 0 ? `${String(result.page).padStart(2, "0")} / ${String(result.totalPages).padStart(2, "0")}` : "—"}
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">{result.results.length} entri di halaman ini</p>
+            </div>
+          </aside>
+        </div>
+      </section>
 
-      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
+      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-10">
         <aside>
           <SearchFilters
             query={params.query ?? ""}
@@ -158,15 +178,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </aside>
 
         <section aria-label="Hasil pencarian">
-          <div className="mb-5 flex items-center justify-between gap-4 border-y border-border py-3">
+          <div className="mb-5 flex items-end justify-between gap-4 border-b border-border pb-4">
             <div>
-              <p className="text-sm font-medium text-foreground">Hasil pencarian</p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {params.query ? `Untuk “${params.query}”` : "Semua kerentanan yang tersedia"}
+              <p className="eyebrow mb-2 text-[10px]">Daftar hasil</p>
+              <h2 className="font-display text-2xl font-medium tracking-tight text-foreground">
+                {params.query ? `“${params.query}”` : "Semua kerentanan"}
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {params.query ? "Hasil yang sesuai dengan kata kunci Anda." : "Gunakan filter untuk mempersempit direktori."}
               </p>
             </div>
-            <span className="data-tag rounded-md bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
-              {result.total} CVE
+            <span className="data-tag hidden text-xs text-muted-foreground sm:block">
+              {result.results.length.toString().padStart(2, "0")} / {DEFAULT_PAGE_SIZE.toString().padStart(2, "0")}
             </span>
           </div>
           {result.results.length === 0 ? (
@@ -174,8 +197,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           ) : (
             <>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {result.results.map((cve) => (
-                  <CVECard key={cve.id} cve={cve} />
+                {result.results.map((cve, index) => (
+                  <CVECard key={cve.id} cve={cve} featured={index === 0} />
                 ))}
               </div>
               <div className="mt-10">

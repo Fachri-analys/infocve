@@ -65,7 +65,7 @@ function DateRangeFieldset({ legend, fromName, toName, fromValue, toValue, input
 export function SearchFilters({ query, years, vendors, products, cwes, selected }: SearchFiltersProps) {
   const sortValue = `${selected.sortBy}-${selected.sortOrder}`;
   const dateInputClasses =
-    "h-10 w-full rounded-xl border border-border bg-background/50 px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+    "h-10 w-full rounded-md border border-border bg-background/50 px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   const activeCount =
     selected.severity.length +
@@ -79,15 +79,18 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
 
   return (
     <details
-      className="group block rounded-xl border border-border bg-surface text-foreground lg:sticky lg:top-24"
+      className="group block border border-border border-t-4 border-t-accent bg-surface text-foreground transition-colors lg:sticky lg:top-24"
       open={true}
     >
-      <summary className="flex cursor-pointer items-center justify-between p-4 font-display text-sm font-semibold text-foreground select-none lg:cursor-default lg:border-b lg:border-border/70">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="size-4 text-accent" />
-          <span>Filter Pencarian</span>
+      <summary className="flex cursor-pointer items-center justify-between gap-3 p-4 font-display text-sm font-semibold text-foreground select-none transition-colors hover:bg-surface-hover/50 lg:cursor-default lg:border-b lg:border-border/70 sm:p-5">
+        <div className="flex min-w-0 items-start gap-3">
+          <SlidersHorizontal className="mt-0.5 size-4 shrink-0 text-accent" />
+          <div className="min-w-0">
+            <span className="data-tag block text-[9px] uppercase tracking-[0.14em] text-muted-foreground">Refine / 01</span>
+            <span className="mt-1 block">Filter pencarian</span>
+          </div>
           {activeCount > 0 && (
-            <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">
+            <span className="data-tag border border-accent/25 bg-accent/10 px-1.5 py-0.5 text-[11px] font-semibold text-accent">
               {activeCount}
             </span>
           )}
@@ -98,27 +101,27 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
         </span>
       </summary>
 
-      <div className="hidden border-b border-border/70 px-5 py-2.5 lg:block">
-        <p className="text-xs text-muted-foreground">Pilih kriteria untuk mempersempit hasil.</p>
+      <div className="hidden border-b border-border/70 px-5 py-3 lg:block">
+        <p className="text-xs leading-5 text-muted-foreground">Gabungkan kriteria untuk mempersempit hasil.</p>
       </div>
 
       <div className="p-4 sm:p-5">
-        <form action="/search" method="GET" className="flex flex-col gap-5">
+        <form action="/search" method="GET" className="flex flex-col gap-6">
           <input type="hidden" name="q" value={query} />
 
           <fieldset>
             <legend className="mb-2 text-sm font-medium text-foreground">Tingkat Keparahan</legend>
-            <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-1">
               {SEVERITY_ORDER.map((tier) => {
                 const classes = SEVERITY_CLASSES[tier];
                 return (
-                    <label key={tier} className="group flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-foreground transition-colors hover:bg-surface-hover">
-                      <input
+                  <label key={tier} className="group flex cursor-pointer items-center gap-2 border border-transparent px-2 py-2 text-xs text-foreground transition-[background-color,border-color] hover:border-border hover:bg-surface-hover sm:text-sm">
+                    <input
                       type="checkbox"
                       name="severity"
                       value={tier}
                       defaultChecked={selected.severity.includes(tier)}
-                      className="size-4 rounded border-border accent-accent focus-visible:ring-2 focus-visible:ring-ring"
+                      className="size-4 shrink-0 rounded border-border accent-accent focus-visible:ring-2 focus-visible:ring-ring"
                     />
                     <span className={cn("size-2 rounded-full", classes.dot)} aria-hidden="true" />
                     {SEVERITY_LABEL_ID[tier]}
@@ -136,7 +139,7 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
               id="year"
               name="year"
               defaultValue={selected.year ?? ""}
-              className="h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-10 w-full border border-border bg-surface px-3 text-sm text-foreground transition-colors hover:border-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="">Semua tahun</option>
               {years.map((year) => (
@@ -155,7 +158,7 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
               id="vendor"
               name="vendor"
               defaultValue={selected.vendor ?? ""}
-              className="h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-10 w-full border border-border bg-surface px-3 text-sm text-foreground transition-colors hover:border-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="">Semua vendor</option>
               {vendors.map((v) => (
@@ -174,7 +177,7 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
               id="product"
               name="product"
               defaultValue={selected.product ?? ""}
-              className="h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-10 w-full border border-border bg-surface px-3 text-sm text-foreground transition-colors hover:border-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="">Semua produk</option>
               {products.map((p) => (
@@ -193,7 +196,7 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
               id="cwe"
               name="cwe"
               defaultValue={selected.cwe ?? ""}
-              className="h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-10 w-full border border-border bg-surface px-3 text-sm text-foreground transition-colors hover:border-border-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="">Semua CWE</option>
               {cwes.map((c) => (
@@ -237,7 +240,7 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
               id="sort"
               name="sort"
               defaultValue={sortValue}
-              className="h-10 w-full rounded-xl border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-10 w-full rounded-md border border-border bg-surface px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <option value="publishedDate-desc">Tanggal publikasi (terbaru)</option>
               <option value="publishedDate-asc">Tanggal publikasi (terlama)</option>
@@ -247,7 +250,7 @@ export function SearchFilters({ query, years, vendors, products, cwes, selected 
             </select>
           </div>
 
-          <div className="flex gap-2 pt-1">
+          <div className="flex gap-2 border-t border-border pt-5">
             <Button type="submit" size="sm" className="flex-1">
               Terapkan
             </Button>

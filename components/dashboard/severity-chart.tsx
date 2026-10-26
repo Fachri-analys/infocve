@@ -11,7 +11,7 @@ interface SeverityChartProps {
 
 export function SeverityChart({ severityDistribution, brackets, totalCves }: SeverityChartProps) {
   return (
-    <Card className="border-border">
+    <Card className="border-border border-t-2 border-t-accent">
       <CardHeader className="pb-3">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div>

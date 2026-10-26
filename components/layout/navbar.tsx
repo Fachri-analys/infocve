@@ -12,7 +12,7 @@ export function Navbar() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md transition-colors duration-200">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 transition-colors duration-200">
       <div className="mx-auto flex h-[4.5rem] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link href="/" className="group flex min-w-0 items-center gap-2.5" aria-label={`${SITE_NAME}, kembali ke beranda`}>
           <span className="flex size-8 shrink-0 items-center justify-center text-accent transition-colors duration-200 group-hover:text-foreground">
@@ -26,7 +26,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        <nav aria-label="Navigasi utama" className="hidden items-center gap-5 md:flex">
+        <nav aria-label="Navigasi utama" className="hidden items-center gap-4 lg:gap-5 md:flex">
           {NAV_LINKS.map((link) => {
             const isActive = link.href === "/" ? pathname === "/" : pathname === link.href || pathname.startsWith(`${link.href}/`);
 

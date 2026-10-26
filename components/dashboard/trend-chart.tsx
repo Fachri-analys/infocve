@@ -16,7 +16,7 @@ export function TrendChart({ trend }: TrendChartProps) {
   const maxTotal = Math.max(...trend.map((t) => t.total), 1);
 
   return (
-    <Card className="border-border">
+    <Card className="border-border border-t-2 border-t-accent">
       <CardHeader className="pb-3">
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">

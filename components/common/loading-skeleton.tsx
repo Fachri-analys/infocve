@@ -42,8 +42,8 @@ export function CVEDetailSkeleton() {
         </Card>
       </div>
       <div className="space-y-4">
-        <Skeleton className="h-40 w-full rounded-2xl" />
-        <Skeleton className="h-32 w-full rounded-2xl" />
+        <Skeleton className="h-40 w-full rounded-md" />
+        <Skeleton className="h-32 w-full rounded-md" />
       </div>
     </div>
   );

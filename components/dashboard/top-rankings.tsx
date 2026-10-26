@@ -14,7 +14,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Top Vendors */}
-      <Card className="border-border flex flex-col justify-between h-full">
+      <Card className="flex h-full flex-col justify-between rounded-none border-x-0 border-b-0 border-t-2 border-t-accent bg-transparent">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Building2 className="size-4 text-blue-500" />
@@ -30,16 +30,16 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
               <Link
                 key={item.name}
                 href={`/search?vendor=${encodeURIComponent(item.name)}`}
-                className="flex items-center justify-between rounded-md border border-border/60 bg-background/50 p-2 text-xs transition-colors hover:border-foreground/20 hover:bg-background-raised"
+                className="flex items-center justify-between border-b border-border/70 px-1 py-2.5 text-xs transition-colors hover:bg-surface-hover/50"
               >
                 <div className="flex items-center gap-2 min-w-0 pr-2">
-                  <span className="font-mono text-muted-foreground w-5 text-right text-[11px] shrink-0">
+                  <span className="data-tag w-5 shrink-0 text-right text-[11px] text-muted-foreground">
                     #{index + 1}
                   </span>
                   <span className="font-medium text-foreground truncate">{item.name}</span>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-foreground">
+                  <span className="data-tag border-l border-accent/60 bg-accent/10 px-1.5 py-0.5 text-[11px] text-foreground">
                     {formatNumberId(item.count)}
                   </span>
                   <ArrowUpRight className="size-3 text-muted-foreground" />
@@ -51,7 +51,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
       </Card>
 
       {/* Top Products */}
-      <Card className="border-border flex flex-col justify-between h-full">
+      <Card className="flex h-full flex-col justify-between rounded-none border-x-0 border-b-0 border-t-2 border-t-severity-low bg-transparent">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Package className="size-4 text-emerald-500" />
@@ -67,16 +67,16 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
               <Link
                 key={item.name}
                 href={`/search?q=${encodeURIComponent(item.name)}`}
-                className="flex items-center justify-between rounded-md border border-border/60 bg-background/50 p-2 text-xs transition-colors hover:border-foreground/20 hover:bg-background-raised"
+                className="flex items-center justify-between border-b border-border/70 px-1 py-2.5 text-xs transition-colors hover:bg-surface-hover/50"
               >
                 <div className="flex items-center gap-2 min-w-0 pr-2">
-                  <span className="font-mono text-muted-foreground w-5 text-right text-[11px] shrink-0">
+                  <span className="data-tag w-5 shrink-0 text-right text-[11px] text-muted-foreground">
                     #{index + 1}
                   </span>
                   <span className="font-medium text-foreground truncate">{item.name}</span>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-foreground">
+                  <span className="data-tag border-l border-accent/60 bg-accent/10 px-1.5 py-0.5 text-[11px] text-foreground">
                     {formatNumberId(item.count)}
                   </span>
                   <ArrowUpRight className="size-3 text-muted-foreground" />
@@ -88,7 +88,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
       </Card>
 
       {/* Top CWE Weaknesses */}
-      <Card className="border-border flex flex-col justify-between h-full">
+      <Card className="flex h-full flex-col justify-between rounded-none border-x-0 border-b-0 border-t-2 border-t-severity-high bg-transparent">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <AlertCircle className="size-4 text-amber-500" />
@@ -104,11 +104,11 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
               <Link
                 key={item.id}
                 href={`/search?cwe=${encodeURIComponent(item.id)}`}
-                className="flex items-center justify-between rounded-md border border-border/60 bg-background/50 p-2 text-xs transition-colors hover:border-foreground/20 hover:bg-background-raised"
+                className="flex items-center justify-between border-b border-border/70 px-1 py-2.5 text-xs transition-colors hover:bg-surface-hover/50"
                 title={`${item.id}: ${item.name}`}
               >
                 <div className="flex items-center gap-2 min-w-0 pr-2">
-                  <span className="font-mono text-muted-foreground w-5 text-right text-[11px] shrink-0">
+                  <span className="data-tag w-5 shrink-0 text-right text-[11px] text-muted-foreground">
                     #{index + 1}
                   </span>
                   <div className="min-w-0">
@@ -120,7 +120,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] text-foreground">
+                  <span className="data-tag border-l border-accent/60 bg-accent/10 px-1.5 py-0.5 text-[11px] text-foreground">
                     {formatNumberId(item.count)}
                   </span>
                   <ArrowUpRight className="size-3 text-muted-foreground" />

@@ -34,7 +34,7 @@ export function PriorityBreakdown({ priorityStats }: PriorityBreakdownProps) {
             return (
               <div
                 key={item.tier}
-                className="flex flex-col justify-between rounded-lg border border-border bg-background-raised/30 p-4 transition-colors hover:border-foreground/20"
+                className="flex flex-col justify-between rounded-sm border border-border border-l-2 border-l-accent bg-background-raised/30 p-4 transition-colors hover:bg-surface-hover"
               >
                 <div>
                   <div className="flex items-center justify-between">

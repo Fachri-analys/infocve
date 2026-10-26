@@ -39,29 +39,32 @@ export default function AboutPage() {
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <Breadcrumb items={[{ label: "Tentang" }]} />
 
-      <div className="page-intro">
+      <div className="page-intro border-b border-border pb-7 sm:pb-9">
         <p className="eyebrow mb-3 text-[10px]">Mengenal InfoCVE</p>
-        <h1 className="content-heading font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">Tentang InfoCVE</h1>
-      <p className="mt-4 text-base leading-8 text-muted-foreground">
-        InfoCVE adalah proyek edukasi yang bertujuan membantu pelajar, developer, dan siapa pun di Indonesia memahami
-        kerentanan keamanan siber (CVE) dengan lebih mudah. Alih-alih hanya menyalin data teknis mentah, setiap
-        kerentanan dilengkapi penjelasan Bahasa Indonesia yang ramah pemula, di samping deskripsi aslinya.
-      </p>
+        <h1 className="content-heading font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl">Tentang InfoCVE</h1>
+        <p className="mt-4 max-w-3xl text-base leading-8 text-muted-foreground">
+          InfoCVE membantu pelajar, developer, dan masyarakat Indonesia memahami kerentanan keamanan siber (CVE).
+          Setiap entri menyandingkan data teknis dengan penjelasan Bahasa Indonesia yang ramah pemula.
+        </p>
       </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {values.map((value) => (
-          <Card key={value.title} className="p-5 transition-[border-color,background-color] hover:border-accent/35 hover:bg-surface-hover/25 sm:p-6">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-accent/12 text-accent">
-              <value.icon className="size-4" />
-            </span>
-            <h3 className="mt-3 font-display text-sm font-medium text-foreground">{value.title}</h3>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{value.description}</p>
-          </Card>
-        ))}
+      <div className="mt-8 grid grid-cols-1 border-y border-border sm:grid-cols-2">
+        {values.map((value, index) => {
+          const Icon = value.icon;
+          return (
+            <article key={value.title} className="border-b border-border p-5 transition-colors hover:bg-surface-hover/30 sm:p-6 sm:odd:border-r">
+              <div className="flex items-center justify-between">
+                <span className="data-tag text-xs text-accent">0{index + 1}</span>
+                <Icon className="size-4 text-accent" aria-hidden="true" />
+              </div>
+              <h2 className="mt-5 font-display text-base font-medium text-foreground">{value.title}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{value.description}</p>
+            </article>
+          );
+        })}
       </div>
 
-      <Card className="mt-8">
+      <Card className="navy-panel mt-8 rounded-none border-x-0 border-y border-border">
         <CardHeader>
           <CardTitle>Status Data</CardTitle>
         </CardHeader>

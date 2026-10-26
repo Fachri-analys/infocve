@@ -18,17 +18,18 @@
   color since no adjustment is needed there.
 */
 :root {
-  --color-background: #080c16;
-  --color-background-raised: #0c1220;
+  --color-background: #08111e;
+  --color-background-raised: #0c1a2b;
   --color-foreground: #edf2ff;
   --color-muted-foreground: #98a5bd;
-  --color-surface: #111a2b;
-  --color-surface-hover: #19263d;
-  --color-border: #273650;
-  --color-border-hover: #4a5f84;
-  --color-accent: #91a9ff;
-  --color-accent-foreground: #0a1020;
-  --color-ring: #91a9ff;
+  --color-surface: #102137;
+  --color-surface-hover: #172b44;
+  --color-border: #2b3d54;
+  --color-border-hover: #52708f;
+  --color-accent: #8bbaff;
+  --color-accent-strong: #3a78df;
+  --color-accent-foreground: #08111e;
+  --color-ring: #8bbaff;
   --color-transition-duration: 240ms;
 
   --color-severity-critical: #f0453b;
@@ -47,17 +48,18 @@
 }
 
 .light {
-  --color-background: #f7f8fc;
+  --color-background: #ffffff;
   --color-background-raised: #ffffff;
   --color-foreground: #12172a;
-  --color-muted-foreground: #58637c;
+  --color-muted-foreground: #536276;
   --color-surface: #ffffff;
-  --color-surface-hover: #eef2fa;
-  --color-border: #dfe5f0;
-  --color-border-hover: #c1cbe0;
-  --color-accent: #5369dc;
+  --color-surface-hover: #f2f6fb;
+  --color-border: #d9e1eb;
+  --color-border-hover: #9eafc4;
+  --color-accent: #1858d8;
+  --color-accent-strong: #1858d8;
   --color-accent-foreground: #ffffff;
-  --color-ring: #5369dc;
+  --color-ring: #1858d8;
 
   /* Verified >= 4.5:1 (WCAG AA, normal text) against each color's own
      12%-opacity badge background — see the audit summary for the exact
@@ -81,6 +83,7 @@
   --color-border: var(--color-border);
   --color-border-hover: var(--color-border-hover);
   --color-accent: var(--color-accent);
+  --color-accent-strong: var(--color-accent-strong);
   --color-accent-foreground: var(--color-accent-foreground);
   --color-ring: var(--color-ring);
 
@@ -149,6 +152,89 @@
   border-color: var(--color-border);
 }
 
+.navy-panel {
+  --color-background: #071a31;
+  --color-background-raised: #0b2441;
+  --color-foreground: #f7faff;
+  --color-muted-foreground: #bac8d9;
+  --color-surface: #0d2643;
+  --color-surface-hover: #153452;
+  --color-border: #29415d;
+  --color-border-hover: #58789d;
+  --color-accent: #91bdff;
+  --color-accent-strong: #1858d8;
+  --color-accent-foreground: #071a31;
+  --color-ring: #a8ccff;
+  --color-severity-critical-fg: #ff928b;
+  --color-severity-high-fg: #ffc17d;
+  --color-severity-medium-fg: #f9df78;
+  --color-severity-low-fg: #7dd3fc;
+  --color-severity-none-fg: #c1cad6;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.home-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--color-background);
+}
+
+.home-hero::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: linear-gradient(to right, rgb(145 189 255 / 9%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(145 189 255 / 9%) 1px, transparent 1px);
+  background-size: 56px 56px;
+  content: "";
+  pointer-events: none;
+}
+
+.home-hero .eyebrow {
+  color: #a6c9ff;
+}
+
+.home-hero-skeleton {
+  background-color: rgb(255 255 255 / 12%);
+}
+
+.editorial-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.editorial-panel::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: linear-gradient(to right, rgb(145 189 255 / 8%) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(145 189 255 / 8%) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(90deg, #000 0%, transparent 88%);
+  content: "";
+  pointer-events: none;
+}
+
+.glossary-term {
+  border: 0;
+  border-radius: 0;
+  border-left: 0;
+  background-color: var(--color-background);
+  transition: background-color 200ms ease-out, box-shadow 200ms ease-out;
+}
+
+.glossary-term:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.glossary-term[data-state="open"] {
+  background-color: var(--color-surface);
+  box-shadow: inset 0 2px 0 var(--color-accent);
+}
+
 /* Theme changes should feel continuous across the whole interface. */
 :where(html, body, body *) {
   transition-property: color, background-color, border-color, outline-color, fill, stroke, text-decoration-color;
@@ -177,7 +263,7 @@ body {
 @keyframes page-enter {
   from {
     opacity: 0;
-    transform: translateY(5px);
+    transform: translate3d(0, 9px, 0);
   }
   to {
     opacity: 1;
@@ -186,7 +272,43 @@ body {
 }
 
 .page-enter {
-  animation: page-enter 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  display: contents;
+}
+
+.page-enter > * {
+  animation: page-enter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.page-enter > *:nth-child(2) {
+  animation-delay: 35ms;
+}
+
+.page-enter > *:nth-child(3) {
+  animation-delay: 70ms;
+}
+
+.page-enter > *:nth-child(n + 4) {
+  animation-delay: 100ms;
+}
+
+.page-enter > :only-child {
+  animation: none;
+}
+
+.page-enter > :only-child > * {
+  animation: page-enter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.page-enter > :only-child > *:nth-child(2) {
+  animation-delay: 35ms;
+}
+
+.page-enter > :only-child > *:nth-child(3) {
+  animation-delay: 70ms;
+}
+
+.page-enter > :only-child > *:nth-child(n + 4) {
+  animation-delay: 100ms;
 }
 
 ::selection {
@@ -206,7 +328,16 @@ body {
 }
 
 .page-intro {
-  max-width: 46rem;
+  max-width: 48rem;
+}
+
+.page-intro h1 {
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.page-intro > p:not(.eyebrow) {
+  max-width: 44rem;
 }
 
 .eyebrow {
@@ -246,6 +377,21 @@ body {
 
 .prose-info h3 {
   font-size: 0.95rem;
+}
+
+.legal-copy > section {
+  border-top: 1px solid var(--color-border);
+  padding-top: 1.25rem;
+}
+
+.legal-copy > section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.legal-copy > section h2 {
+  margin-bottom: 0.65rem;
+  color: var(--color-accent);
 }
 
 .prose-info a {
@@ -369,6 +515,7 @@ p {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;

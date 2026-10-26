@@ -68,7 +68,7 @@ export function KpiCards({ data }: KpiCardsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
       {cards.map((card) => {
         const Icon = card.icon;
         const interactiveCardClasses = card.href
@@ -77,7 +77,7 @@ export function KpiCards({ data }: KpiCardsProps) {
         const content = (
           <Card
             key={card.label}
-            className={`group h-full flex flex-col justify-between border-border transition-[background-color,border-color] duration-200 ${interactiveCardClasses}`}
+            className={`group h-full flex flex-col justify-between rounded-none border-0 bg-background transition-colors duration-200 ${interactiveCardClasses}`}
           >
             <CardContent className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
               <div className="flex items-start justify-between gap-3">
@@ -88,7 +88,7 @@ export function KpiCards({ data }: KpiCardsProps) {
                   </h3>
                   <p className="mt-1.5 text-xs text-muted-foreground line-clamp-1">{card.subtext}</p>
                 </div>
-                <div className={`flex size-9 shrink-0 items-center justify-center border border-border ${card.bgColor} transition-colors ${card.href ? "group-hover:border-accent/30" : ""}`}>
+                <div className={`flex size-10 shrink-0 items-center justify-center border border-border ${card.bgColor} transition-colors ${card.href ? "group-hover:border-accent/30" : ""}`}>
                   <Icon className={`size-4.5 ${card.iconColor}`} />
                 </div>
               </div>
