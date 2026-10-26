@@ -1,5 +1,10 @@
 # InfoCVE — Basis Pengetahuan Kerentanan Siber Indonesia
 
+[![CI](https://github.com/Fachri-analys/infocve/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Fachri-analys/infocve/actions/workflows/ci.yml)
+[![Node.js >=22.5.0](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Next.js 16.3.0](https://img.shields.io/badge/Next.js-16.3.0-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 > Platform intelijen kerentanan siber (CVE) untuk Indonesia — menyajikan data teknis, skor dampak CVSS, probabilitas eksploitasi EPSS, status eksploitasi aktif CISA KEV, dan rekomendasi prioritas tindakan dalam bahasa yang jelas dan mudah dipahami.
 
 InfoCVE mengintegrasikan feed resmi dari **National Vulnerability Database (NVD NIST)**, **CISA Known Exploited Vulnerabilities (KEV)**, **FIRST Exploit Prediction Scoring System (EPSS)**, dan **GitHub Security Advisories (GHSA)** ke dalam basis data intelijen lokal berbasis SQLite tertanam (`node:sqlite`).
