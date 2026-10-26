@@ -4,6 +4,10 @@
 
 InfoCVE mengintegrasikan feed resmi dari **National Vulnerability Database (NVD NIST)**, **CISA Known Exploited Vulnerabilities (KEV)**, **FIRST Exploit Prediction Scoring System (EPSS)**, dan **GitHub Security Advisories (GHSA)** ke dalam basis data intelijen lokal berbasis SQLite tertanam (`node:sqlite`).
 
+## 🖥️ Pratinjau Antarmuka
+
+![Tampilan beranda InfoCVE dengan pencarian CVE dan ringkasan cakupan NVD](docs/images/infocve-homepage.png)
+
 ---
 
 ## 🚀 Fitur Utama
