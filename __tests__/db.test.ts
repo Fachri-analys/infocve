@@ -1,6 +1,16 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { closeDb } from "@/lib/db";
 import { CveRepository } from "@/lib/db/cve-repository";
 import type { CVE } from "@/types/cve";
+
+beforeAll(() => {
+  process.env.TEST_DB = "memory";
+});
+
+afterAll(() => {
+  closeDb();
+  delete process.env.TEST_DB;
+});
 
 describe("Database & CVE Repository", () => {
   const sampleCve: CVE = {

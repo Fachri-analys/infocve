@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Database, ShieldAlert, Activity, GitFork, ExternalLink, CheckCircle2 } from "lucide-react";
+import { Database, ShieldAlert, Activity, GitFork, ExternalLink, FileSearch } from "lucide-react";
 import { Breadcrumb } from "@/components/common/breadcrumb";
 import { buildPageMetadata } from "@/utils/metadata";
 import { safeJsonLdStringify } from "@/utils/format";
@@ -18,9 +18,10 @@ const DATA_SOURCES = [
     provider: "National Institute of Standards and Technology (NIST)",
     url: "https://nvd.nist.gov",
     description:
-      "Standar data kerentanan resmi pemerintah AS yang memuat CVE Dictionary, skor keparahan CVSS v2.0/v3.x/v4.0, Common Weakness Enumeration (CWE), dan konfigurasi Common Platform Enumeration (CPE).",
+      "Sumber data CVE dan pengayaan NIST yang memuat skor CVSS, CWE, referensi, serta konfigurasi produk jika tersedia. Record CVE dapat memuat kontribusi pihak lain.",
     role: "Sumber data utama untuk metadata CVE, deskripsi teknis, skor CVSS resmi, dan relasi vendor/produk.",
-    license: "Public Domain (US Government Work)",
+    terms: "Ikuti ketentuan API NVD dan CVE Program, serta pertahankan copyright/license notice. Kontribusi CNA/pihak ketiga: Needs Review per record. This product uses the NVD API but is not endorsed or certified by the NVD.",
+    termsUrl: "https://nvd.nist.gov/developers/terms-of-use",
     cadence: "Sinkronisasi berkala (1 - 6 jam) via REST API v2.0",
     icon: Database,
     color: "text-blue-500",
@@ -33,7 +34,8 @@ const DATA_SOURCES = [
     description:
       "Katalog resmi otoritatif kerentanan yang memiliki bukti konfirmasi telah dieksploitasi secara aktif oleh penyerang siber di lingkungan nyata (in-the-wild).",
     role: "Memberikan status KEV, tenggat waktu remediasi mandat federal (due date), dan rekomendasi tindakan mitigasi darurat.",
-    license: "Public Domain (US Federal)",
+    terms: "Data katalog KEV di bawah CC0 1.0. Informasi di tautan pihak ketiga tidak tercakup; penggunaan logo/seal atau kesan endorsement tidak diizinkan.",
+    termsUrl: "https://github.com/cisagov/kev-data/blob/develop/LICENSE",
     cadence: "Diperbarui setiap ada publikasi eksploitasi aktif baru",
     icon: ShieldAlert,
     color: "text-red-500",
@@ -46,7 +48,8 @@ const DATA_SOURCES = [
     description:
       "Model statistik berbasis machine learning yang memperkirakan probabilitas suatu CVE akan dieksploitasi dalam 30 hari ke depan, dilengkapi peringkat persentil global.",
     role: "Membantu tim keamanan memprioritaskan patching berdasarkan ancaman nyata, bukan hanya skor keparahan teoretis.",
-    license: "Open Data (FIRST.org)",
+    terms: "Skor tersedia gratis melalui API/CSV dan atribusi diminta. Lisensi dataset tersendiri tidak ditemukan pada FAQ yang ditinjau; Needs Review sebelum redistribusi massal.",
+    termsUrl: "https://www.first.org/epss/faq",
     cadence: "Diperbarui setiap hari (skor harian global)",
     icon: Activity,
     color: "text-purple-500",
@@ -59,10 +62,24 @@ const DATA_SOURCES = [
     description:
       "Basis data kerentanan perangkat lunak open-source di berbagai ekosistem paket (npm, PyPI, Maven, Go, Cargo, NuGet, RubyGems, Composer).",
     role: "Menghubungkan CVE dengan dependensi paket open-source, versi terdampak, dan rilis patch perbaikan.",
-    license: "Creative Commons Attribution 4.0 International (CC-BY 4.0)",
+    terms: "Basis data GHSA berlisensi CC BY 4.0. Tautkan advisori spesifik atau database GitHub dan tandai jika materi diubah.",
+    termsUrl: "https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#advisory-database",
     cadence: "Sinkronisasi real-time / harian",
     icon: GitFork,
     color: "text-emerald-500",
+  },
+  {
+    id: "OSV",
+    name: "Open Source Vulnerabilities (OSV.dev)",
+    provider: "OSV.dev; data dikumpulkan dari berbagai database advisori",
+    url: "https://osv.dev",
+    description: "Agregator advisori kerentanan yang dipakai pemindai dependency npm InfoCVE untuk mencari kandidat, rentang versi, dan relasi package.",
+    role: "Mencocokkan package npm dengan advisori; hasil OSV diperiksa silang dengan GHSA dan dibatasi pada identitas serta rentang versi yang cocok.",
+    terms: "Lisensi mengikuti sumber asal setiap record dan dapat berbeda. API/schema OSV bukan lisensi menyeluruh; record tanpa asal/lisensi jelas berstatus Needs Review.",
+    termsUrl: "https://google.github.io/osv.dev/data/",
+    cadence: "Saat pemindaian dependency",
+    icon: FileSearch,
+    color: "text-amber-500",
   },
 ];
 
@@ -74,13 +91,13 @@ export default function SourcesPage() {
     "@type": "DataCatalog",
     name: "Katalog Sumber Data Intelijen Kerentanan InfoCVE",
     description:
-      "Katalog resmi sumber data intelijen kerentanan yang digunakan InfoCVE, mencakup NVD NIST, CISA KEV, FIRST EPSS, dan GHSA.",
+      "Katalog sumber data intelijen kerentanan yang dirujuk InfoCVE, mencakup NVD NIST, CISA KEV, FIRST EPSS, GHSA, dan OSV.dev.",
     url: `${siteUrl}/sources`,
     dataset: DATA_SOURCES.map((s) => ({
       "@type": "Dataset",
       name: s.name,
       description: s.description,
-      license: s.license,
+      citation: s.termsUrl,
       creator: {
         "@type": "Organization",
         name: s.provider,
@@ -123,6 +140,10 @@ export default function SourcesPage() {
         </div>
       </header>
 
+      <p className="mb-8 max-w-4xl border-l-2 border-accent px-4 py-2 text-xs leading-relaxed text-muted-foreground">
+        Status lisensi di bawah merujuk pada ketentuan sumber yang ditautkan, bukan jaminan bahwa seluruh referensi yang dikutip dapat didistribusikan ulang. InfoCVE menyimpan tautan dan identitas sumber; teks terjemahan, prioritas, serta analisis diberi label sebagai hasil InfoCVE.
+      </p>
+
       {primarySource && (
         <section aria-labelledby="primary-source-title">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -164,11 +185,11 @@ export default function SourcesPage() {
                   <dd className="mt-2 leading-6 text-muted-foreground">{primarySource.cadence}</dd>
                 </div>
                 <div className="border-t border-border pt-4">
-                  <dt className="eyebrow text-[9px]">Lisensi</dt>
+                  <dt className="eyebrow text-[9px]">Lisensi & ketentuan</dt>
                   <dd className="mt-2 flex items-start gap-2 leading-5 text-muted-foreground">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-400" />
-                    {primarySource.license}
+                    {primarySource.terms}
                   </dd>
+                  <a href={primarySource.termsUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs text-accent underline-offset-4 hover:underline">Baca ketentuan resmi <ExternalLink className="size-3" /></a>
                 </div>
               </dl>
             </div>
@@ -179,15 +200,15 @@ export default function SourcesPage() {
       <section aria-labelledby="supporting-sources-title" className="mt-12">
         <header className="mb-5 flex flex-col gap-2 border-b border-border pb-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="eyebrow mb-2 text-[10px]">Sinyal pelengkap / 02—04</p>
+            <p className="eyebrow mb-2 text-[10px]">Sinyal pelengkap / 02—05</p>
             <h2 id="supporting-sources-title" className="font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
               Lapisan intelijen tambahan
             </h2>
           </div>
-          <p className="max-w-sm text-xs leading-5 text-muted-foreground">Eksploitasi aktif, peluang eksploitasi, dan advisori ekosistem open-source.</p>
+          <p className="max-w-sm text-xs leading-5 text-muted-foreground">Eksploitasi aktif, probabilitas eksploitasi, advisori, dan pencocokan dependency.</p>
         </header>
 
-        <div className="grid grid-cols-1 border-y border-border md:grid-cols-3 md:divide-x md:divide-border">
+        <div className="grid grid-cols-1 border-y border-border md:grid-cols-2 md:divide-x md:divide-border lg:grid-cols-4">
           {supportingSources.map((source, index) => {
             const Icon = source.icon;
             return (
@@ -211,11 +232,11 @@ export default function SourcesPage() {
                     <dd className="mt-1 text-xs leading-5 text-foreground">{source.cadence}</dd>
                   </div>
                   <div>
-                    <dt className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Lisensi data</dt>
+                    <dt className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Lisensi & ketentuan</dt>
                     <dd className="mt-1 flex items-start gap-2 text-xs leading-5 text-muted-foreground">
-                      <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />
-                      {source.license}
+                      {source.terms}
                     </dd>
+                    <a href={source.termsUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs text-accent underline-offset-4 hover:underline">Ketentuan resmi <ExternalLink className="size-3" /></a>
                   </div>
                 </dl>
 

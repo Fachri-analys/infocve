@@ -65,12 +65,35 @@ export function getDb(): DatabaseSyncInstance {
 
   // Run schema initialization
   db.exec(CREATE_TABLES_SQL);
+  ensureColumn(db, "cves", "translation_status", "TEXT NOT NULL DEFAULT 'UNTRANSLATED'");
+  ensureColumn(db, "cves", "translation_source_hash", "TEXT");
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS translation_cache (
+      source_hash TEXT PRIMARY KEY,
+      source_text TEXT NOT NULL,
+      translated_text TEXT,
+      status TEXT NOT NULL DEFAULT 'PENDING',
+      attempts INTEGER NOT NULL DEFAULT 0,
+      next_attempt_at TEXT,
+      last_error TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_translation_cache_due ON translation_cache (status, next_attempt_at);
+  `);
 
   // Seed default data sources if empty
   initDataSources(db);
 
   dbInstance = db;
   return dbInstance;
+}
+
+function ensureColumn(db: DatabaseSyncInstance, tableName: string, columnName: string, definition: string): void {
+  const columns = db.prepare(`PRAGMA table_info(${tableName})`).all() as Array<{ name: string }>;
+  if (!columns.some((column) => column.name === columnName)) {
+    db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+  }
 }
 
 function initDataSources(db: DatabaseSyncInstance): void {

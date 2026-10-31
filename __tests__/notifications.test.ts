@@ -1,8 +1,12 @@
-import { describe, expect, it, afterAll } from "vitest";
+import { describe, expect, it, beforeAll, afterAll } from "vitest";
 import { getDb, closeDb } from "@/lib/db";
 import { NotificationEngine } from "@/lib/notifications/notification-engine";
 
 describe("Notification Engine", () => {
+  beforeAll(() => {
+    process.env.TEST_DB = "memory";
+  });
+
   // Ensure DB is initialized before tests
   it("initializes database connection", () => {
     const db = getDb();
@@ -19,5 +23,6 @@ describe("Notification Engine", () => {
 
   afterAll(() => {
     closeDb();
+    delete process.env.TEST_DB;
   });
 });

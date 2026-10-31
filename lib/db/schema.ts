@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS cves (
   title TEXT NOT NULL,
   description_en TEXT NOT NULL,
   description_id TEXT NOT NULL,
+  translation_status TEXT NOT NULL DEFAULT 'UNTRANSLATED',
+  translation_source_hash TEXT,
   published_date TEXT NOT NULL,
   last_modified_date TEXT NOT NULL,
   vendor TEXT NOT NULL,
@@ -43,6 +45,33 @@ CREATE INDEX IF NOT EXISTS idx_cves_product ON cves (product);
 CREATE INDEX IF NOT EXISTS idx_cves_category ON cves (category);
 CREATE INDEX IF NOT EXISTS idx_cves_cisa_kev ON cves (cisa_kev_flag);
 CREATE INDEX IF NOT EXISTS idx_cves_has_poc ON cves (has_poc);
+
+-- Persistent cache and retry queue for asynchronous CVE translations.
+CREATE TABLE IF NOT EXISTS translation_cache (
+  source_hash TEXT PRIMARY KEY,
+  source_text TEXT NOT NULL,
+  translated_text TEXT,
+  status TEXT NOT NULL DEFAULT 'PENDING',
+  attempts INTEGER NOT NULL DEFAULT 0,
+  next_attempt_at TEXT,
+  last_error TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_translation_cache_due ON translation_cache (status, next_attempt_at);
+
+-- Capability-protected dependency scan history; raw uploaded manifests are never stored.
+CREATE TABLE IF NOT EXISTS dependency_scans (
+  id TEXT PRIMARY KEY,
+  parent_scan_id TEXT,
+  access_token_hash TEXT NOT NULL,
+  scanned_at TEXT NOT NULL,
+  status TEXT NOT NULL,
+  report_json TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY (parent_scan_id) REFERENCES dependency_scans (id)
+);
+CREATE INDEX IF NOT EXISTS idx_dependency_scans_parent ON dependency_scans (parent_scan_id, scanned_at DESC);
 
 -- Affected products table
 CREATE TABLE IF NOT EXISTS cve_affected (

@@ -27,7 +27,7 @@ const CISA_KEV_METADATA: SourceMetadata = {
   name: "CISA Known Exploited Vulnerabilities Catalog",
   description: "Daftar resmi kerentanan keamanan yang telah terbukti dieksploitasi di dunia nyata oleh penyerang siber.",
   homepage: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
-  license: "Public Domain (US Government)",
+  license: "CC0 1.0 for KEV catalog data; linked third-party content remains subject to its own terms",
   updateFrequency: "Harian / Berkala",
 };
 

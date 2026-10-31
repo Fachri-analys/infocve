@@ -41,7 +41,7 @@ const GHSA_METADATA: SourceMetadata = {
   name: "GitHub Security Advisories (GHSA)",
   description: "Basis data advisori keamanan ekosistem open-source (npm, PyPI, Maven, Go, Cargo, dll.) dari GitHub.",
   homepage: "https://github.com/advisories",
-  license: "CC-BY 4.0",
+  license: "CC BY 4.0; retain attribution and link to the advisory record",
   updateFrequency: "Harian / Real-time",
 };
 

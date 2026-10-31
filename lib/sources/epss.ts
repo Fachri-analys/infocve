@@ -20,7 +20,7 @@ const EPSS_METADATA: SourceMetadata = {
   name: "FIRST Exploit Prediction Scoring System (EPSS)",
   description: "Model probabilitas berbasis data untuk memprediksi kemungkinan suatu kerentanan dieksploitasi dalam 30 hari ke depan.",
   homepage: "https://www.first.org/epss/",
-  license: "Open Data (FIRST.org)",
+  license: "Free API/CSV access; attribution requested; no dedicated dataset license identified",
   updateFrequency: "Harian",
 };
 

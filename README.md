@@ -21,9 +21,12 @@ InfoCVE mengintegrasikan feed resmi dari **National Vulnerability Database (NVD 
 - **Dashboard Intelijen Ancaman (`/dashboard`)**: Visualisasi statistik aktual (tanpa data dummy): distribusi severity CVSS, skor numerik, korelasi eksploitasi CISA KEV, probabilitas EPSS, hierarki prioritas InfoCVE, tren publikasi mingguan, dan top entitas terdampak.
 - **InfoCVE Priority (P1–P4)**: Metodologi triase deterministik yang memadukan CVSS, EPSS, CISA KEV, dan PoC exploit untuk membantu tim keamanan menentukan urgensi penambalan.
 - **Detail Kerentanan Terpadu (`/cve/[id]`)**: Deskripsi dwibahasa (Inggris & Indonesia), kalkulator metrik CVSS, indikator CISA KEV (due date & rekomendasi mitigasi), skor EPSS beserta persentil global, deteksi PoC exploit, dan referensi resmi.
+- **Automatic CVE Translation**: Deskripsi asli tetap tersimpan; terjemahan Bahasa Indonesia diproses di antrean background, di-cache berdasarkan isi, memiliki retry dan status, serta dapat dibandingkan dengan teks asli. Provider LibreTranslate-compatible dikonfigurasi terpisah.
+- **Dependency Vulnerability Scanner (`/dependency-scanner`)**: Pemindaian statis `package.json` dan `package-lock.json` npm untuk dependency langsung maupun transitif. Kode tidak dijalankan; pencocokan versi dan advisori CVE menggunakan OSV.dev.
+- **Mitigasi, Verifikasi & Laporan**: Temuan menampilkan versi terdampak/perbaikan, sumber advisori, langkah upgrade yang dibuat sistem, dan data mitigasi yang tidak tersedia secara eksplisit. Pemindaian ulang membandingkan status Resolved, Still Detected, atau Unverified. Laporan aktual dapat diunduh sebagai PDF/JSON.
 - **Dynamic OpenGraph Preview**: Setiap halaman CVE menghasilkan kartu preview sosial otomatis (`/cve/[id]/opengraph-image`) saat dibagikan ke media sosial atau aplikasi perpesanan.
 - **Glosarium Keamanan (`/glossary`)**: Kamus istilah keamanan siber (Zero-day, RCE, CWE, CPE, MITRE ATT&CK, dll) dengan filter instan.
-- **Transparansi Sumber Data (`/sources`, `docs/data-sources.md`)**: Audit hak cipta, ToS, limitasi, dan lisensi feed resmi.
+- **Transparansi Sumber Data (`/sources`, `docs/data-sources.md`, `THIRD_PARTY_NOTICES.md`)**: Atribusi, ketentuan data, status review, serta inventaris dependency terkunci.
 - **Zero-Dependency Database**: Menggunakan SQLite bawaan runtime Node.js (`node:sqlite DatabaseSync`) tanpa instalasi database server eksternal.
 
 ---
@@ -57,6 +60,8 @@ cp .env.example .env.local
 ```
 
 > **Catatan Penting**: Aplikasi dapat langsung berjalan **tanpa perlu mengisi API key** apa pun! Kunci API NIST dan GitHub bersifat opsional untuk menaikkan limit kuota request.
+>
+> Untuk menerjemahkan CVE secara otomatis, atur endpoint LibreTranslate-compatible melalui `INFOCVE_TRANSLATION_URL`. Tanpa provider tersebut, sinkronisasi tetap berjalan dan status terjemahan dicatat; teks sumber asli tetap tersedia.
 
 ### 4. Jalankan Mode Development
 ```bash
@@ -79,8 +84,19 @@ Buka peramban Anda di: **[http://localhost:3000](http://localhost:3000)**
 | `NOTIFICATIONS_ENABLED` | Opsional | `false` | Set `true` untuk mengaktifkan notifikasi webhook saat ada CVE Kritis / KEV baru. |
 | `NOTIFICATION_WEBHOOK_URL`| Opsional | *(Kosong)* | URL webhook tujuan (Discord / Slack / webhook kustom). |
 | `SYNC_INTERVAL_MINUTES` | Opsional | `60` | Interval penjadwalan sinkronisasi data latar belakang. |
+| `INFOCVE_TRANSLATION_URL` | Opsional untuk aplikasi; diperlukan untuk terjemahan otomatis | *(Tidak dikonfigurasi)* | URL endpoint `/translate` yang kompatibel dengan LibreTranslate. Provider berjalan di server dan tidak memengaruhi sinkronisasi CVE; operator harus meninjau ketentuan provider sebelum mengirim deskripsi ke layanan tersebut. |
+| `INFOCVE_TRANSLATION_API_KEY` | Opsional | *(Kosong)* | API key untuk provider terjemahan yang memerlukannya. |
+| `INFOCVE_TRANSLATION_RETRY_DELAY_MS` | Opsional | `400` | Jeda awal retry provider, bertambah eksponensial untuk percobaan berikutnya. |
 
 > **Keamanan Kunci**: Semua kredensial dan API key disimpan murni di server environment (`server-only`) dan tidak pernah terekspos ke bundle JavaScript browser pengguna.
+
+### Dependency Scanner
+
+Buka **Pemindai** dari navigasi, lalu unggah `package.json` dan `package-lock.json` dari revisi yang sama. Batas unggahan adalah 1 MB per file dan 2 MB total. InfoCVE membaca JSON sebagai data statis tanpa memasang dependency atau menjalankan script. File mentah tidak disimpan; inventory, temuan, dan status pemindaian disimpan di SQLite untuk riwayat, pemindaian ulang, dan laporan.
+
+Setiap hasil memiliki ID scan dan token akses acak. Token disimpan di `sessionStorage` tab browser dan dikirim melalui header `x-scan-token`; menjaga token berarti menjaga akses ke hasil dan laporan. API laporan tersedia di `/api/dependency-scans/{id}/report.json` dan `/api/dependency-scans/{id}/report.pdf`.
+
+Scanner memeriksa versi terdampak dari OSV.dev dan hanya mengonfirmasi CVE bila ekosistem, nama package, dan rentang versi cocok. Data kosong yang berhasil diperiksa dibedakan dari API gagal; konflik atau informasi yang tidak cukup menghasilkan status parsial/unverified. Hasil tanpa temuan tidak membuktikan aplikasi sepenuhnya aman.
 
 ---
 
@@ -170,6 +186,8 @@ pm2 start npm --name "infocve" -- start
    - `INFOCVE_DATA_DIR` = `/tmp` (karena lingkungan serverless hanya mengizinkan penulisan di direktori `/tmp`).
 3. Deploy. Feed API live (NVD, CISA KEV, EPSS) akan otomatis di-cache menggunakan Next.js Incremental Static Regeneration (ISR).
 
+> **Penyimpanan fitur scanner dan antrean translation**: `/tmp` pada serverless bersifat sementara dan tidak dibagi antar-instance. Riwayat pemindaian, cache terjemahan, dan antrean retry memerlukan SQLite pada persistent disk serta proses server yang tetap hidup; gunakan hosting self-hosted/persistent volume untuk jaminan tersebut.
+
 ---
 
 ## 📁 Struktur Direktori Proyek
@@ -198,12 +216,15 @@ infocve/
 │   ├── priority.ts         # Metodologi deterministik InfoCVE Priority
 │   └── dashboard-stats.ts  # Agregasi data statistik aktual dashboard
 ├── utils/                  # Format tanggal, konstanta navigasi, metadata SEO
-├── scripts/                # Script utilitas CLI (sync-cli.mjs)
+├── scripts/                # CLI sinkronisasi & generator dependency notices
+│   ├── sync-cli.mjs
+│   └── generate-third-party-notices.mjs
 ├── docs/                   # Dokumentasi teknis & kepatuhan lisensi
 │   ├── data-sources.md     # Audit ToS, limit, lisensi, & aturan redistribusi
 │   ├── INSTALLATION.md     # Panduan instalasi terperinci
 │   ├── DEPLOYMENT.md       # Panduan deployment Vercel & serverless
 │   └── SELF_HOSTING.md     # Panduan hosting mandiri di server VPS/Docker
+├── THIRD_PARTY_NOTICES.md  # Inventaris dependency, lisensi, author, repo, LICENSE/NOTICE
 └── __tests__/              # Unit test suite lengkap (Vitest)
 ```
 
@@ -211,7 +232,11 @@ infocve/
 
 ## 📄 Lisensi & Pernyataan Resmi
 
-- **Lisensi Perangkat Lunak**: [MIT License](LICENSE).
-- **Atribusi NVD**: *This product uses the NVD API but is not endorsed or certified by the NVD.*
-- **Atribusi CISA**: *Data Known Exploited Vulnerabilities bersumber langsung dari Cybersecurity and Infrastructure Security Agency (CISA) US Federal Public Domain.*
-- **Atribusi FIRST EPSS**: *Data Exploit Prediction Scoring System bersumber dari FIRST.org Open Data.*
+- **Kode InfoCVE**: [MIT License](LICENSE). Lisensi ini hanya mencakup karya InfoCVE; lisensi data dan komponen pihak ketiga tetap terpisah.
+- **NVD / NIST dan CVE Program**: *This product uses the NVD API but is not endorsed or certified by the NVD.* CVE® adalah merek dagang terdaftar The MITRE Corporation; hak cipta © The MITRE Corporation. CVE records digunakan sesuai [NVD API Terms](https://nvd.nist.gov/developers/terms-of-use) dan [CVE Program Terms of Use](https://www.cve.org/Legal/TermsOfUse); pertahankan copyright designation serta lisensi MITRE saat menyalin CVE.
+- **CISA KEV**: Data katalog KEV yang digunakan berada di bawah [CC0 1.0](https://github.com/cisagov/kev-data/blob/develop/LICENSE). Tautan pihak ketiga mengikuti ketentuannya sendiri. Penggunaan ini tidak menyiratkan endorsement atau memberi hak atas logo CISA/seal DHS.
+- **FIRST EPSS**: FIRST meminta atribusi saat skor digunakan dalam produk. Sumber resmi yang ditinjau tidak mencantumkan lisensi dataset EPSS tersendiri; InfoCVE tidak menyebutnya public domain.
+- **GitHub Advisory Database**: CC BY 4.0; pertahankan atribusi dan tautan advisory spesifik. Lihat [ketentuan GitHub](https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#advisory-database).
+- **OSV.dev**: Agregator scanner; lisensi setiap record bergantung pada sumber asalnya. Periksa [daftar sumber dan lisensi OSV](https://google.github.io/osv.dev/data/) sebelum redistribusi.
+- **Dependency npm**: Lihat [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) untuk versi lockfile, repository, author yang dinyatakan, copyright notice yang ditemukan, lisensi metadata, dan file LICENSE/NOTICE yang tersedia. Baris `Needs Review` memerlukan pemeriksaan upstream.
+- Catatan pemeriksaan, timestamp provenance, dan batas penggunaan ada di [docs/data-sources.md](docs/data-sources.md). Referensi vendor tetap mengikuti syarat masing-masing penerbit.

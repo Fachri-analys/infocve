@@ -85,6 +85,9 @@ export function ReferenceCard({ references }: { references: CVEReference[] }) {
             </a>
           );
         })}
+        <p className="border-t border-border pt-3 text-[11px] leading-relaxed text-muted-foreground">
+          URL dan identitas penerbit berasal dari record CVE. Halaman referensi eksternal tidak diambil oleh InfoCVE; waktu pembaruan setiap halaman mengikuti penerbitnya.
+        </p>
       </CardContent>
     </Card>
   );

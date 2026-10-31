@@ -84,6 +84,14 @@ export interface CisaKevStatus {
   notes?: string;
 }
 
+/** Per-request source trace for CVE detail pages. `accessedAt` is when InfoCVE
+ * handled the response; upstream APIs may return a cached response. */
+export interface CveSourceObservation {
+  sourceId: "NVD" | "CISA_KEV" | "EPSS" | "GHSA";
+  recordUrl: string;
+  accessedAt: string;
+}
+
 export type PriorityLevel = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
 
 export interface PriorityAssessment {
@@ -110,6 +118,7 @@ export interface CVE {
   lastModifiedDate: string; // ISO date
   descriptionEn: string;
   descriptionId: string;
+  translationStatus?: "PENDING" | "TRANSLATED" | "FAILED" | "UNTRANSLATED";
   cvss: CVSSMetrics;
   cwe: CWEReference[];
   vendor: string;
@@ -122,6 +131,7 @@ export interface CVE {
   hasPoc?: boolean;
   priority?: PriorityAssessment;
   sources?: string[]; // e.g. ["NVD", "CISA_KEV", "EPSS", "GHSA"]
+  sourceObservations?: CveSourceObservation[];
 }
 
 export interface PaginatedResult<T> {

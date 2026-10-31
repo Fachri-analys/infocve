@@ -1,231 +1,65 @@
-# Pemeriksaan Legalitas, Ketentuan Layanan, & Aturan Redistribusi Sumber Kerentanan (Data Sources Audit)
+# Kebijakan atribusi dan penggunaan data InfoCVE
 
-Dokumen ini mendokumentasikan hasil audit kepatuhan (*compliance review*) terhadap Terms of Service (ToS), API Terms, Lisensi, Acceptable Use Policy (AUP), batas laju (*rate limit*), mekanisme autentikasi, aturan *caching*, atribusi (*attribution*), dan izin redistribusi data dari sumber-sumber intelijen kerentanan resmi.
+**Pemeriksaan sumber: 31 Oktober 2026.** Dokumen ini merangkum ketentuan primer yang ditemukan untuk sumber yang sudah dipakai aplikasi. Ini catatan engineering, bukan nasihat hukum. Setiap feed atau record dapat berubah; cek halaman resmi sebelum menambah sumber atau melakukan redistribusi skala besar.
 
----
+## Prinsip
 
-## 1. Prinsip Kepatuhan InfoCVE
+- Jangan menyamakan akses API atau status publik dengan lisensi untuk menyalin dan mendistribusikan ulang seluruh isi sumber.
+- Pertahankan ID sumber, URL record asli, waktu respons diterima/diproses, serta ketentuan lisensi yang diketahui pada UI dan ekspor.
+- Labeli terjemahan, prioritas, dan rekomendasi yang dihasilkan InfoCVE sebagai analisis/transformasi InfoCVE. Jangan menyajikan teks terjemahan seolah ditulis atau disahkan sumber aslinya.
+- Tautkan konten advisori ke sumber asal. Tautan vendor sendiri mengikuti ketentuan vendor tersebut; InfoCVE tidak mengambil atau menyalin halaman vendor sebagai isi advisori.
+- Lisensi kode aplikasi di [`LICENSE`](../LICENSE) hanya berlaku untuk materi InfoCVE yang dicakup olehnya. Lisensi ini tidak mengubah hak atas data, library, logo, atau konten pihak lain.
 
-1. **Anti-Scraping Policy**: InfoCVE **tidak** menggunakan web scraping jika API resmi tersedia, atau jika ketentuan layanan (ToS) melarang scraping atau automasi tanpa izin.
-2. **Strict Licensing Basis**: Tidak ada asumsi bahwa suatu data bebas digunakan tanpa dasar hukum tertulis dari dokumentasi resmi, lisensi terbuka (Public Domain, CC0, CC-BY, MIT, Apache 2.0), atau ketentuan API resmi.
-3. **Pencegahan Kebocoran Kredensial**: Semua token/kunci API pihak ketiga wajib tersimpan di server/local environment (`server-only`) dan tidak pernah dikirimkan ke client atau tercatat di repositori publik.
-4. **Klasifikasi Status**:
-   - `APPROVED (ACTIVE)`: Sumber resmi aktif yang telah diuji dan mematuhi seluruh ketentuan.
-   - `APPROVED (READY)`: Sumber resmi terverifikasi yang diizinkan untuk diintegrasikan pada tahap berikutnya.
-   - `NEEDS REVIEW`: Sumber dengan batasan redistribusi ketat, izin bersyarat, atau kebijakan yang belum jelas. **Dilarang diimplementasikan** hingga ada verifikasi/izin formal.
-   - `PROHIBITED / EXCLUDED`: Sumber yang ToS-nya secara eksplisit melarang scraping, mirroring, atau redistribusi. **Dilarang diintegrasikan**.
+## Sumber yang digunakan
 
----
+| Sumber | Ketentuan yang diverifikasi | Atribusi dan batas penggunaan di InfoCVE | Status |
+| --- | --- | --- | --- |
+| [NVD/NIST API](https://nvd.nist.gov/developers/terms-of-use) | Ketentuan API meminta pemberitahuan bahwa produk memakai API NVD dan tidak didukung/disertifikasi NVD. Informasi pada situs NIST umumnya dapat disalin kecuali ditandai hak cipta, tetapi halaman NIST memperingatkan sebagian materi memiliki syarat sendiri. | Pertahankan nama dan URL record NVD; gunakan kalimat non-endorsement NVD pada README/halaman detail. CVE record juga tunduk pada [CVE Program Terms of Use](https://www.cve.org/Legal/TermsOfUse), yang mengizinkan penggunaan CVE dengan copyright designation dan lisensi MITRE tetap disertakan pada salinan CVE. Konten dari CNA/vendor yang ditautkan tidak otomatis menjadi konten NVD. | Aktif; jangan klaim satu lisensi blanket untuk semua teks record. |
+| [CISA KEV](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) | [Lisensi resmi mirror KEV](https://github.com/cisagov/kev-data/blob/develop/LICENSE) menyatakan data katalog di bawah CC0 1.0; tautan pihak ketiga di dalam katalog tetap mengikuti syarat masing-masing. Lisensi itu juga tidak memberikan hak memakai logo CISA/seal DHS atau menyiratkan endorsement. | Cantumkan CISA KEV dan tautan katalog/record. CC0 hanya dicatat untuk data katalog, tidak untuk konten halaman yang ditautkan. | Aktif; pemberian kredit tetap dilakukan sebagai praktik atribusi. |
+| [FIRST EPSS](https://www.first.org/epss/faq) | FAQ menyebut skor tersedia gratis lewat API/CSV tanpa registrasi dan meminta atribusi pada publikasi/produk. FAQ [Get the Data](https://www.first.org/epss/data) membedakan lookup API dari unduhan data harian. Kami tidak menemukan lisensi dataset khusus pada sumber resmi yang ditinjau. | Sebut FIRST EPSS / Empirical Security, tautkan data/API, dan tampilkan tanggal skor bila tersedia. Jangan menyebut skor “public domain”, CC-BY, atau lisensi lain. Redistribusi bulk perlu pemeriksaan lebih lanjut. | Aktif untuk lookup dan tampilan skor; redistribusi massal: **Needs Review**. |
+| [GitHub Advisory Database](https://github.com/advisories) | [Ketentuan GitHub untuk Advisory Database](https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#advisory-database) menetapkan CC BY 4.0 dan menerima atribusi melalui link ke database atau advisori tertentu. Repo resmi memuat salinan [teks lisensi](https://github.com/github/advisory-database/blob/main/LICENSE.md). | Pertahankan GHSA ID, link record spesifik, atribusi GitHub Advisory Database, dan nyatakan materi diubah ketika diringkas/diterjemahkan. Referensi ke CNA/vendor tetap ditautkan terpisah. | Aktif; CC BY 4.0 dengan atribusi. |
+| [OSV.dev](https://osv.dev) (scanner npm) | [Daftar sumber OSV](https://google.github.io/osv.dev/data/) menunjukkan lisensi data berbeda antar database, termasuk CC-BY, CC0, MIT, Apache, BSD, dan CC-BY-SA. OSV sendiri meminta setiap kontributor mendokumentasikan lisensi data sumbernya; ini bukan lisensi tunggal untuk semua respons API. | Simpan ID advisory OSV, GHSA bila tersedia, URL record, referensi upstream, waktu pengambilan, dan status lisensi. Jika sumber asal/license record tidak jelas, tampilkan **Needs Review**; jangan menyimpulkan izin redistribusi hanya dari akses API. | Aktif untuk pencarian/matching; hak redistribusi materi record harus ditinjau per asal. |
+| Advisori vendor dan URL referensi | Ketentuan ditentukan masing-masing vendor/penerbit dan tidak seragam. | InfoCVE menampilkan link, identitas host/sumber, dan fakta/rentang seperlunya; tidak melakukan fetch, mirror, atau menyalin seluruh teks halaman vendor ke laporan. Rujukan tidak berarti InfoCVE memiliki atau mengesahkan materi tersebut. | Pemeriksaan per penerbit masih diperlukan. |
+| Provider terjemahan (`INFOCVE_TRANSLATION_URL`) | Provider tidak ditetapkan atau dibundel oleh repository; konfigurasi dapat menunjuk layanan berbeda dengan ketentuan dan kebijakan data masing-masing. | Operator deployment harus memeriksa Terms/Privacy dan izin pengiriman deskripsi CVE sebelum mengaktifkannya. UI menandai output sebagai terjemahan yang diproses melalui provider; identitas endpoint/API key tidak diekspos ke browser. | **Needs Review per konfigurasi** sebelum penggunaan produksi. |
 
-## 2. Audit Sumber Aktif (Existing Sources)
+Sumber resmi tambahan: [Pernyataan hak cipta NIST](https://www.nist.gov/copyrights-disclaimers). NIST menyatakan informasi situsnya umumnya dapat disalin kecuali materi berhak cipta dan meminta kredit yang sesuai; pernyataan umum tersebut tidak menghapus hak pihak ketiga yang materinya termuat/ditautkan.
 
-### 2.1. National Vulnerability Database (NIST NVD)
-- **Status:** `APPROVED (ACTIVE)`
-- **Penyedia:** National Institute of Standards and Technology (NIST), Departemen Perdagangan AS.
-- **Dokumentasi Resmi:** <https://nvd.nist.gov/developers/vulnerabilities>
-- **Endpoint API:** `https://services.nvd.nist.gov/rest/json/cves/2.0`
-- **Lisensi Data:** Domain Publik (Karya Pemerintah Federal AS berdasarkan 17 U.S.C. § 105).
-- **Ketentuan Penggunaan (AUP):**
-  - Menggunakan API resmi v2.0 (tidak ada scraping).
-  - Parameter tanggal wajib berpasangan (`pubStartDate`/`pubEndDate`) maksimal rentang 120 hari.
-- **Autentikasi:**
-  - Opsional: Kunci API dikirim melalui header `apiKey` (tidak melalui query string).
-- **Rate Limit:**
-  - Tanpa API Key: 5 permintaan per jendela 30 detik (IP-based).
-  - Dengan API Key: 50 permintaan per jendela 30 detik.
-  - *InfoCVE Client Limiter:* Proaktif dibatasi pada 45 req/30s (dengan key) dan 5 req/30s (tanpa key).
-- **Caching:** Diizinkan dan sangat direkomendasikan untuk menghindari kelebihan beban server NIST.
-- **Atribusi:** Dianjurkan menyebutkan NIST NVD sebagai sumber data.
-- **Aturan Redistribusi:** Diizinkan sepenuhnya tanpa royalti (Public Domain).
+## Cara atribusi diterapkan
 
----
+### Detail CVE dan terjemahan
 
-### 2.2. CISA Known Exploited Vulnerabilities (KEV)
-- **Status:** `APPROVED (ACTIVE)`
-- **Penyedia:** Cybersecurity and Infrastructure Security Agency (CISA), Departemen Keamanan Dalam Negeri AS.
-- **Dokumentasi Resmi:** <https://www.cisa.gov/known-exploited-vulnerabilities-catalog>
-- **Endpoint API / Feed:** `https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json`
-- **Lisensi Data:** CC0 1.0 Universal (Public Domain Dedication) melalui repositori resmi `cisagov/kev-data`.
-- **Ketentuan Penggunaan (AUP):** Feed resmi disediakan gratis untuk publik dan komunitas keamanan siber dunia.
-- **Autentikasi:** Tidak diperlukan (Public JSON feed).
-- **Rate Limit:** Dilayani melalui CDN; polling disarankan berkala (misal: setiap 1 hingga 4 jam).
-- **Caching:** Diizinkan & direkomendasikan (InfoCVE menerapkan TTL cache 4 jam).
-- **Atribusi:** Memberikan atribusi kepada CISA KEV Catalog.
-- **Aturan Redistribusi:** Bebas didistribusikan ulang (Public Domain / CC0).
+Halaman detail menautkan record NVD dan referensi asli. Waktu yang ditampilkan adalah saat respons diproses oleh InfoCVE; NVD/API dapat mengembalikan respons cache Next.js (detail CVE memiliki jendela revalidasi enam jam), sehingga itu bukan bukti waktu unduh origin. Tanggal modifikasi dari sumber tetap metadata terpisah. Terjemahan otomatis menyebut NVD sebagai sumber teks asli dan InfoCVE sebagai pembuat terjemahan.
 
----
+Pernyataan non-endorsement NVD: “This product uses the NVD API but is not endorsed or certified by the NVD.” InfoCVE bukan produk resmi/tersertifikasi NVD.
 
-### 2.3. FIRST Exploit Prediction Scoring System (EPSS)
-- **Status:** `APPROVED (ACTIVE)`
-- **Penyedia:** Forum of Incident Response and Security Teams (FIRST.org) & Empirical Security.
-- **Dokumentasi Resmi:** <https://www.first.org/epss/api>
-- **Endpoint API:** `https://api.first.org/data/v1/epss`
-- **Lisensi Data:** FIRST Open Data Policy.
-- **Ketentuan Penggunaan (AUP):**
-  - Akses publik gratis tanpa pendaftaran.
-  - Dirancang untuk integrasi produk keamanan, dashboard, dan otomatisasi prioritas kerentanan.
-- **Autentikasi:** Tidak memerlukan API key.
-- **Rate Limit:** Fair-use policy. Mendukung multi-CVE batch query (misal: `?cve=CVE-...,CVE-...`).
-- **Caching:** Skor EPSS diperbarui satu kali per hari (UTC), sehingga caching harian sangat disarankan.
-- **Atribusi:** **Wajib / Sangat Dimohon**: Menyertakan kredit bahwa data skor berasal dari FIRST EPSS (<https://www.first.org/epss>).
-- **Aturan Redistribusi:** Diizinkan dalam platform/dashboard intelijen dengan mencantumkan atribusi resmi.
+### Pemindai, mitigasi, verifikasi, dan ekspor
 
----
+Setiap temuan scanner membawa source ID/advisory ID, URL record, waktu fetch, tanggal modifikasi record bila ada, paket/rentang yang dievaluasi, dan alasan keputusan. UI membedakan keterangan dari advisori dengan prioritas/perintah upgrade analisis InfoCVE. PDF/JSON mempertahankan bukti, konflik, status verifikasi, peringatan, keterbatasan, link atribusi, dan status ketentuan `TERMS_IDENTIFIED`/`NEEDS_REVIEW`. Atribusi OSV menyatakan lisensi per-record mengikuti database asal; GHSA ditautkan secara terpisah. Vendor reference hanya provenance: halaman vendor tidak di-fetch dan statusnya `NEEDS_REVIEW` sampai penerbit ditinjau.
 
-### 2.4. GitHub Security Advisories (GHSA)
-- **Status:** `APPROVED (ACTIVE)`
-- **Penyedia:** GitHub, Inc.
-- **Dokumentasi Resmi:** <https://docs.github.com/en/rest/security-advisories> & <https://github.com/advisories>
-- **Endpoint API:** `https://api.github.com/advisories` (REST) & GitHub GraphQL API.
-- **Lisensi Data:** Creative Commons Attribution 4.0 International (CC-BY-4.0).
-- **Ketentuan Penggunaan (AUP):** Tunduk pada GitHub Acceptable Use Policies dan GitHub API Terms.
-- **Autentikasi:**
-  - Opsional namun disarankan: GitHub Personal Access Token (`Bearer <token>`).
-- **Rate Limit:**
-  - Autentikasi: 5.000 permintaan per jam.
-  - Tanpa autentikasi: 60 permintaan per jam.
-- **Caching:** Diizinkan.
-- **Atribusi:** **Wajib** berdasarkan lisensi CC-BY-4.0. Harus menyertakan tautan ke basis data penasihat GitHub (`https://github.com/advisories`) atau URL penasihat spesifik (`GHSA-...`).
-- **Aturan Redistribusi:** Diizinkan secara komersial dan non-komersial selama atribusi dipenuhi dan perubahan ditandai.
+Waktu scan pada report adalah waktu analisis. Setiap `sourceEvidence` menyimpan timestamp serta `observationType`: respons advisory, pemeriksaan snapshot lokal, URL referensi saja (halaman vendor tidak di-fetch), atau lookup yang tidak mengembalikan record. Timestamp respons OSV/GHSA adalah saat respons diproses; timestamp NVD lokal adalah saat snapshot diperiksa, bukan waktu sinkronisasi NVD. Timestamp ini bukan waktu publikasi upstream; tanggal modifikasi sumber ditampilkan terpisah jika tersedia.
 
----
+## Inventaris library dan dependency
 
-## 3. Audit Sumber Potensial Tambahan (Candidate Sources)
+[`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md) dihasilkan dari `package-lock.json` versi terkunci dan metadata paket yang tersedia. Ia mencatat setiap dependency langsung/transitif termasuk versi, jenis penggunaan, deklarasi repository, author yang dinyatakan, copyright line pada notice bila ditemukan, lisensi, link metadata npm, serta salinan file LICENSE/NOTICE yang ditemukan lokal.
 
-### 3.1. OSV.dev (Open Source Vulnerabilities)
-- **Status:** `APPROVED (READY)`
-- **Penyedia:** Open Source Security Foundation (OpenSSF) & Google.
-- **Dokumentasi Resmi:** <https://google.github.io/osv.dev/api/> dan <https://osv.dev>
-- **Endpoint API:** `https://api.osv.dev/v1/vulns/{id}` dan `POST https://api.osv.dev/v1/query`
-- **Lisensi Data:** Skema & infrastruktur OSV berlisensi Apache 2.0. Data individual mengikuti lisensi upstream (sebagian besar CC-BY 4.0).
-- **Ketentuan Penggunaan (AUP):** Disediakan sebagai layanan publik gratis untuk ekosistem open source.
-- **Autentikasi:** Tidak ada kunci API yang diperlukan.
-- **Rate Limit:** Sangat longgar (tidak ada hard rate limit yang membatasi penggunaan wajar). Batas ukuran payload respons 32 MiB pada HTTP/1.1 (disarankan HTTP/2).
-- **Caching:** Diizinkan.
-- **Atribusi:** Wajib mencantumkan atribusi ke OSV.dev dan sumber data asal paket.
-- **Aturan Redistribusi:** Diizinkan secara luas untuk integrasi keamanan.
-- **Rekomendasi InfoCVE:** Sangat direkomendasikan sebagai adapter berikutnya untuk memperkaya data paket open-source (npm, PyPI, Go, Maven, dll.).
+Jalankan ulang setelah mengubah lockfile:
 
----
+```bash
+node scripts/generate-third-party-notices.mjs
+```
 
-### 3.2. CVE.org / CVE Services / cvelistV5 (The CVE Program)
-- **Status:** `APPROVED (READY)`
-- **Penyedia:** CVE Program (didukung oleh The MITRE Corporation dan CISA).
-- **Dokumentasi Resmi:** <https://www.cve.org/Legal/TermsOfUse> & <https://github.com/CVEProject/cvelistV5>
-- **Mekanisme Akses:**
-  - Repositori git resmi `cvelistV5` (format resmi CVE JSON 5.0).
-  - CVE Services REST API (`https://cveawg.mitre.org/api/cve/`).
-- **Lisensi Data:** CVE Program Terms of Use (Bebas untuk dicari, diunduh, dan dimasukkan ke dalam produk/layanan).
-- **Ketentuan Penggunaan (AUP):** Menggunakan data resmi JSON 5.0. Format lama (CSV, XML, HTML) telah dihentikan sejak Juni 2024.
-- **Autentikasi:** Read-only pada repositori GitHub cvelistV5 tidak memerlukan kredensial khusus.
-- **Rate Limit:** Mengikuti batasan GitHub API jika menggunakan API GitHub.
-- **Caching:** Diizinkan.
-- **Atribusi:** "CVE" adalah merek dagang terdaftar milik The MITRE Corporation. Penggunaan nama harus menghormati panduan merek dagang.
-- **Aturan Redistribusi:** Diizinkan.
+Nilai `author`/`repository` dari metadata paket belum diverifikasi sebagai pemilik hak cipta. Paket yang tidak menyediakan metadata/file notice lokal ditandai **Needs Review**; ini bukan pernyataan bahwa paket tersebut tidak memiliki hak cipta atau kewajiban lisensi. Periksa notice pada artifact untuk platform yang benar sebelum mendistribusikan bundle atau installer.
 
----
+## Temuan kepatuhan dan pemeriksaan lanjutan
 
-### 3.3. Red Hat Security Data API
-- **Status:** `APPROVED (READY)`
-- **Penyedia:** Red Hat Product Security.
-- **Dokumentasi Resmi:** <https://access.redhat.com/documentation/en-us/red_hat_security_data_api/>
-- **Endpoint API:** `https://access.redhat.com/hydra/rest/securitydata/cve/{cveId}.json`
-- **Lisensi Data:** Open Data / Creative Commons Attribution 4.0 International (CC-BY 4.0).
-- **Ketentuan Penggunaan (AUP):** Tersedia secara gratis untuk publik untuk memantau keamanan paket Linux / Enterprise.
-- **Autentikasi:** Tidak diperlukan.
-- **Rate Limit:** Fair-use policy.
-- **Caching:** Diizinkan.
-- **Atribusi:** Wajib mencantumkan Red Hat Product Security sebagai sumber penilaian.
-- **Aturan Redistribusi:** Diizinkan dengan lisensi CC-BY 4.0.
+1. EPSS tidak menunjukkan lisensi dataset eksplisit pada FAQ/data page yang ditinjau; atribusi diterapkan dan bulk redistribution tetap ditahan untuk pemeriksaan.
+2. OSV mengagregasi record dengan ketentuan upstream campuran. Scanner saat ini mempertahankan identitas dan link OSV/GHSA/vendor serta timestamp; untuk record yang asal/lisensinya belum diketahui, status hak redistribusi perlu dianggap **Needs Review**. Jangan mengekspor ulang koleksi advisori secara massal tanpa pemeriksaan sumber.
+3. Link advisori vendor membawa pengguna ke situs penerbit dan tetap di bawah ketentuan masing-masing. Halaman yang belum ditinjau tidak digunakan sebagai sumber teks yang disalin.
+4. Inventaris npm dibuat dari lockfile dan metadata yang tersedia di mesin saat generator dijalankan. Ia bukan legal clearance; baris **Needs Review** perlu dituntaskan sebelum distribusi binary/bundle yang relevan.
+5. Logo, merek, dan endorsement sumber eksternal tidak disertakan sebagai identitas InfoCVE. Nama sumber hanya untuk atribusi dan penjelasan provenance.
 
----
+Pada snapshot dependency **31 Oktober 2026**, `THIRD_PARTY_NOTICES.md` berisi 529 versi terkunci; 222 paket masih ditandai **Needs Review** karena metadata author/repository/copyright/notice belum lengkap di instalasi lokal. Ini belum membuktikan pelanggaran lisensi, tetapi kepemilikan dan kewajiban distribusi paket-paket itu belum tervalidasi penuh. Tinjau semuanya sebelum menerbitkan artifact yang membundel dependency; lihat alasan per paket pada inventaris. Tidak ada dependency baru yang ditambahkan oleh perubahan kepatuhan ini.
 
-### 3.4. GitLab Advisory Database
-- **Status:** `APPROVED (READY)`
-- **Penyedia:** GitLab Inc.
-- **Dokumentasi Resmi:** <https://gitlab.com/gitlab-org/advisories-community>
-- **Lisensi Data:** MIT License.
-- **Ketentuan Penggunaan (AUP):** Repositori publik open source yang berisi advisory kerentanan.
-- **Autentikasi:** Tidak diperlukan untuk git clone / download raw feed.
-- **Rate Limit:** GitLab raw file download rate limits.
-- **Caching:** Diizinkan.
-- **Atribusi:** Menyertakan pemberitahuan hak cipta MIT.
-- **Aturan Redistribusi:** Diizinkan di bawah lisensi MIT.
+Snapshot yang sama memuat **25 entri MPL-2.0** di dependency development (Lightning CSS dan `axe-core`) serta **14 entri LGPL-3.0-or-later** pada paket opsional Sharp/libvips khusus platform. Ini bukan temuan pelanggaran: periksa apakah paket tersebut masuk artifact yang benar-benar didistribusikan. Bila iya, ikuti [MPL 2.0](https://www.mozilla.org/en-US/MPL/2.0/) (termasuk ketentuan source form saat mendistribusikan executable) atau [LGPL 3.0](https://www.gnu.org/licenses/lgpl-3.0.html) yang berlaku, dan sertakan notice yang diwajibkan. Paket opsional yang tidak terpasang pada mesin ini masih perlu diperiksa dari registry/source resmi untuk target deployment.
 
----
-
-## 4. Sumber dengan Batasan / Perlu Peninjauan Khusus (NEEDS REVIEW)
-
-### 4.1. VulnCheck Community API
-- **Status:** `NEEDS REVIEW`
-- **Penyedia:** VulnCheck Inc.
-- **Dokumentasi Resmi:** <https://docs.vulncheck.com/>
-- **Ketentuan Lisensi & Masalah Redistribusi:**
-  - Syarat Layanan Standar VulnCheck secara tegas **melarang** penyediaan "Service Data" secara gratis atau di bawah lisensi open source kepada pihak ketiga.
-  - VulnCheck memberikan pengecualian khusus untuk dataset **VulnCheck KEV** dan **NVD++** agar dapat digunakan secara komersial/open source, namun mewajibkan pelabelan publik yang sangat mencolok (*prominent public attribution*).
-  - Produk intelijen lainnya (eksploit dan data akses awal) berada di bawah kontrak berbayar eksklusif.
-- **Alasan Penahanan:** Adanya risiko pelanggaran klausul redistribusi jika dataset selain KEV/NVD++ tercampur atau terindeks ke dalam basis data terbuka tanpa lisensi komersial enterprise.
-- **Tindakan:** **JANGAN DIIMPLEMENTASIKAN** hingga ada konfirmasi tertulis bahwa penggunaan InfoCVE hanya mencakup feed KEV/NVD++ dan format atribusi telah disetujui.
-
----
-
-### 4.2. Exploit-DB (OffSec)
-- **Status:** `NEEDS REVIEW / EXCLUDED (NO SCRAPING)`
-- **Penyedia:** Offensive Security (OffSec).
-- **Dokumentasi Resmi:** <https://www.exploit-db.com/> & <https://gitlab.com/exploit-database/exploitdb>
-- **Ketentuan Lisensi & Masalah Penggunaan:**
-  - Ketentuan Layanan (ToS) `exploit-db.com` secara tegas **melarang scraping** dan pengambilan data otomatis tanpa izin tertulis.
-  - OffSec menyediakan arsip file CSV resmi untuk perkakas lokal (`searchsploit`).
-  - Menyimpan dan mendistribusikan ulang kode eksploit mentah (*raw exploit proof-of-concept*) memiliki implikasi hukum hak cipta pembuat eksploit dan kebijakan anti-malware hosting platform.
-- **Tindakan:** **JANGAN MELAKUKAN SCRAPING**. Hanya gunakan klasifikasi metadata URL referensi (seperti yang saat ini sudah berjalan pada `poc-classifier.ts`) tanpa melakukan crawling atau re-hosting konten eksploit.
-
----
-
-## 5. Sumber yang Dilarang Keras (PROHIBITED / EXCLUDED)
-
-### 5.1. Snyk Vulnerability Database
-- **Status:** `PROHIBITED / EXCLUDED`
-- **Ketentuan Layanan:**
-  - Bagian Terms of Service Snyk secara eksplisit melarang:
-    1. *Web scraping*, *crawling*, *spidering*, atau automasi terhadap situs atau basis data kerentanan Snyk.
-    2. *Mirroring*, *framing*, menyalin (*copying*), mengunduh secara massal, atau mempublikasikan ulang (*republishing*) basis data kerentanan.
-    3. Mendistribusikan ulang data kerentanan kepada pihak ketiga untuk tujuan komersial atau platform agregasi publik tanpa kontrak enterprise resmi.
-- **Tindakan:** **DILARANG KERAS** melakukan scraping atau integrasi tidak resmi ke Snyk.
-
----
-
-### 5.2. Packet Storm Security
-- **Status:** `PROHIBITED / EXCLUDED`
-- **Ketentuan Layanan:**
-  - Tidak memiliki REST API publik berlisensi terbuka.
-  - ToS melarang segala bentuk automated crawling/scraping data advisory dan eksploit.
-- **Tindakan:** **DILARANG KERAS** melakukan scraping terhadap Packet Storm.
-
----
-
-## 6. Matriks Evaluasi Sumber Kerentanan
-
-| Sumber | Lisensi Data | API Resmi? | Scraping Diperlukan? | Autentikasi | Atribusi Wajib? | Status Kepatuhan |
-|---|---|---|---|---|---|---|
-| **NIST NVD** | Public Domain (17 U.S.C. § 105) | Ya (v2.0) | **Tidak** | Opsional (`apiKey`) | Dianjurkan | `APPROVED (ACTIVE)` |
-| **CISA KEV** | CC0 1.0 Universal | Ya (JSON Feed) | **Tidak** | Tidak | Dianjurkan | `APPROVED (ACTIVE)` |
-| **FIRST EPSS** | Open Data Policy | Ya (REST) | **Tidak** | Tidak | **Ya** | `APPROVED (ACTIVE)` |
-| **GitHub Advisories** | CC-BY-4.0 | Ya (REST/GraphQL) | **Tidak** | Opsional (Token) | **Ya** (Link resmi) | `APPROVED (ACTIVE)` |
-| **OSV.dev** | Apache 2.0 / CC-BY-4.0 | Ya (REST) | **Tidak** | Tidak | **Ya** | `APPROVED (READY)` |
-| **CVE.org (JSON 5.0)** | CVE Terms of Use | Ya (Git / API) | **Tidak** | Opsional | **Ya** (Trademark) | `APPROVED (READY)` |
-| **Red Hat Security** | CC-BY-4.0 / Open Data | Ya (REST) | **Tidak** | Tidak | **Ya** | `APPROVED (READY)` |
-| **GitLab Advisories** | MIT | Ya (Git Repository) | **Tidak** | Tidak | **Ya** (Notice MIT) | `APPROVED (READY)` |
-| **VulnCheck** | Proprietary Service Terms | Ya (Community API) | **Tidak** | Ya (API Key) | **Ya** (Prominent) | `NEEDS REVIEW` |
-| **Exploit-DB** | Proprietary / Mixed | Hanya Git CSV | Dilarang ToS | Tidak | Ya | `NEEDS REVIEW` |
-| **Snyk DB** | Hak Cipta Dilindungi ToS | Tidak Resmi | Dilarang ToS | Enterprise Only | - | `PROHIBITED` |
-| **Packet Storm** | Hak Cipta Dilindungi ToS | Tidak Ada | Dilarang ToS | - | - | `PROHIBITED` |
-
----
-
-## 7. Pedoman Implementasi Adapter Baru (Implementation Guidelines)
-
-Sebelum mengimplementasikan adapter baru di `lib/sources/`:
-1. **Verifikasi Status:** Pastikan sumber berstatus `APPROVED`. Jika berstatus `NEEDS REVIEW` atau `PROHIBITED`, integrasi tidak boleh dibuat.
-2. **Warisi `BaseVulnerabilitySource`:** Gunakan kelas dasar dari `lib/sources/base.ts` untuk menjamin adanya rate limiting, isolasi konfigurasi, dan penanganan error standar.
-3. **Penyimpanan Kredensial:** Jika sumber membutuhkan token (seperti GitHub Token atau kunci API di masa depan), selalu simpan di environment variable server (tanpa prefiks `NEXT_PUBLIC_`).
-4. **Tampilkan Atribusi di Antarmuka:** Setiap adapter yang berstatus `APPROVED` dengan syarat atribusi wajib (seperti CC-BY-4.0 atau EPSS) harus memiliki link referensi atau label sumber resmi pada tampilan detail CVE / daftar kerentanan.
+Diperiksa terakhir: **31 Oktober 2026**. Periksa ulang ketentuan resmi ketika integrasi, cara ekspor, atau kebijakan sumber berubah.

@@ -6,6 +6,7 @@ import { PocClassifier } from "./poc";
 import { CveRepository } from "@/lib/db/cve-repository";
 import { sourceRegistry } from "./registry";
 import { calculatePriority } from "@/lib/priority";
+import { enqueueCveTranslation } from "@/lib/translation/queue";
 
 const cisaKevAdapter = new CisaKevSourceAdapter();
 const epssAdapter = new EpssSourceAdapter();
@@ -38,6 +39,23 @@ export class ThreatIntelligenceAggregator {
       epssAdapter.fetchById(cve.id).catch(() => null),
       ghsaAdapter.fetchByCve(cve.id).catch(() => null),
     ]);
+    const accessedAt = new Date().toISOString();
+    const sourceObservations = [...(cve.sourceObservations ?? [])];
+    if (cisaKev?.isKev) sourceObservations.push({
+      sourceId: "CISA_KEV",
+      recordUrl: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+      accessedAt,
+    });
+    if (epss) sourceObservations.push({
+      sourceId: "EPSS",
+      recordUrl: `https://api.first.org/data/v1/epss?cve=${encodeURIComponent(cve.id)}`,
+      accessedAt,
+    });
+    if (ghsa) sourceObservations.push({
+      sourceId: "GHSA",
+      recordUrl: `https://github.com/advisories/${encodeURIComponent(ghsa.ghsaId)}`,
+      accessedAt,
+    });
 
     // 2. Classify references for PoC/Exploit presence
     const { enriched: enrichedRefs, hasPoc } = PocClassifier.enrichReferences(cve.references);
@@ -69,6 +87,7 @@ export class ThreatIntelligenceAggregator {
 
     const preliminaryCve: CVE = {
       ...cve,
+      sourceObservations,
       references: enrichedRefs,
       cisaKev: cisaKev || cve.cisaKev,
       epss: epss || cve.epss,
@@ -86,6 +105,14 @@ export class ThreatIntelligenceAggregator {
     if (saveToDb) {
       try {
         CveRepository.upsert(enrichedCve, "AGGREGATOR");
+        enqueueCveTranslation(enrichedCve.id, enrichedCve.descriptionEn);
+        const stored = CveRepository.getById(enrichedCve.id);
+        if (stored?.translationStatus === "TRANSLATED") {
+          enrichedCve.descriptionId = stored.descriptionId;
+          enrichedCve.translationStatus = stored.translationStatus;
+        } else {
+          enrichedCve.translationStatus = stored?.translationStatus ?? "PENDING";
+        }
       } catch (err) {
         console.error(`[Aggregator] DB persistence error for ${cve.id}:`, err);
       }
@@ -144,6 +171,14 @@ export class ThreatIntelligenceAggregator {
       if (saveToDb) {
         try {
           CveRepository.upsert(enrichedItem, "BATCH_SYNC");
+          enqueueCveTranslation(enrichedItem.id, enrichedItem.descriptionEn);
+          const stored = CveRepository.getById(enrichedItem.id);
+          if (stored?.translationStatus === "TRANSLATED") {
+            enrichedItem.descriptionId = stored.descriptionId;
+            enrichedItem.translationStatus = stored.translationStatus;
+          } else {
+            enrichedItem.translationStatus = stored?.translationStatus ?? "PENDING";
+          }
         } catch {
           // ignore
         }

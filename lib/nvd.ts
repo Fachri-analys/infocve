@@ -279,7 +279,15 @@ export async function getCVEById(id: string): Promise<CVE | null> {
 
   const response = await fetchNvd({ cveId: normalizedId }, { revalidateSeconds: REVALIDATE.detail, tags: [`nvd:cve:${normalizedId}`] });
   const record: NvdCveRecord | undefined = response.vulnerabilities[0]?.cve;
-  return record ? normalizeNvdCve(record) : null;
+  if (!record) return null;
+  return {
+    ...normalizeNvdCve(record),
+    sourceObservations: [{
+      sourceId: "NVD",
+      recordUrl: `https://nvd.nist.gov/vuln/detail/${encodeURIComponent(normalizedId)}`,
+      accessedAt: new Date().toISOString(),
+    }],
+  };
 }
 
 /** The full filter + sort + paginate pipeline backing the search page. */

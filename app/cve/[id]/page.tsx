@@ -16,6 +16,8 @@ import { EPSSCard } from "@/components/cve/epss-card";
 import { CisaKevCard } from "@/components/cve/cisa-kev-card";
 import { PriorityCard } from "@/components/cve/priority-card";
 import { SourceBadge } from "@/components/cve/source-badge";
+import { CVEDescription } from "@/components/cve/cve-description";
+import { CveSourceAttribution } from "@/components/cve/source-attribution";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCVEById } from "@/lib/nvd";
@@ -211,18 +213,12 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
               <CardTitle className="mt-1">Deskripsi</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Deskripsi Asli (Bahasa Inggris)
-                </p>
-                <p className="text-sm leading-7 text-muted-foreground">{cve.descriptionEn}</p>
-              </div>
-              <div className="border-t border-border/70 pt-4">
-                <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-accent">Penjelasan Bahasa Indonesia</p>
-                <p className="border-l-2 border-accent bg-accent/5 py-3 pl-4 text-sm leading-7 text-foreground">
-                  {cve.descriptionId}
-                </p>
-              </div>
+              <CVEDescription
+                descriptionEn={cve.descriptionEn}
+                descriptionId={cve.descriptionId}
+                cveId={cve.id}
+                translationStatus={cve.translationStatus}
+              />
             </CardContent>
           </Card>
 
@@ -280,6 +276,7 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
           <CWECard items={cve.cwe} />
           <Timeline publishedDate={cve.publishedDate} lastModifiedDate={cve.lastModifiedDate} />
           <ReferenceCard references={cve.references} />
+          <CveSourceAttribution cveId={cve.id} observations={cve.sourceObservations ?? []} />
         </div>
       </div>
     </div>
