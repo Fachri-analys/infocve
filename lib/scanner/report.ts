@@ -24,6 +24,16 @@ export function buildSecurityPdf(report: DependencyScanReport): Buffer {
   }
   lines.push("CVE® is a registered trademark of The MITRE Corporation. Copyright © The MITRE Corporation; CVE data used under the CVE Program Terms of Use: https://www.cve.org/Legal/TermsOfUse.", "");
 
+  if (report.packageSummaries?.length) {
+    lines.push("Ringkasan remediasi per package:");
+    for (const summary of report.packageSummaries) {
+      lines.push(
+        `- ${summary.packageName}@${summary.currentVersion}: ${summary.findingCount} temuan (${summary.cveIds.join(", ")}) | Versi minimum: ${summary.minimumFixVersion ?? "Tidak tersedia"} | Lompat major: ${summary.isMajorJump ? "Ya" : "Tidak"} | Perintah: ${summary.upgradeCommand ?? (summary.hasSourceConflict ? "Ditahan (konflik sumber)" : "Tidak tersedia")}`
+      );
+    }
+    lines.push("");
+  }
+
   for (const finding of report.findings) {
     lines.push(
       `${finding.cveId} | ${finding.priority} | ${finding.packageName}@${finding.version}`,

@@ -12,6 +12,64 @@ export interface NotificationPayload {
   url: string;
 }
 
+function isPrivateOrLocalHost(hostname: string): boolean {
+  const host = hostname.toLowerCase().trim();
+  if (host === "localhost" || host.endsWith(".localhost") || host === "local") {
+    return true;
+  }
+
+  // IPv6 loopback, unspecified, link-local, unique-local
+  if (
+    host === "::1" ||
+    host === "::" ||
+    host.startsWith("fe80:") ||
+    host.startsWith("fc") ||
+    host.startsWith("fd") ||
+    host.startsWith("[::1]") ||
+    host.startsWith("[fe80:")
+  ) {
+    return true;
+  }
+
+  // IPv4 dotted-decimal
+  const ipv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+  const match = host.match(ipv4Regex);
+  if (match) {
+    const octets = match.slice(1, 5).map(Number);
+    if (octets.length !== 4 || octets.some((n) => Number.isNaN(n) || n < 0 || n > 255)) return true;
+    const o1 = octets[0]!;
+    const o2 = octets[1]!;
+    if (o1 === 0) return true; // 0.0.0.0/8
+    if (o1 === 10) return true; // 10.0.0.0/8
+    if (o1 === 127) return true; // 127.0.0.0/8
+    if (o1 === 169 && o2 === 254) return true; // 169.254.0.0/16
+    if (o1 === 172 && o2 >= 16 && o2 <= 31) return true; // 172.16.0.0/12
+    if (o1 === 192 && o2 === 168) return true; // 192.168.0.0/16
+    if (o1 >= 224) return true; // 224.0.0.0/4 multicast & reserved
+  }
+
+  return false;
+}
+
+export function validateWebhookUrl(urlStr: string): { valid: boolean; host: string; error?: string } {
+  try {
+    const parsed = new URL(urlStr);
+    const host = parsed.host || "unknown";
+
+    if (parsed.protocol !== "https:") {
+      return { valid: false, host, error: "Webhook URL wajib menggunakan protokol HTTPS" };
+    }
+
+    if (isPrivateOrLocalHost(parsed.hostname)) {
+      return { valid: false, host, error: "Alamat IP privat, loopback, atau link-local tidak diizinkan" };
+    }
+
+    return { valid: true, host };
+  } catch {
+    return { valid: false, host: "invalid", error: "Format URL webhook tidak valid" };
+  }
+}
+
 export class NotificationEngine {
   /**
    * Check if notifications are enabled
@@ -50,12 +108,53 @@ export class NotificationEngine {
   }
 
   /**
-   * Dispatch vulnerability alert to configured channels if enabled
+   * Check if an alert for this cve_id has already been successfully sent
+   */
+  static isAlertAlreadySent(cveId: string): boolean {
+    try {
+      const db = getDb();
+      const row = db.prepare(`
+        SELECT id FROM notification_logs
+        WHERE cve_id = ? AND status IN ('SENT', 'SUCCESS')
+        LIMIT 1
+      `).get(cveId);
+      return !!row;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Dispatch vulnerability alert to configured channels if enabled.
+   * Enforces HTTPS validation, SSRF protection against private/loopback IPs,
+   * disallows redirect following (redirect: "error"), deduplicates per cve_id,
+   * stores only target host in logs, and uses NEXT_PUBLIC_SITE_URL.
    */
   static async dispatchVulnerabilityAlert(cve: CVE): Promise<boolean> {
     if (!this.isEnabled()) {
       return false;
     }
+
+    // Deduplicate alert per cve_id
+    if (this.isAlertAlreadySent(cve.id)) {
+      return false;
+    }
+
+    const webhookUrl = process.env.NOTIFICATION_WEBHOOK_URL || this.getWebhookUrl();
+    if (!webhookUrl) {
+      this.logNotification(cve.id, "WEBHOOK", "NO_WEBHOOK_CONFIGURED", "SKIPPED");
+      return false;
+    }
+
+    // Validate HTTPS and reject private/loopback/link-local addresses
+    const validation = validateWebhookUrl(webhookUrl);
+    if (!validation.valid) {
+      this.logNotification(cve.id, "WEBHOOK", validation.host, "REJECTED_SSRF", validation.error);
+      return false;
+    }
+
+    const host = validation.host;
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 
     const payload: NotificationPayload = {
       cveId: cve.id,
@@ -65,14 +164,8 @@ export class NotificationEngine {
       isCisaKev: cve.cisaKev?.isKev ?? false,
       hasPoc: cve.hasPoc ?? false,
       publishedDate: cve.publishedDate,
-      url: `https://infocve.com/cve/${cve.id}`,
+      url: `${siteUrl}/cve/${cve.id}`,
     };
-
-    const webhookUrl = process.env.NOTIFICATION_WEBHOOK_URL || this.getWebhookUrl();
-    if (!webhookUrl) {
-      this.logNotification(cve.id, "WEBHOOK", "NO_WEBHOOK_CONFIGURED", "SKIPPED");
-      return false;
-    }
 
     try {
       const controller = new AbortController();
@@ -85,17 +178,18 @@ export class NotificationEngine {
           text: `🚨 [InfoCVE Alert] ${cve.id} (${cve.cvss.severity} - ${cve.cvss.baseScore}) detected!`,
           data: payload,
         }),
+        redirect: "error",
         signal: controller.signal,
       });
 
       clearTimeout(timeout);
 
       const status = res.ok ? "SENT" : "FAILED";
-      this.logNotification(cve.id, "WEBHOOK", webhookUrl, status, res.ok ? undefined : `HTTP ${res.status}`);
+      this.logNotification(cve.id, "WEBHOOK", host, status, res.ok ? undefined : `HTTP ${res.status}`);
       return res.ok;
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      this.logNotification(cve.id, "WEBHOOK", webhookUrl, "ERROR", errorMsg);
+      this.logNotification(cve.id, "WEBHOOK", host, "ERROR", errorMsg);
       return false;
     }
   }
@@ -110,13 +204,13 @@ export class NotificationEngine {
     }
   }
 
-  private static logNotification(cveId: string, eventType: string, target: string, status: string, error?: string): void {
+  private static logNotification(cveId: string, eventType: string, targetHost: string, status: string, error?: string): void {
     try {
       const db = getDb();
       db.prepare(`
         INSERT INTO notification_logs (cve_id, event_type, target, status, sent_at, error_message)
         VALUES (?, ?, ?, ?, ?, ?)
-      `).run(cveId, eventType, target, status, new Date().toISOString(), error || null);
+      `).run(cveId, eventType, targetHost, status, new Date().toISOString(), error || null);
     } catch {
       // ignore
     }

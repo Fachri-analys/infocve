@@ -38,4 +38,105 @@ describe("npm scanner upload boundary", () => {
     await expect(readNpmScanUpload(requestFor(tooLarge, "{\"lockfileVersion\":3,\"packages\":{\"\":{}}}")))
       .rejects.toMatchObject({ status: 413 });
   });
+
+  describe("lockfile rusak (corrupted / invalid lockfile)", () => {
+    it("rejects lockfile containing broken JSON syntax", async () => {
+      await expect(
+        readNpmScanUpload(requestFor("{}", "{ broken json lockfile"))
+      ).rejects.toMatchObject({
+        message: expect.stringContaining("bukan JSON UTF-8 yang valid"),
+        status: 400,
+      });
+    });
+
+    it("rejects lockfile when root is an array instead of an object", async () => {
+      await expect(
+        readNpmScanUpload(requestFor("{}", "[]"))
+      ).rejects.toMatchObject({
+        message: expect.stringContaining("Kedua file harus berisi objek JSON"),
+        status: 400,
+      });
+    });
+
+    it("rejects lockfile missing both packages and dependencies", async () => {
+      await expect(
+        readNpmScanUpload(requestFor("{}", JSON.stringify({ name: "orphan-project" })))
+      ).rejects.toMatchObject({
+        message: expect.stringContaining("Lockfile tidak memiliki packages atau dependencies"),
+        status: 400,
+      });
+    });
+
+    it("rejects lockfile with invalid entry data types", async () => {
+      const corruptLock = {
+        lockfileVersion: 3,
+        packages: {
+          "": {},
+          "node_modules/bad-pkg": { version: 12345 }, // version should be a string
+        },
+      };
+      await expect(
+        readNpmScanUpload(requestFor("{}", JSON.stringify(corruptLock)))
+      ).rejects.toMatchObject({
+        message: expect.stringContaining("Nama atau versi package di lockfile tidak valid"),
+        status: 400,
+      });
+    });
+  });
+
+  describe("lockfile melewati batas (boundary & resource limit violations)", () => {
+    it("rejects lockfile exceeding 1 MB individual file limit with 413", async () => {
+      const hugeLock = JSON.stringify({
+        lockfileVersion: 3,
+        packages: { "": {} },
+        comment: "a".repeat(1024 * 1024 + 50),
+      });
+      await expect(
+        readNpmScanUpload(requestFor("{}", hugeLock))
+      ).rejects.toMatchObject({
+        message: expect.stringContaining("Setiap file dibatasi hingga 1 MB"),
+        status: 413,
+      });
+    });
+
+    it("rejects lockfile with more than 20,000 package entries with 413", async () => {
+      const packages: Record<string, { version: string }> = { "": { version: "1.0.0" } };
+      for (let i = 0; i < 20_005; i++) {
+        packages[`node_modules/pkg-${i}`] = { version: "1.0.0" };
+      }
+      const lockData = {
+        lockfileVersion: 3,
+        packages,
+      };
+
+      await expect(
+        readNpmScanUpload(requestFor("{}", JSON.stringify(lockData)))
+      ).rejects.toMatchObject({
+        message: expect.stringContaining("terlalu banyak entri package"),
+        status: 413,
+      });
+    });
+
+    it("rejects v1 lockfile exceeding maximum depth of 100 with 413", async () => {
+      // Build a deeply nested tree exceeding depth 100
+      let current: Record<string, unknown> = { version: "1.0.0" };
+      const root: Record<string, unknown> = { "deep-pkg-0": current };
+      for (let depth = 1; depth <= 105; depth++) {
+        const next: Record<string, unknown> = { version: "1.0.0" };
+        current.dependencies = { [`deep-pkg-${depth}`]: next };
+        current = next;
+      }
+      const deepLock = {
+        lockfileVersion: 1,
+        dependencies: root,
+      };
+
+      await expect(
+        readNpmScanUpload(requestFor("{}", JSON.stringify(deepLock)))
+      ).rejects.toMatchObject({
+        message: expect.stringContaining("Pohon dependency melewati batas kedalaman 100"),
+        status: 413,
+      });
+    });
+  });
 });

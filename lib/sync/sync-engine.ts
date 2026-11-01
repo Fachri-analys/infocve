@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 import { getLatestCVEs, getRecentCVEs } from "@/lib/nvd";
 import { ThreatIntelligenceAggregator } from "@/lib/sources/aggregator";
 import { CisaKevSourceAdapter } from "@/lib/sources/cisa-kev";
+import { EpssSourceAdapter } from "@/lib/sources/epss";
 import { NotificationEngine } from "@/lib/notifications/notification-engine";
 
 export interface SyncRunResult {
@@ -41,10 +42,14 @@ export class SyncEngine {
       results.push(nvdResult);
       totalSynced += nvdResult.itemsSynced;
 
-      // Update data source sync status
+      // 3. Check EPSS independently
+      const epssResult = await this.probeEpss();
+      results.push(epssResult);
+
+      // Update data source sync status with real counts
       this.updateSourceStatus("NVD", nvdResult.success, nvdResult.itemsSynced, nvdResult.error);
       this.updateSourceStatus("CISA_KEV", kevResult.success, kevResult.itemsSynced, kevResult.error);
-      this.updateSourceStatus("EPSS", true, totalSynced);
+      this.updateSourceStatus("EPSS", epssResult.success, epssResult.itemsSynced, epssResult.error);
     } finally {
       this.isSyncing = false;
     }
@@ -85,18 +90,85 @@ export class SyncEngine {
   }
 
   /**
-   * Sync NVD latest and recently modified feeds + enrich with EPSS, CISA, GHSA
+   * Probe EPSS service health — reflects real reachability instead of
+   * blindly reporting "healthy".
+   */
+  private static async probeEpss(): Promise<SyncRunResult> {
+    const startTime = Date.now();
+    const runId = this.logSyncStart("EPSS");
+
+    try {
+      const adapter = new EpssSourceAdapter();
+      const reachable = await adapter.testConnection();
+      if (!reachable) {
+        this.logSyncEnd(runId, "FAILED", 0, "EPSS API unreachable or returned no data");
+        return {
+          sourceId: "EPSS",
+          success: false,
+          itemsSynced: 0,
+          error: "EPSS API unreachable or returned no data",
+          durationMs: Date.now() - startTime,
+        };
+      }
+
+      this.logSyncEnd(runId, "SUCCESS", 1);
+      return {
+        sourceId: "EPSS",
+        success: true,
+        itemsSynced: 1,
+        durationMs: Date.now() - startTime,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      this.logSyncEnd(runId, "FAILED", 0, errorMsg);
+      return {
+        sourceId: "EPSS",
+        success: false,
+        itemsSynced: 0,
+        error: errorMsg,
+        durationMs: Date.now() - startTime,
+      };
+    }
+  }
+
+  /**
+   * Sync NVD latest and recently modified feeds + enrich with EPSS, CISA, GHSA.
+   *
+   * Fetches a wider window (up to 50 per feed) and does NOT silently swallow
+   * NVD failures — if both feeds fail the result reports the error.
    */
   private static async syncNvdFeeds(): Promise<SyncRunResult> {
     const startTime = Date.now();
     const runId = this.logSyncStart("NVD");
 
     try {
-      // Fetch latest published and recent modified
-      const [latest, recent] = await Promise.all([
-        getLatestCVEs(20).catch(() => []),
-        getRecentCVEs(20).catch(() => []),
-      ]);
+      // Wider pagination window: 50 latest + 50 recent modified
+      const latestPromise = getLatestCVEs(50);
+      const recentPromise = getRecentCVEs(50);
+
+      const settled = await Promise.allSettled([latestPromise, recentPromise]);
+      const latest = settled[0].status === "fulfilled" ? settled[0].value : [];
+      const recent = settled[1].status === "fulfilled" ? settled[1].value : [];
+
+      // If both failed, surface the error
+      if (latest.length === 0 && recent.length === 0) {
+        const errors: string[] = [];
+        if (settled[0].status === "rejected") errors.push(`latest: ${settled[0].reason}`);
+        if (settled[1].status === "rejected") errors.push(`recent: ${settled[1].reason}`);
+
+        // Both returned empty arrays (no throw, NVD just had nothing) vs actual failures
+        if (errors.length > 0) {
+          const errorMsg = `NVD feeds failed: ${errors.join("; ")}`;
+          this.logSyncEnd(runId, "FAILED", 0, errorMsg);
+          return {
+            sourceId: "NVD",
+            success: false,
+            itemsSynced: 0,
+            error: errorMsg,
+            durationMs: Date.now() - startTime,
+          };
+        }
+      }
 
       const combinedMap = new Map<string, typeof latest[0]>();
       for (const cve of latest) combinedMap.set(cve.id, cve);
@@ -134,6 +206,24 @@ export class SyncEngine {
     }
   }
 
+  /**
+   * Auto-sync on first boot if the CVE table is empty.
+   * Called from instrumentation or health check; safe to call multiple times.
+   */
+  static async autoSyncIfEmpty(): Promise<void> {
+    try {
+      const db = getDb();
+      const row = db.prepare("SELECT COUNT(*) as count FROM cves").get() as { count: number | bigint } | undefined;
+      const count = Number(row?.count ?? 0);
+      if (count === 0) {
+        console.log("[SyncEngine] Database is empty — running initial sync...");
+        await this.runFullSync();
+      }
+    } catch (err) {
+      console.error("[SyncEngine] autoSyncIfEmpty failed:", err);
+    }
+  }
+
   private static logSyncStart(sourceId: string): number {
     try {
       const db = getDb();
@@ -161,12 +251,16 @@ export class SyncEngine {
     }
   }
 
+  /**
+   * Update data_sources status — uses absolute count (SET, not +=) so
+   * total_records reflects a real snapshot rather than ever-growing sum.
+   */
   private static updateSourceStatus(sourceId: string, success: boolean, count: number, error?: string): void {
     try {
       const db = getDb();
       db.prepare(`
         UPDATE data_sources
-        SET last_sync_at = ?, sync_status = ?, total_records = total_records + ?, last_error = ?, updated_at = ?
+        SET last_sync_at = ?, sync_status = ?, total_records = ?, last_error = ?, updated_at = ?
         WHERE id = ?
       `).run(
         new Date().toISOString(),

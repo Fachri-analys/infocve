@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getCVEById } from "@/lib/nvd";
 import { SITE_NAME } from "@/utils/constants";
+import { getLocalOgFonts } from "@/lib/og-fonts";
 
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
@@ -19,7 +20,11 @@ interface OpengraphImageProps {
 }
 
 export default async function OpengraphImage({ params }: OpengraphImageProps) {
-  const { id } = await params;
+  const [{ id }, fonts] = await Promise.all([
+    params,
+    getLocalOgFonts(),
+  ]);
+
   const cve = await getCVEById(id).catch(() => null);
 
   const severity = cve?.cvss?.severity ?? "UNKNOWN";
@@ -46,11 +51,11 @@ export default async function OpengraphImage({ params }: OpengraphImageProps) {
           padding: "64px 80px",
           background: "#0a0e1a",
           backgroundImage: "radial-gradient(ellipse 80% 60% at 30% 0%, rgba(124,155,255,0.25), transparent)",
-          fontFamily: "sans-serif",
+          fontFamily: "IBM Plex Sans, sans-serif",
         }}
       >
         {/* Top Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyItems: "space-between", width: "100%", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div
               style={{
@@ -97,7 +102,7 @@ export default async function OpengraphImage({ params }: OpengraphImageProps) {
               fontSize: 54,
               fontWeight: 800,
               color: "#ffffff",
-              fontFamily: "monospace",
+              fontFamily: "IBM Plex Mono, monospace",
               letterSpacing: "-1px",
             }}
           >
@@ -150,6 +155,9 @@ export default async function OpengraphImage({ params }: OpengraphImageProps) {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts,
+    }
   );
 }

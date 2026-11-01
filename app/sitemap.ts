@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 
 import { getLatestCVEs } from "@/lib/nvd";
 
+export const revalidate = 3600;
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 // With live NVD data there are 200,000+ CVEs — far too many (and far too

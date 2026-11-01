@@ -5,7 +5,7 @@ import { matchesNpmRange, isOsvVersionAffected } from "@/lib/scanner/npm-semver"
 import { createNpmFindings, scanNpmDependencies } from "@/lib/scanner/npm-scanner";
 import { createNpmPurl, npmPurlMatches, parseNpmPurl } from "@/lib/scanner/npm-purl";
 import type { DependencyPackage } from "@/lib/scanner/npm-manifest";
-import type { OsvQueryResult } from "@/lib/scanner/osv-client";
+import { packageKey, type OsvQueryResult } from "@/lib/scanner/osv-client";
 import type { ScanWarning } from "@/lib/scanner/types";
 import type { CVE } from "@/types/cve";
 import type { GithubAdvisory } from "@/lib/scanner/github-advisory-client";
@@ -277,6 +277,221 @@ describe("CVE matching for npm packages", () => {
     expect(incomplete.warnings.map((warning) => warning.code)).toContain("OSV_INCOMPLETE_COVERAGE");
     expect(incomplete.auditTrail.some((event) => event.stage === "osv_query" && event.status === "INCOMPLETE")).toBe(true);
     expect(incomplete.auditTrail.every((event) => event.scan_id === "scan-unassigned" && event.timestamp)).toBe(true);
+  });
+
+  describe("multi-advisory on a single package & OSV failure", () => {
+    it("handles OSV completely down / offline and marks scan as FAILED", async () => {
+      const manifest = { dependencies: { axios: "^0.21.1" } };
+      const lock = {
+        lockfileVersion: 3,
+        packages: {
+          "": { dependencies: { axios: "^0.21.1" } },
+          "node_modules/axios": { version: "0.21.1" },
+        },
+      };
+
+      const scanResult = await scanNpmDependencies(
+        manifest,
+        lock,
+        async () => {
+          throw new Error("OSV network timeout / connection refused");
+        }
+      );
+
+      expect(scanResult.status).toBe("FAILED");
+      expect(scanResult.warnings.some((w) => w.code === "OSV_API_ERROR")).toBe(true);
+      expect(scanResult.auditTrail.some((e) => e.stage === "osv_query" && e.status === "FAILED")).toBe(true);
+    });
+
+    it("calculates minimum version covering ALL findings for a package with multiple advisories", async () => {
+      const manifest = { dependencies: { mypkg: "^1.0.0" } };
+      const lock = {
+        lockfileVersion: 3,
+        packages: {
+          "": { dependencies: { mypkg: "^1.0.0" } },
+          "node_modules/mypkg": { version: "1.0.0" },
+        },
+      };
+
+      const multiAdvisoryOsv: OsvQueryResult = {
+        completedPackages: 1,
+        errors: [],
+        results: [
+          {
+            packageKey: packageKey({ name: "mypkg", version: "1.0.0" }),
+            vulnerabilities: [
+              {
+                id: "GHSA-1111-2222-3333",
+                aliases: ["CVE-2023-11111"],
+                summary: "First vuln",
+                affected: [
+                  {
+                    package: { name: "mypkg", ecosystem: "npm" },
+                    ranges: [
+                      {
+                        type: "SEMVER",
+                        events: [{ introduced: "1.0.0" }, { fixed: "1.2.0" }],
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                id: "GHSA-4444-5555-6666",
+                aliases: ["CVE-2023-22222"],
+                summary: "Second vuln",
+                affected: [
+                  {
+                    package: { name: "mypkg", ecosystem: "npm" },
+                    ranges: [
+                      {
+                        type: "SEMVER",
+                        events: [{ introduced: "1.0.0" }, { fixed: "1.5.0" }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const result = await scanNpmDependencies(manifest, lock, async () => multiAdvisoryOsv);
+      expect(result.findings).toHaveLength(2);
+      expect(result.packageSummaries).toBeDefined();
+      const pkgSummary = result.packageSummaries?.find((s) => s.packageName === "mypkg");
+      expect(pkgSummary).toBeDefined();
+      expect(pkgSummary?.findingCount).toBe(2);
+      expect(pkgSummary?.cveIds).toEqual(expect.arrayContaining(["CVE-2023-11111", "CVE-2023-22222"]));
+      // Minimum version closing BOTH 1.2.0 and 1.5.0 is 1.5.0
+      expect(pkgSummary?.minimumFixVersion).toBe("1.5.0");
+      expect(pkgSummary?.isMajorJump).toBe(false);
+      expect(pkgSummary?.upgradeCommand).toBe("npm install --save-exact mypkg@1.5.0");
+    });
+
+    it("flags major version jump when minimum fix version crosses major boundary", async () => {
+      const manifest = { dependencies: { majorpkg: "^1.0.0" } };
+      const lock = {
+        lockfileVersion: 3,
+        packages: {
+          "": { dependencies: { majorpkg: "^1.0.0" } },
+          "node_modules/majorpkg": { version: "1.0.0" },
+        },
+      };
+
+      const majorJumpOsv: OsvQueryResult = {
+        completedPackages: 1,
+        errors: [],
+        results: [
+          {
+            packageKey: packageKey({ name: "majorpkg", version: "1.0.0" }),
+            vulnerabilities: [
+              {
+                id: "GHSA-aaaa-bbbb-cccc",
+                aliases: ["CVE-2024-33333"],
+                summary: "Critical vuln fixed in v2",
+                affected: [
+                  {
+                    package: { name: "majorpkg", ecosystem: "npm" },
+                    ranges: [
+                      {
+                        type: "SEMVER",
+                        events: [{ introduced: "1.0.0" }, { fixed: "2.0.0" }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const result = await scanNpmDependencies(manifest, lock, async () => majorJumpOsv);
+      const pkgSummary = result.packageSummaries?.find((s) => s.packageName === "majorpkg");
+      expect(pkgSummary?.minimumFixVersion).toBe("2.0.0");
+      expect(pkgSummary?.isMajorJump).toBe(true);
+      expect(pkgSummary?.notes).toContain("Peringatan");
+    });
+
+    it("withholds upgrade command in package summary when source conflict exists", async () => {
+      const manifest = { dependencies: { conflictpkg: "^1.0.0" } };
+      const lock = {
+        lockfileVersion: 3,
+        packages: {
+          "": { dependencies: { conflictpkg: "^1.0.0" } },
+          "node_modules/conflictpkg": { version: "1.0.0" },
+        },
+      };
+
+      const osvData: OsvQueryResult = {
+        completedPackages: 1,
+        errors: [],
+        results: [
+          {
+            packageKey: packageKey({ name: "conflictpkg", version: "1.0.0" }),
+            vulnerabilities: [
+              {
+                id: "GHSA-35jh-r3h4-6jhm",
+                aliases: ["CVE-2024-44444"],
+                summary: "OSV summary",
+                affected: [
+                  {
+                    package: { name: "conflictpkg", ecosystem: "npm" },
+                    ranges: [
+                      {
+                        type: "SEMVER",
+                        events: [{ introduced: "1.0.0" }, { fixed: "1.2.0" }],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      // GHSA reports conflicting fix version 1.3.0
+      const queryGithubMock = async () => ({
+        advisories: new Map([
+          [
+            "GHSA-35JH-R3H4-6JHM",
+            {
+              id: "GHSA-35JH-R3H4-6JHM",
+              cveId: "CVE-2024-44444",
+              updatedAt: null,
+              fetchedAt: new Date().toISOString(),
+              url: "https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
+              vulnerabilities: [
+                {
+                  package: { ecosystem: "npm", name: "conflictpkg" },
+                  vulnerableVersionRange: "< 1.3.0",
+                  firstPatchedVersion: "1.3.0",
+                },
+              ],
+              references: [],
+            },
+          ],
+        ]),
+        errors: [],
+        attempts: new Map(),
+      });
+
+      const result = await scanNpmDependencies(
+        manifest,
+        lock,
+        async () => osvData,
+        () => null,
+        queryGithubMock
+      );
+
+      const pkgSummary = result.packageSummaries?.find((s) => s.packageName === "conflictpkg");
+      expect(pkgSummary?.hasSourceConflict).toBe(true);
+      expect(pkgSummary?.upgradeCommand).toBeNull();
+      expect(pkgSummary?.notes).toContain("ditahan karena terdapat konflik");
+    });
   });
 });
 

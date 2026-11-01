@@ -8,9 +8,9 @@ import { logScannerAuditEvent, sanitizeAuditEvent } from "./audit";
 import { queryGithubAdvisories, type GithubAdvisory, type GithubAdvisoryResult } from "./github-advisory-client";
 import { packageKey, queryOsvPackages, type OsvAffected, type OsvQueryResult, type OsvVulnerability } from "./osv-client";
 import { parseNpmLock, type NpmInventory, type PackageJsonShape, type PackageLockShape } from "./npm-manifest";
-import { compareSemver, isOsvVersionAffected, matchesNpmRange } from "./npm-semver";
+import { compareSemver, isOsvVersionAffected, matchesNpmRange, parseSemver } from "./npm-semver";
 import { npmPurlMatches } from "./npm-purl";
-import type { DependencyFinding, DependencyScanReport, MatchStatus, ScanAuditEvent, ScanPackage, ScanWarning, SourceEvidence } from "./types";
+import type { DependencyFinding, DependencyScanReport, MatchStatus, PackageRemediationSummary, ScanAuditEvent, ScanPackage, ScanWarning, SourceEvidence } from "./types";
 
 export type LocalCveLookup = (cveId: string) => CVE | null;
 export type OsvPackageQuery = (packages: NpmInventory["packages"]) => Promise<OsvQueryResult>;
@@ -61,7 +61,15 @@ export async function scanNpmDependencies(
     warnings.push({ code: "OSV_INCOMPLETE_COVERAGE", message: `OSV menyelesaikan ${osvResult.completedPackages} dari ${expectedOsvPackages} pencarian paket.` });
   }
   if ((osvResult.retryCount ?? 0) > 0) audit({ stage: "retry", source: "OSV", status: "RETRIED", decision: "TRANSIENT_RETRY", reason: "OSV API mengalami kegagalan sementara dan permintaan diulang secara terbatas.", retry: osvResult.retryCount });
-  audit({ stage: "osv_query", source: "OSV", status: osvCoverageComplete ? "COMPLETED" : "INCOMPLETE", decision: "SOURCE_QUERY_FINISHED", reason: `Completed ${osvResult.completedPackages}/${expectedOsvPackages} package queries.`, api_error: osvResult.errors.length ? osvResult.errors.join(" | ") : undefined, duration_ms: Date.now() - osvStartedAt });
+  audit({
+    stage: "osv_query",
+    source: "OSV",
+    status: osvCoverageComplete ? "COMPLETED" : (osvResult.completedPackages === 0 && osvResult.errors.length > 0 ? "FAILED" : "INCOMPLETE"),
+    decision: "SOURCE_QUERY_FINISHED",
+    reason: `Completed ${osvResult.completedPackages}/${expectedOsvPackages} package queries.`,
+    api_error: osvResult.errors.length ? osvResult.errors.join(" | ") : undefined,
+    duration_ms: Date.now() - osvStartedAt
+  });
 
   const ghsaIds = Array.from(new Set(osvResult.results.flatMap((result) => result.vulnerabilities.flatMap((advisory) =>
     [advisory.id, ...(advisory.aliases ?? [])].filter((id) => /^GHSA-[23456789CFGHJMPQRVWX]{4}-[23456789CFGHJMPQRVWX]{4}-[23456789CFGHJMPQRVWX]{4}$/i.test(id))
@@ -110,6 +118,8 @@ export async function scanNpmDependencies(
         : "COMPLETED";
   audit({ stage: "scan", status, decision: "SCAN_FINALIZED", reason: `${packages.length} package records; ${findings.filter((finding) => finding.currentDetected).length} affected findings; ${warnings.length} warnings.` });
 
+  const packageSummaries = buildPackageRemediationSummaries(packages, findings);
+
   return {
     status,
     scope: {
@@ -123,6 +133,7 @@ export async function scanNpmDependencies(
     },
     packages,
     findings,
+    packageSummaries,
     warnings,
     limitations: SCAN_LIMITATIONS,
     auditTrail,
@@ -636,4 +647,88 @@ function safeText(value: string | undefined, maxLength: number): string | null {
 
 function compareVersions(left: string, right: string): number {
   return compareSemver(left, right) ?? left.localeCompare(right);
+}
+
+/**
+ * Builds a per-package remediation summary.
+ * For each package with detected findings:
+ * - Computes the minimum version that closes ALL findings on that package.
+ * - Flags major version jumps.
+ * - Suppresses upgrade commands if there are source conflicts or no fix version available.
+ */
+export function buildPackageRemediationSummaries(
+  packages: ScanPackage[],
+  findings: DependencyFinding[]
+): PackageRemediationSummary[] {
+  const summaries: PackageRemediationSummary[] = [];
+
+  const findingsByPackage = new Map<string, DependencyFinding[]>();
+  for (const finding of findings) {
+    if (!finding.currentDetected) continue;
+    const list = findingsByPackage.get(finding.packageName) ?? [];
+    list.push(finding);
+    findingsByPackage.set(finding.packageName, list);
+  }
+
+  for (const [pkgName, pkgFindings] of findingsByPackage.entries()) {
+    const pkg = packages.find((p) => p.name === pkgName);
+    const currentVersion = pkg?.version ?? pkgFindings[0]?.version ?? "0.0.0";
+    const currSem = parseSemver(currentVersion);
+    const cveIds = Array.from(new Set(pkgFindings.map((f) => f.cveId)));
+    const hasSourceConflict = pkgFindings.some((f) => f.sourceConflicts.length > 0);
+
+    // Candidates: all fixed versions across all findings for this package
+    const candidateVersions = Array.from(
+      new Set(pkgFindings.flatMap((f) => f.fixedVersions))
+    ).sort(compareVersions);
+
+    // Find the lowest candidate version V > currentVersion that satisfies ALL findings
+    let minimumFixVersion: string | null = null;
+    for (const candidate of candidateVersions) {
+      const cmpCurrent = compareSemver(candidate, currentVersion);
+      if (cmpCurrent === null || cmpCurrent <= 0) {
+        continue;
+      }
+      const closesAll = pkgFindings.every((finding) => {
+        if (finding.fixedVersions.length === 0) return false;
+        return finding.fixedVersions.some((fv) => {
+          const cmp = compareSemver(candidate, fv);
+          return cmp !== null && cmp >= 0;
+        });
+      });
+      if (closesAll) {
+        minimumFixVersion = candidate;
+        break;
+      }
+    }
+
+    const fixSem = minimumFixVersion ? parseSemver(minimumFixVersion) : null;
+    const isMajorJump = Boolean(currSem && fixSem && fixSem.major > currSem.major);
+
+    let upgradeCommand: string | null = null;
+    if (!hasSourceConflict && minimumFixVersion) {
+      upgradeCommand = `npm install --save-exact ${pkgName}@${minimumFixVersion}`;
+    }
+
+    let notes: string | undefined;
+    if (hasSourceConflict) {
+      notes = "Rekomendasi upgrade ditahan karena terdapat konflik informasi antar-sumber advisori.";
+    } else if (isMajorJump) {
+      notes = "Peringatan: Pembaruan versi melibatkan lompatan major (breaking change); verifikasi kompatibilitas aplikasi Anda.";
+    }
+
+    summaries.push({
+      packageName: pkgName,
+      currentVersion,
+      findingCount: pkgFindings.length,
+      cveIds,
+      minimumFixVersion,
+      isMajorJump,
+      hasSourceConflict,
+      upgradeCommand,
+      notes,
+    });
+  }
+
+  return summaries.sort((a, b) => a.packageName.localeCompare(b.packageName));
 }

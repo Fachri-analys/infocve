@@ -217,7 +217,7 @@ function comparatorMatches(version: string, operator: string, value: string): bo
   return compared === 0;
 }
 
-function parseSemver(value: string): Semver | null {
+export function parseSemver(value: string): Semver | null {
   const normalized = normalizeVersion(value);
   const match = normalized.match(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/);
   if (!match) return null;

@@ -87,6 +87,9 @@ Buka peramban Anda di: **[http://localhost:3000](http://localhost:3000)**
 | `INFOCVE_TRANSLATION_URL` | Opsional untuk aplikasi; diperlukan untuk terjemahan otomatis | *(Tidak dikonfigurasi)* | URL endpoint `/translate` yang kompatibel dengan LibreTranslate. Provider berjalan di server dan tidak memengaruhi sinkronisasi CVE; operator harus meninjau ketentuan provider sebelum mengirim deskripsi ke layanan tersebut. |
 | `INFOCVE_TRANSLATION_API_KEY` | Opsional | *(Kosong)* | API key untuk provider terjemahan yang memerlukannya. |
 | `INFOCVE_TRANSLATION_RETRY_DELAY_MS` | Opsional | `400` | Jeda awal retry provider, bertambah eksponensial untuk percobaan berikutnya. |
+| `DEPENDENCY_SCAN_RETENTION_DAYS` | Opsional | `30` | Masa retensi riwayat pemindaian dependensi sebelum dibersihkan otomatis (dalam hari). |
+| `SYNC_RATE_LIMIT_MAX` | Opsional | `5` | Batas maksimum pemanggilan sinkronisasi per IP per jendela 60 detik. |
+| `SCAN_RATE_LIMIT_MAX` | Opsional | `10` | Batas maksimum pemindaian / pemindaian ulang per IP per jendela 60 detik. |
 
 > **Keamanan Kunci**: Semua kredensial dan API key disimpan murni di server environment (`server-only`) dan tidak pernah terekspos ke bundle JavaScript browser pengguna.
 

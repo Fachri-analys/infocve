@@ -424,6 +424,9 @@ export async function getFacetSample(): Promise<CVE[]> {
       inMemoryFacetSample = cves;
       facetSampleFetchedAt = Date.now();
       return cves;
+    } catch (error) {
+      logAndFallback("getFacetSample", error);
+      return inMemoryFacetSample ?? [];
     } finally {
       inFlightFacetSample = null;
     }

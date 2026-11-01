@@ -18,6 +18,8 @@ import { glossaryTerms } from "@/lib/glossary-data";
 import { formatNumberId, safeJsonLdStringify, truncate } from "@/utils/format";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/utils/constants";
 
+export const revalidate = 3600;
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export default async function HomePage() {
@@ -124,11 +126,15 @@ export default async function HomePage() {
         description="Kerentanan yang paling baru ditambahkan ke basis data ini."
         href="/search"
       >
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {latest.map((cve, index) => (
-            <CVECard key={cve.id} cve={cve} featured={index === 0} />
-          ))}
-        </div>
+        {latest.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {latest.map((cve, index) => (
+              <CVECard key={cve.id} cve={cve} featured={index === 0} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground py-4">Data kerentanan terbaru sedang tidak tersedia saat ini.</p>
+        )}
       </SectionShell>
 
       {/* CRITICAL CVEs */}
@@ -138,11 +144,15 @@ export default async function HomePage() {
           description="Kerentanan dengan dampak paling parah — perlu perhatian dan penambalan segera."
           href="/search?severity=CRITICAL"
         >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {critical.map((cve) => (
-              <CVECard key={cve.id} cve={cve} />
-            ))}
-          </div>
+          {critical.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {critical.map((cve) => (
+                <CVECard key={cve.id} cve={cve} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-4">Data kerentanan kritis sedang tidak tersedia saat ini.</p>
+          )}
         </SectionShell>
       </div>
 
@@ -153,11 +163,15 @@ export default async function HomePage() {
           description="Signifikan dan patut diwaspadai, meski tidak seekstrem tingkat kritis."
           href="/search?severity=HIGH"
         >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {high.map((cve) => (
-              <CVECard key={cve.id} cve={cve} />
-            ))}
-          </div>
+          {high.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {high.map((cve) => (
+                <CVECard key={cve.id} cve={cve} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-4">Data kerentanan tingkat tinggi sedang tidak tersedia saat ini.</p>
+          )}
         </SectionShell>
       </div>
 

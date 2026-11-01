@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db";
 import type { DependencyScanReport } from "./types";
 
 export function saveDependencyScan(report: DependencyScanReport, accessToken: string): void {
+  pruneExpiredScans();
   const db = getDb();
   db.prepare(`
     INSERT INTO dependency_scans (id, parent_scan_id, access_token_hash, scanned_at, status, report_json, created_at)
@@ -55,6 +56,7 @@ function normalizeStoredReport(value: unknown): DependencyScanReport | null {
         sourceEvidence: Array.isArray(finding.sourceEvidence) ? finding.sourceEvidence : [],
       };
     }),
+    packageSummaries: Array.isArray(report.packageSummaries) ? report.packageSummaries : undefined,
   } as DependencyScanReport;
 }
 
@@ -67,3 +69,30 @@ function tokenMatches(storedHash: string, token: string): boolean {
   const actual = Buffer.from(hashToken(token), "hex");
   return expected.length === actual.length && timingSafeEqual(expected, actual);
 }
+
+/**
+ * Prunes scans older than the retention threshold.
+ * Retention window defaults to 30 days and can be configured via DEPENDENCY_SCAN_RETENTION_DAYS.
+ */
+export function pruneExpiredScans(retentionDays?: number): number {
+  try {
+    const envDays = parseInt(process.env.DEPENDENCY_SCAN_RETENTION_DAYS || "", 10);
+    const days = typeof retentionDays === "number" && retentionDays > 0
+      ? retentionDays
+      : Number.isFinite(envDays) && envDays > 0
+        ? envDays
+        : 30;
+
+    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+    const db = getDb();
+    db.prepare(`
+      DELETE FROM dependency_scans
+      WHERE parent_scan_id IN (SELECT id FROM dependency_scans WHERE scanned_at < ?)
+    `).run(cutoff);
+    const res = db.prepare(`DELETE FROM dependency_scans WHERE scanned_at < ?`).run(cutoff);
+    return Number(res.changes);
+  } catch {
+    return 0;
+  }
+}
+

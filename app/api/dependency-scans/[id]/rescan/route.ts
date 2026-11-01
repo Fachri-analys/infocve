@@ -1,12 +1,35 @@
 import { NextResponse } from "next/server";
-import { getAuthorizedDependencyScan } from "@/lib/scanner/scan-repository";
+import { getAuthorizedDependencyScan, pruneExpiredScans } from "@/lib/scanner/scan-repository";
 import { runUploadedNpmScan } from "@/lib/scanner/scan-service";
 import { ScanUploadError } from "@/lib/scanner/upload";
+import { getClientIp, scanRateLimiter } from "@/lib/security/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
+  const ip = getClientIp(request);
+  const rateLimit = scanRateLimiter.check(ip, {
+    maxRequests: parseInt(process.env.SCAN_RATE_LIMIT_MAX || "20", 10) || 20,
+    windowSeconds: 60,
+  });
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "Terlalu banyak permintaan pemindaian ulang. Silakan coba lagi nanti." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rateLimit.retryAfterSeconds),
+          "Cache-Control": "no-store",
+        },
+      }
+    );
+  }
+
+  // Prune scans older than configured retention window
+  pruneExpiredScans();
+
   const { id } = await context.params;
   if (!isScanId(id)) return hiddenNotFound();
   const token = request.headers.get("x-scan-token") ?? "";

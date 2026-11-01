@@ -101,6 +101,18 @@ export interface DependencyFinding {
   currentDetected: boolean;
 }
 
+export interface PackageRemediationSummary {
+  packageName: string;
+  currentVersion: string;
+  findingCount: number;
+  cveIds: string[];
+  minimumFixVersion: string | null;
+  isMajorJump: boolean;
+  hasSourceConflict: boolean;
+  upgradeCommand: string | null;
+  notes?: string;
+}
+
 export interface DependencyScanReport {
   scanId: string;
   parentScanId: string | null;
@@ -117,6 +129,7 @@ export interface DependencyScanReport {
   };
   packages: ScanPackage[];
   findings: DependencyFinding[];
+  packageSummaries?: PackageRemediationSummary[];
   warnings: ScanWarning[];
   limitations: string[];
   auditTrail: ScanAuditEvent[];

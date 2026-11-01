@@ -1,13 +1,16 @@
 import { ImageResponse } from "next/og";
 
 import { SITE_DESCRIPTION, SITE_NAME } from "@/utils/constants";
+import { getLocalOgFonts } from "@/lib/og-fonts";
 
 export const runtime = "nodejs";
 export const alt = `${SITE_NAME} — Basis Pengetahuan Kerentanan Siber`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  const fonts = await getLocalOgFonts();
+
   return new ImageResponse(
     (
       <div
@@ -20,7 +23,7 @@ export default function OpengraphImage() {
           padding: "80px",
           background: "#0a0e1a",
           backgroundImage: "radial-gradient(ellipse 80% 60% at 30% 0%, rgba(124,155,255,0.35), transparent)",
-          fontFamily: "sans-serif",
+          fontFamily: "IBM Plex Sans, sans-serif",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -50,6 +53,9 @@ export default function OpengraphImage() {
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts,
+    }
   );
 }

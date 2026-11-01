@@ -137,6 +137,25 @@
   }
 }
 
+
+@keyframes batik-drift {
+  0% {
+    background-position: 0 0, 0 0, 0 0, 0 0;
+  }
+  100% {
+    background-position: 64px 64px, 0 0, 0 0, 0 0;
+  }
+}
+
+@keyframes batik-ambient {
+  0%, 100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 @keyframes scale-in {
   from {
     opacity: 0;
@@ -170,26 +189,36 @@
   --color-severity-medium-fg: #f9df78;
   --color-severity-low-fg: #7dd3fc;
   --color-severity-none-fg: #c1cad6;
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-}
-
-.home-hero {
+  --pattern-batik: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2264%22%20height%3D%2264%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3Cstyle%3E.k-line%7Bstroke%3Argba(145%2C189%2C255%2C0.18)%3Bfill%3Anone%3Bstroke-width%3A1.2%3Bstroke-linecap%3Around%7D.k-inner%7Bstroke%3Argba(145%2C189%2C255%2C0.08)%3Bfill%3Anone%3Bstroke-width%3A0.8%7D.k-dot%7Bfill%3Argba(145%2C189%2C255%2C0.22)%7D.k-center%7Bstroke%3Argba(145%2C189%2C255%2C0.18)%3Bfill%3Anone%3Bstroke-width%3A1%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2232%22%20cy%3D%2218%22%20rx%3D%227.5%22%20ry%3D%2212.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2232%22%20cy%3D%2246%22%20rx%3D%227.5%22%20ry%3D%2212.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2218%22%20cy%3D%2232%22%20rx%3D%2212.5%22%20ry%3D%227.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2246%22%20cy%3D%2232%22%20rx%3D%2212.5%22%20ry%3D%227.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2232%22%20cy%3D%2218%22%20rx%3D%223.5%22%20ry%3D%226.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2232%22%20cy%3D%2246%22%20rx%3D%223.5%22%20ry%3D%226.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2218%22%20cy%3D%2232%22%20rx%3D%226.5%22%20ry%3D%223.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2246%22%20cy%3D%2232%22%20rx%3D%226.5%22%20ry%3D%223.5%22%2F%3E%3Cpath%20class%3D%22k-center%22%20d%3D%22M32%2026%20L38%2032%20L32%2038%20L26%2032%20Z%22%2F%3E%3Ccircle%20class%3D%22k-dot%22%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%222.2%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%220%22%20cy%3D%2214%22%20rx%3D%227.5%22%20ry%3D%2212.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2264%22%20cy%3D%2214%22%20rx%3D%227.5%22%20ry%3D%2212.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2214%22%20cy%3D%220%22%20rx%3D%2212.5%22%20ry%3D%227.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2250%22%20cy%3D%220%22%20rx%3D%2212.5%22%20ry%3D%227.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%220%22%20cy%3D%2250%22%20rx%3D%227.5%22%20ry%3D%2212.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2264%22%20cy%3D%2250%22%20rx%3D%227.5%22%20ry%3D%2212.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2214%22%20cy%3D%2264%22%20rx%3D%2212.5%22%20ry%3D%227.5%22%2F%3E%3Cellipse%20class%3D%22k-line%22%20cx%3D%2250%22%20cy%3D%2264%22%20rx%3D%2212.5%22%20ry%3D%227.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%220%22%20cy%3D%2214%22%20rx%3D%223.5%22%20ry%3D%226.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2264%22%20cy%3D%2214%22%20rx%3D%223.5%22%20ry%3D%226.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2214%22%20cy%3D%220%22%20rx%3D%226.5%22%20ry%3D%223.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2250%22%20cy%3D%220%22%20rx%3D%226.5%22%20ry%3D%223.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%220%22%20cy%3D%2250%22%20rx%3D%223.5%22%20ry%3D%226.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2264%22%20cy%3D%2250%22%20rx%3D%223.5%22%20ry%3D%226.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2214%22%20cy%3D%2264%22%20rx%3D%226.5%22%20ry%3D%223.5%22%2F%3E%3Cellipse%20class%3D%22k-inner%22%20cx%3D%2250%22%20cy%3D%2264%22%20rx%3D%226.5%22%20ry%3D%223.5%22%2F%3E%3Ccircle%20class%3D%22k-dot%22%20cx%3D%220%22%20cy%3D%220%22%20r%3D%222.2%22%2F%3E%3Ccircle%20class%3D%22k-dot%22%20cx%3D%2264%22%20cy%3D%220%22%20r%3D%222.2%22%2F%3E%3Ccircle%20class%3D%22k-dot%22%20cx%3D%220%22%20cy%3D%2264%22%20r%3D%222.2%22%2F%3E%3Ccircle%20class%3D%22k-dot%22%20cx%3D%2264%22%20cy%3D%2264%22%20r%3D%222.2%22%2F%3E%3Cpath%20class%3D%22k-line%22%20d%3D%22M16%2013%20L16%2019%20M13%2016%20L19%2016%22%2F%3E%3Ccircle%20class%3D%22k-dot%22%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%221.2%22%2F%3E%3Cpath%20class%3D%22k-line%22%20d%3D%22M48%2013%20L48%2019%20M45%2016%20L51%2016%22%2F%3E%3Ccircle%20class%3D%22k-dot%22%20cx%3D%2248%22%20cy%3D%2216%22%20r%3D%221.2%22%2F%3E%3Cpath%20class%3D%22k-line%22%20d%3D%22M16%2045%20L16%2051%20M13%2048%20L19%2048%22%2F%3E%3Ccircle%20class%3D%22k-dot%22%20cx%3D%2216%22%20cy%3D%2248%22%20r%3D%221.2%22%2F%3E%3Cpath%20class%3D%22k-line%22%20d%3D%22M48%2045%20L48%2051%20M45%2048%20L51%2048%22%2F%3E%3Ccircle%20class%3D%22k-dot%22%20cx%3D%2248%22%20cy%3D%2248%22%20r%3D%221.2%22%2F%3E%3C%2Fsvg%3E");
   position: relative;
   isolation: isolate;
   overflow: hidden;
   background-color: var(--color-background);
+  color: var(--color-foreground);
 }
 
-.home-hero::before {
+/* Motif Batik Indonesia khusus pada seluruh latar belakang biru (navy-panel) */
+.navy-panel::before {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background-image: linear-gradient(to right, rgb(145 189 255 / 9%) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(145 189 255 / 9%) 1px, transparent 1px);
-  background-size: 56px 56px;
+  background-image:
+    var(--pattern-batik),
+    radial-gradient(ellipse 70% 60% at 20% 25%, rgb(58 120 223 / 16%) 0%, transparent 65%),
+    radial-gradient(ellipse 65% 55% at 80% 65%, rgb(145 189 255 / 12%) 0%, transparent 60%),
+    linear-gradient(180deg, transparent 0%, var(--color-background) 96%);
+  background-size: 64px 64px, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
   content: "";
   pointer-events: none;
+  animation: batik-drift 75s linear infinite, batik-ambient 12s ease-in-out infinite;
+  transition: opacity 300ms ease, background-image 300ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navy-panel::before {
+    animation: none;
+  }
 }
 
 .home-hero .eyebrow {
@@ -200,22 +229,9 @@
   background-color: rgb(255 255 255 / 12%);
 }
 
-.editorial-panel {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-}
-
-.editorial-panel::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background-image: linear-gradient(to right, rgb(145 189 255 / 8%) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(145 189 255 / 8%) 1px, transparent 1px);
-  background-size: 52px 52px;
+.editorial-panel.navy-panel::before {
   mask-image: linear-gradient(90deg, #000 0%, transparent 88%);
-  content: "";
-  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 88%);
 }
 
 .glossary-term {
