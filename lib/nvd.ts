@@ -59,7 +59,7 @@ const REVALIDATE = {
 } as const;
 
 const CLIENT_REFINE_BATCH_SIZE = 200;
-const FACET_SAMPLE_SIZE = 250; // Keep the NVD response small enough for serverless request budgets.
+const FACET_SAMPLE_SIZE = 100; // One compact NVD response keeps cold serverless renders within budget.
 const LATEST_CVE_SAMPLE_SIZE = 100;
 const MAX_DATE_RANGE_DAYS = 120; // NVD's documented hard limit on any date-range param
 const LOCAL_FALLBACK_SAMPLE_SIZE = 2000;
@@ -521,13 +521,16 @@ export async function getFacetSample(): Promise<CVE[]> {
         return synced;
       }
 
-      const cves = await fetchNewestWindow(
-        { pubStartDate: start, pubEndDate: end },
-        FACET_SAMPLE_SIZE,
+      // Facets are explicitly a sample, so fetch one page only. The generic
+      // newest-window helper fetches both ends of a larger result set, which
+      // adds a second sequential NVD request on a cold Vercel render and can
+      // exhaust the function budget before the homepage stats resolve.
+      const response = await fetchNormalized(
+        { pubStartDate: start, pubEndDate: end, resultsPerPage: FACET_SAMPLE_SIZE },
         REVALIDATE.facetSample,
-        ["nvd:facet-sample"],
-        "publishedDate"
+        ["nvd:facet-sample"]
       );
+      const cves = sortCVEs(response.cves, "publishedDate", "desc");
       inMemoryFacetSample = cves;
       facetSampleFetchedAt = Date.now();
       try {
