@@ -64,6 +64,21 @@ export default function DashboardPage() {
 
 async function DashboardContent() {
   const data = await getDashboardData();
+  if (!data.dataAvailable) {
+    return (
+      <section role="status" className="navy-panel border border-border p-6 sm:p-8">
+        <p className="eyebrow text-[10px] text-accent">Data analitik belum tersedia</p>
+        <h2 className="mt-3 font-display text-2xl font-medium text-foreground">Menunggu respons NVD</h2>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+          Ringkasan statistik tidak ditampilkan sebagai nol karena sampel CVE belum berhasil dimuat. Coba muat ulang beberapa saat lagi atau buka pencarian CVE.
+        </p>
+        <Link href="/search" className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-accent underline-offset-4 hover:underline">
+          Buka pencarian CVE <ArrowRight className="size-4" />
+        </Link>
+      </section>
+    );
+  }
+
   return (
     <div className="space-y-10">
       <section aria-label="Metrik Utama">

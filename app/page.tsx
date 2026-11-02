@@ -184,11 +184,12 @@ export default function HomePage() {
 
 async function HomeCoverageStats() {
   const stats = await getStats();
+  const value = (count: number) => stats.available ? formatNumberId(count) : "—";
   return (
     <>
-      <StatItem value={formatNumberId(stats.total)} label="CVE terbaru" />
-      <StatItem value={formatNumberId(stats.critical)} label="tingkat kritis" tone="critical" />
-      <StatItem value={formatNumberId(stats.vendors)} label="vendor" />
+      <StatItem value={value(stats.total)} label="CVE terbaru" />
+      <StatItem value={value(stats.critical)} label="tingkat kritis" tone="critical" />
+      <StatItem value={value(stats.vendors)} label="vendor" />
     </>
   );
 }

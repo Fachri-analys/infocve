@@ -5,6 +5,7 @@ import type { SecurityCategory } from "@/types";
 import type { NvdCveRecord, NvdQueryParams } from "@/lib/nvd-types";
 import { fetchNvd, NvdApiError } from "@/lib/nvd-client";
 import { normalizeNvdCve } from "@/lib/nvd-normalize";
+import { readNvdFacetSample, writeNvdFacetSample, type CachedFacetSample } from "@/lib/nvd-facet-cache";
 import { CveRepository } from "@/lib/db/cve-repository";
 import { CATEGORY_META, DEFAULT_PAGE_SIZE } from "@/utils/constants";
 
@@ -54,11 +55,12 @@ import { CATEGORY_META, DEFAULT_PAGE_SIZE } from "@/utils/constants";
 const REVALIDATE = {
   detail: 21_600, // 6h -- an individual CVE record changes rarely once published
   search: 3_600, // 1h -- reasonably fresh without hammering the API
-  facetSample: 21_600, // 6h -- the shared "recent batch" facets are derived from
+  facetSample: 604_800, // 7d -- persistent recent sample cache for serverless deployments
 } as const;
 
 const CLIENT_REFINE_BATCH_SIZE = 200;
-const FACET_SAMPLE_SIZE = 2000; // NVD's own max resultsPerPage
+const FACET_SAMPLE_SIZE = 250; // Keep the NVD response small enough for serverless request budgets.
+const LATEST_CVE_SAMPLE_SIZE = 100;
 const MAX_DATE_RANGE_DAYS = 120; // NVD's documented hard limit on any date-range param
 const LOCAL_FALLBACK_SAMPLE_SIZE = 2000;
 
@@ -72,6 +74,10 @@ function logAndFallback(context: string, error: unknown): void {
 }
 
 function getSyncedCves(params: SearchCVEParams, limit = LOCAL_FALLBACK_SAMPLE_SIZE): CVE[] {
+  // Vercel's function filesystem is ephemeral/read-only; Neon holds the shared
+  // CVE sample there, while SQLite remains the local development fallback.
+  if (process.env.VERCEL) return [];
+
   try {
     const result = CveRepository.search({ ...params, page: 1, pageSize: limit });
     return applyFilters(result.results.filter(isNvdSyncedRecord), params);
@@ -276,7 +282,7 @@ export async function getLatestCVEs(limit = 6, preferSynced = false): Promise<CV
       const { start, end } = getRecentPublishedRange(days);
       const latest = await fetchNewestWindow(
         { pubStartDate: start, pubEndDate: end },
-        FACET_SAMPLE_SIZE,
+        LATEST_CVE_SAMPLE_SIZE,
         REVALIDATE.search,
         ["nvd:latest"],
         "publishedDate"
@@ -286,6 +292,10 @@ export async function getLatestCVEs(limit = 6, preferSynced = false): Promise<CV
     return [];
   } catch (error) {
     logAndFallback("getLatestCVEs", error);
+    const cachedSample = await getFacetSample();
+    if (cachedSample.length > 0) {
+      return sortCVEs(cachedSample, "publishedDate", "desc").slice(0, limit);
+    }
     return sortCVEs(getSyncedCves({ publishedFrom: recentRange.start.slice(0, 10), publishedTo: recentRange.end.slice(0, 10) }), "publishedDate", "desc").slice(0, limit);
   }
 }
@@ -356,7 +366,7 @@ export async function getCVEById(id: string): Promise<CVE | null> {
       }],
     };
   } catch (error) {
-    const synced = CveRepository.getById(normalizedId);
+    const synced = process.env.VERCEL ? null : CveRepository.getById(normalizedId);
     if (synced && isNvdSyncedRecord(synced)) {
       logAndFallback(`getCVEById(${normalizedId})`, error);
       return synced;
@@ -479,14 +489,6 @@ export function clearFacetSampleCache(): void {
 
 export async function getFacetSample(): Promise<CVE[]> {
   const now = Date.now();
-  const { start, end } = getRecentPublishedRange();
-  const synced = getSyncedCves({ publishedFrom: start.slice(0, 10), publishedTo: end.slice(0, 10) });
-  if (synced.length > 0) {
-    inMemoryFacetSample = synced;
-    facetSampleFetchedAt = now;
-    return synced;
-  }
-
   if (inMemoryFacetSample && now - facetSampleFetchedAt < FACET_SAMPLE_CACHE_TTL_MS) {
     return inMemoryFacetSample;
   }
@@ -496,7 +498,29 @@ export async function getFacetSample(): Promise<CVE[]> {
   }
 
   inFlightFacetSample = (async () => {
+    let persistedSample: CachedFacetSample | null = null;
     try {
+      try {
+        persistedSample = await readNvdFacetSample();
+        if (persistedSample) {
+          inMemoryFacetSample = persistedSample.cves;
+          facetSampleFetchedAt = persistedSample.fetchedAt;
+          if (now - persistedSample.fetchedAt < FACET_SAMPLE_CACHE_TTL_MS) {
+            return persistedSample.cves;
+          }
+        }
+      } catch (error) {
+        console.error("[lib/nvd] Persistent facet cache read failed:", error instanceof Error ? error.message : String(error));
+      }
+
+      const { start, end } = getRecentPublishedRange();
+      const synced = getSyncedCves({ publishedFrom: start.slice(0, 10), publishedTo: end.slice(0, 10) });
+      if (synced.length > 0) {
+        inMemoryFacetSample = synced;
+        facetSampleFetchedAt = now;
+        return synced;
+      }
+
       const cves = await fetchNewestWindow(
         { pubStartDate: start, pubEndDate: end },
         FACET_SAMPLE_SIZE,
@@ -506,9 +530,15 @@ export async function getFacetSample(): Promise<CVE[]> {
       );
       inMemoryFacetSample = cves;
       facetSampleFetchedAt = Date.now();
+      try {
+        await writeNvdFacetSample(cves);
+      } catch (error) {
+        console.error("[lib/nvd] Persistent facet cache write failed:", error instanceof Error ? error.message : String(error));
+      }
       return cves;
     } catch (error) {
       logAndFallback("getFacetSample", error);
+      if (persistedSample) return persistedSample.cves;
       if (inMemoryFacetSample) return inMemoryFacetSample;
       const { start } = getRecentPublishedRange();
       return getSyncedCves({ publishedFrom: start.slice(0, 10) });
@@ -591,17 +621,19 @@ export async function getCategories(): Promise<(SecurityCategory & { count: numb
 }
 
 /** Aggregate counts used in the hero's small stats row -- derived from the same recent sample, so "total" means "in the last 120 days", not "all of NVD history". */
-export async function getStats(): Promise<{ total: number; critical: number; high: number; vendors: number }> {
+export async function getStats(): Promise<{ total: number; critical: number; high: number; vendors: number; available: boolean }> {
   try {
     const sample = await getFacetSample();
+    if (sample.length === 0) return { total: 0, critical: 0, high: 0, vendors: 0, available: false };
     return {
       total: sample.length,
       critical: sample.filter((c) => c.cvss.severity === "CRITICAL").length,
       high: sample.filter((c) => c.cvss.severity === "HIGH").length,
       vendors: new Set(sample.map((c) => c.vendor)).size,
+      available: true,
     };
   } catch (error) {
     logAndFallback("getStats", error);
-    return { total: 0, critical: 0, high: 0, vendors: 0 };
+    return { total: 0, critical: 0, high: 0, vendors: 0, available: false };
   }
 }

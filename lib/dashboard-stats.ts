@@ -80,6 +80,7 @@ export interface TopCweItem {
 }
 
 export interface DashboardData {
+  dataAvailable: boolean;
   totalSampleCves: number;
   sampleTimeRangeDays: number;
   generatedAt: string;
@@ -538,6 +539,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     const urgentCount = priorityStats.find((p) => p.tier === "P1")?.count ?? 0;
 
     return {
+      dataAvailable: sampleCves.length > 0,
       totalSampleCves: sampleCves.length,
       sampleTimeRangeDays: 120,
       generatedAt: new Date().toISOString(),
@@ -560,6 +562,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   } catch (error) {
     console.error("[Dashboard] Error compiling dashboard data:", error);
     return {
+      dataAvailable: false,
       totalSampleCves: 0,
       sampleTimeRangeDays: 120,
       generatedAt: new Date().toISOString(),

@@ -12,7 +12,7 @@ if (!databaseUrl) {
   process.exit(1);
 }
 
-const result = spawnSync(process.execPath, ["node_modules/vitest/vitest.mjs", "run", "__tests__/scan-repository.neon.test.ts"], {
+const result = spawnSync(process.execPath, ["node_modules/vitest/vitest.mjs", "run", "__tests__/scan-repository.neon.test.ts", "__tests__/nvd-facet-cache.neon.test.ts"], {
   stdio: "inherit",
   env: { ...process.env, TEST_DATABASE_URL: databaseUrl },
 });
