@@ -5,6 +5,7 @@ import type { SecurityCategory } from "@/types";
 import type { NvdCveRecord, NvdQueryParams } from "@/lib/nvd-types";
 import { fetchNvd, NvdApiError } from "@/lib/nvd-client";
 import { normalizeNvdCve } from "@/lib/nvd-normalize";
+import { CveRepository } from "@/lib/db/cve-repository";
 import { CATEGORY_META, DEFAULT_PAGE_SIZE } from "@/utils/constants";
 
 /**
@@ -59,14 +60,37 @@ const REVALIDATE = {
 const CLIENT_REFINE_BATCH_SIZE = 200;
 const FACET_SAMPLE_SIZE = 2000; // NVD's own max resultsPerPage
 const MAX_DATE_RANGE_DAYS = 120; // NVD's documented hard limit on any date-range param
+const LOCAL_FALLBACK_SAMPLE_SIZE = 2000;
+
+function isNvdSyncedRecord(cve: CVE): boolean {
+  return cve.sources?.some((source) => source === "NVD" || source === "BATCH_SYNC") ?? false;
+}
 
 function logAndFallback(context: string, error: unknown): void {
   const message = error instanceof NvdApiError ? `[${error.kind}] ${error.message}` : String(error);
   console.error(`[lib/nvd] ${context} failed, degrading to empty result: ${message}`);
 }
 
-function emptyPage(pageSize: number): PaginatedResult<CVE> {
-  return { results: [], total: 0, page: 1, pageSize, totalPages: 1 };
+function getSyncedCves(params: SearchCVEParams, limit = LOCAL_FALLBACK_SAMPLE_SIZE): CVE[] {
+  try {
+    const result = CveRepository.search({ ...params, page: 1, pageSize: limit });
+    return applyFilters(result.results.filter(isNvdSyncedRecord), params);
+  } catch (error) {
+    console.error("[lib/nvd] Local NVD fallback failed:", error);
+    return [];
+  }
+}
+
+function getRecentPublishedRange(days = MAX_DATE_RANGE_DAYS): { start: string; end: string } {
+  const end = new Date();
+  const start = new Date(end.getTime() - days * 24 * 60 * 60 * 1000);
+  return { start: start.toISOString(), end: end.toISOString() };
+}
+
+function localSearchFallback(params: SearchCVEParams, pageSize: number, page: number): PaginatedResult<CVE> {
+  const synced = getSyncedCves(params);
+  const filtered = sortCVEs(synced, params.sortBy ?? "publishedDate", params.sortOrder ?? "desc");
+  return paginate(filtered, page, pageSize);
 }
 
 function daysBetween(fromIso: string, toIso: string): number {
@@ -210,31 +234,72 @@ async function fetchNormalized(params: NvdQueryParams, revalidateSeconds: number
   };
 }
 
+async function fetchNewestWindow(
+  params: NvdQueryParams,
+  pageSize: number,
+  revalidateSeconds: number,
+  tags: string[] | undefined,
+  sortBy: SearchCVEParams["sortBy"]
+): Promise<CVE[]> {
+  const firstPage = await fetchNormalized({ ...params, resultsPerPage: pageSize }, revalidateSeconds, tags);
+  if (firstPage.totalResults <= firstPage.cves.length) {
+    return sortCVEs(firstPage.cves, sortBy, "desc");
+  }
+
+  // NVD can return old records first when a large update gives many CVEs the
+  // same modified timestamp. Include both ends of the result window, then sort
+  // locally so a recent publication is not hidden behind that tie ordering.
+  const lastPage = await fetchNormalized(
+    { ...params, resultsPerPage: pageSize, startIndex: Math.max(0, firstPage.totalResults - pageSize) },
+    revalidateSeconds,
+    tags
+  );
+  const merged = new Map(firstPage.cves.map((cve) => [cve.id, cve]));
+  for (const cve of lastPage.cves) merged.set(cve.id, cve);
+  return sortCVEs([...merged.values()], sortBy, "desc");
+}
+
 // ---------------------------------------------------------------------------
 // Required public API
 // ---------------------------------------------------------------------------
 
 /** Most recently *published* CVEs. Powers the homepage's "CVE Terbaru" section and the ticker. */
-export async function getLatestCVEs(limit = 6): Promise<CVE[]> {
+export async function getLatestCVEs(limit = 6, preferSynced = false): Promise<CVE[]> {
+  const recentRange = getRecentPublishedRange();
+  if (preferSynced) {
+    const synced = getSyncedCves({ publishedFrom: recentRange.start.slice(0, 10), publishedTo: recentRange.end.slice(0, 10) });
+    if (synced.length > 0) return sortCVEs(synced, "publishedDate", "desc").slice(0, limit);
+  }
+
   try {
-    const { cves } = await fetchNormalized({ resultsPerPage: limit }, REVALIDATE.search, ["nvd:latest"]);
-    return sortCVEs(cves, "publishedDate", "desc").slice(0, limit);
+    for (const days of [7, 14, 30, 60, MAX_DATE_RANGE_DAYS]) {
+      const { start, end } = getRecentPublishedRange(days);
+      const latest = await fetchNewestWindow(
+        { pubStartDate: start, pubEndDate: end },
+        FACET_SAMPLE_SIZE,
+        REVALIDATE.search,
+        ["nvd:latest"],
+        "publishedDate"
+      );
+      if (latest.length >= limit || days === MAX_DATE_RANGE_DAYS) return latest.slice(0, limit);
+    }
+    return [];
   } catch (error) {
     logAndFallback("getLatestCVEs", error);
-    return [];
+    return sortCVEs(getSyncedCves({ publishedFrom: recentRange.start.slice(0, 10), publishedTo: recentRange.end.slice(0, 10) }), "publishedDate", "desc").slice(0, limit);
   }
 }
 
 /** Shorthand for `searchCVEs({ severity: ["CRITICAL"] })`, newest first. */
 export async function getCriticalCVEs(limit = 4): Promise<CVE[]> {
-  const result = await searchCVEs({ severity: ["CRITICAL"], sortBy: "publishedDate", sortOrder: "desc", pageSize: limit });
-  return result.results;
+  const sample = await getFacetSample();
+  return sortCVEs(sample.filter((cve) => cve.cvss.severity === "CRITICAL"), "publishedDate", "desc").slice(0, limit);
 }
 
 /** Shorthand for `searchCVEs({ severity: ["HIGH"] })`, newest first. */
 export async function getHighCVEs(limit = 4): Promise<CVE[]> {
-  const result = await searchCVEs({ severity: ["HIGH"], sortBy: "publishedDate", sortOrder: "desc", pageSize: limit });
-  return result.results;
+  const sample = await getFacetSample();
+  return sortCVEs(sample.filter((cve) => cve.cvss.severity === "HIGH"), "publishedDate", "desc").slice(0, limit);
 }
 
 /**
@@ -247,16 +312,17 @@ export async function getRecentCVEs(limit = 6): Promise<CVE[]> {
   try {
     const end = new Date();
     const start = new Date(end.getTime() - MAX_DATE_RANGE_DAYS * 24 * 60 * 60 * 1000);
-    const { cves } = await fetchNormalized(
+    const cves = await fetchNewestWindow(
       {
         lastModStartDate: start.toISOString(),
         lastModEndDate: end.toISOString(),
-        resultsPerPage: Math.max(limit, 50),
       },
+      Math.max(limit, 50),
       REVALIDATE.search,
-      ["nvd:recent"]
+      ["nvd:recent"],
+      "lastModifiedDate"
     );
-    return sortCVEs(cves, "lastModifiedDate", "desc").slice(0, limit);
+    return cves.slice(0, limit);
   } catch (error) {
     logAndFallback("getRecentCVEs", error);
     return [];
@@ -277,17 +343,26 @@ export async function getCVEById(id: string): Promise<CVE | null> {
   const normalizedId = id.trim().toUpperCase();
   if (!/^CVE-\d{4}-\d{4,}$/.test(normalizedId)) return null;
 
-  const response = await fetchNvd({ cveId: normalizedId }, { revalidateSeconds: REVALIDATE.detail, tags: [`nvd:cve:${normalizedId}`] });
-  const record: NvdCveRecord | undefined = response.vulnerabilities[0]?.cve;
-  if (!record) return null;
-  return {
-    ...normalizeNvdCve(record),
-    sourceObservations: [{
-      sourceId: "NVD",
-      recordUrl: `https://nvd.nist.gov/vuln/detail/${encodeURIComponent(normalizedId)}`,
-      accessedAt: new Date().toISOString(),
-    }],
-  };
+  try {
+    const response = await fetchNvd({ cveId: normalizedId }, { revalidateSeconds: REVALIDATE.detail, tags: [`nvd:cve:${normalizedId}`] });
+    const record: NvdCveRecord | undefined = response.vulnerabilities[0]?.cve;
+    if (!record) return null;
+    return {
+      ...normalizeNvdCve(record),
+      sourceObservations: [{
+        sourceId: "NVD",
+        recordUrl: `https://nvd.nist.gov/vuln/detail/${encodeURIComponent(normalizedId)}`,
+        accessedAt: new Date().toISOString(),
+      }],
+    };
+  } catch (error) {
+    const synced = CveRepository.getById(normalizedId);
+    if (synced && isNvdSyncedRecord(synced)) {
+      logAndFallback(`getCVEById(${normalizedId})`, error);
+      return synced;
+    }
+    throw error;
+  }
 }
 
 /** The full filter + sort + paginate pipeline backing the search page. */
@@ -320,7 +395,7 @@ export async function searchCVEs(params: SearchCVEParams = {}): Promise<Paginate
     return paginate(sorted, page, pageSize);
   } catch (error) {
     logAndFallback("searchCVEs", error);
-    return emptyPage(pageSize);
+    return localSearchFallback(params, pageSize, page);
   }
 }
 
@@ -404,6 +479,14 @@ export function clearFacetSampleCache(): void {
 
 export async function getFacetSample(): Promise<CVE[]> {
   const now = Date.now();
+  const { start, end } = getRecentPublishedRange();
+  const synced = getSyncedCves({ publishedFrom: start.slice(0, 10), publishedTo: end.slice(0, 10) });
+  if (synced.length > 0) {
+    inMemoryFacetSample = synced;
+    facetSampleFetchedAt = now;
+    return synced;
+  }
+
   if (inMemoryFacetSample && now - facetSampleFetchedAt < FACET_SAMPLE_CACHE_TTL_MS) {
     return inMemoryFacetSample;
   }
@@ -414,19 +497,21 @@ export async function getFacetSample(): Promise<CVE[]> {
 
   inFlightFacetSample = (async () => {
     try {
-      const end = new Date();
-      const start = new Date(end.getTime() - MAX_DATE_RANGE_DAYS * 24 * 60 * 60 * 1000);
-      const { cves } = await fetchNormalized(
-        { pubStartDate: start.toISOString(), pubEndDate: end.toISOString(), resultsPerPage: FACET_SAMPLE_SIZE },
+      const cves = await fetchNewestWindow(
+        { pubStartDate: start, pubEndDate: end },
+        FACET_SAMPLE_SIZE,
         REVALIDATE.facetSample,
-        ["nvd:facet-sample"]
+        ["nvd:facet-sample"],
+        "publishedDate"
       );
       inMemoryFacetSample = cves;
       facetSampleFetchedAt = Date.now();
       return cves;
     } catch (error) {
       logAndFallback("getFacetSample", error);
-      return inMemoryFacetSample ?? [];
+      if (inMemoryFacetSample) return inMemoryFacetSample;
+      const { start } = getRecentPublishedRange();
+      return getSyncedCves({ publishedFrom: start.slice(0, 10) });
     } finally {
       inFlightFacetSample = null;
     }

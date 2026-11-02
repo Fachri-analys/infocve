@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Database, ShieldCheck, Calendar, ArrowRight } from "lucide-react";
@@ -10,8 +11,12 @@ import { PriorityBreakdown } from "@/components/dashboard/priority-breakdown";
 import { ThreatIntelSummary } from "@/components/dashboard/threat-intel-summary";
 import { TrendChart } from "@/components/dashboard/trend-chart";
 import { TopRankings } from "@/components/dashboard/top-rankings";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export const revalidate = 21600; // 6 hours, matching NVD facet-sample cache window
+// Stream the static dashboard shell while analytics load. Data fetches keep
+// their own cache windows (the NVD facet sample is cached for 6 hours).
+export const revalidate = 0;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Dashboard Vulnerability & Intelijen Ancaman",
@@ -20,9 +25,7 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/dashboard",
 });
 
-export default async function DashboardPage() {
-  const data = await getDashboardData();
-
+export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 animate-fade-in">
       <Breadcrumb items={[{ label: "Dashboard" }]} />
@@ -52,85 +55,100 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Dashboard Content */}
-      <div className="space-y-10">
-        {/* KPI Cards Section */}
-        <section aria-label="Metrik Utama">
-          <KpiCards data={data} />
+      <Suspense fallback={<DashboardContentFallback />}>
+        <DashboardContent />
+      </Suspense>
+    </div>
+  );
+}
+
+async function DashboardContent() {
+  const data = await getDashboardData();
+  return (
+    <div className="space-y-10">
+      <section aria-label="Metrik Utama">
+        <KpiCards data={data} />
+      </section>
+
+      <section aria-label="Distribusi Keparahan">
+        <SeverityChart severityDistribution={data.severityDistribution} brackets={data.cvssStats.brackets} totalCves={data.totalSampleCves} />
+      </section>
+
+      <section aria-label="Hierarki Prioritas InfoCVE">
+        <PriorityBreakdown priorityStats={data.priorityStats} />
+      </section>
+
+      <section aria-label="Intelijen Eksploitasi Nyata">
+        <ThreatIntelSummary cisaKevStats={data.cisaKevStats} epssStats={data.epssStats} />
+      </section>
+
+      {data.trend.length > 0 && (
+        <section aria-label="Tren Publikasi">
+          <TrendChart trend={data.trend} />
         </section>
+      )}
 
-        {/* Severity and Score Distribution */}
-        <section aria-label="Distribusi Keparahan">
-          <SeverityChart
-            severityDistribution={data.severityDistribution}
-            brackets={data.cvssStats.brackets}
-            totalCves={data.totalSampleCves}
-          />
-        </section>
+      <section aria-label="Peringkat Entitas Terdampak">
+        <TopRankings topVendors={data.topVendors} topProducts={data.topProducts} topCwes={data.topCwes} />
+      </section>
 
-        {/* InfoCVE Priority Methodology Breakdown */}
-        <section aria-label="Hierarki Prioritas InfoCVE">
-          <PriorityBreakdown
-            priorityStats={data.priorityStats}
-          />
-        </section>
-
-        {/* Real-World Threat Intelligence (CISA KEV + EPSS) */}
-        <section aria-label="Intelijen Eksploitasi Nyata">
-          <ThreatIntelSummary
-            cisaKevStats={data.cisaKevStats}
-            epssStats={data.epssStats}
-          />
-        </section>
-
-        {/* Weekly Trend Chart */}
-        {data.trend.length > 0 && (
-          <section aria-label="Tren Publikasi">
-            <TrendChart trend={data.trend} />
-          </section>
-        )}
-
-        {/* Top Vendors, Products, and CWEs */}
-        <section aria-label="Peringkat Entitas Terdampak">
-          <TopRankings
-            topVendors={data.topVendors}
-            topProducts={data.topProducts}
-            topCwes={data.topCwes}
-          />
-        </section>
-
-        {/* Methodology & Data Provenance Notice */}
-        <div className="navy-panel border border-border p-5 sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <ShieldCheck className="size-4 text-accent" />
-                Transparansi Sumber &amp; Metodologi Intelijen
-              </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed max-w-3xl">
-                Seluruh statistik di dashboard ini bersumber langsung dari API resmi tanpa manipulasi atau data dummy.
-                InfoCVE memprioritaskan tindakan berdasarkan kombinasi keparahan teknis (CVSS) dan ancaman eksploitasi
-                nyata (CISA KEV &amp; EPSS).
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2 shrink-0">
-              <Link
-                href="/sources"
-                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
-              >
-                <Database className="size-3.5" />
-                Audit Sumber Data
-                <ArrowRight className="size-3" />
-              </Link>
-              <Link
-                href="/search"
-                className="inline-flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-accent-foreground transition-colors hover:bg-accent/90"
-              >
-                Cari Semua Kerentanan
-              </Link>
-            </div>
+      <div className="navy-panel border border-border p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <ShieldCheck className="size-4 text-accent" />
+              Transparansi Sumber &amp; Metodologi Intelijen
+            </h3>
+            <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">
+              Seluruh statistik di dashboard ini bersumber langsung dari API resmi tanpa manipulasi atau data dummy.
+              InfoCVE memprioritaskan tindakan berdasarkan kombinasi keparahan teknis (CVSS) dan ancaman eksploitasi
+              nyata (CISA KEV &amp; EPSS).
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Link href="/sources" className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted">
+              <Database className="size-3.5" />
+              Audit Sumber Data
+              <ArrowRight className="size-3" />
+            </Link>
+            <Link href="/search" className="inline-flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-accent-foreground transition-colors hover:bg-accent/90">
+              Cari Semua Kerentanan
+            </Link>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function DashboardContentFallback() {
+  return (
+    <div className="space-y-10" aria-busy="true" aria-label="Memuat analitik dashboard">
+      <div className="grid grid-cols-1 gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Card key={index} className="rounded-none border-0">
+            <CardContent className="space-y-3 p-5">
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-8 w-24" />
+              <Skeleton className="h-3 w-40" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <Card className="space-y-4 p-6">
+        <Skeleton className="h-5 w-64" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-40 w-full" />
+      </Card>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="space-y-4 p-6">
+          <Skeleton className="h-5 w-56" />
+          <Skeleton className="h-28 w-full" />
+        </Card>
+        <Card className="space-y-4 p-6">
+          <Skeleton className="h-5 w-56" />
+          <Skeleton className="h-28 w-full" />
+        </Card>
       </div>
     </div>
   );

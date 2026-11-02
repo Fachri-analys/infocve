@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import { Breadcrumb } from "@/components/common/breadcrumb";
@@ -6,6 +7,8 @@ import { CVECard } from "@/components/cve/cve-card";
 import { SearchBar } from "@/components/search/search-bar";
 import { SearchFilters } from "@/components/search/search-filters";
 import { Pagination } from "@/components/search/pagination";
+import { CVEGridSkeleton } from "@/components/common/loading-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getAvailableCWEs, getAvailableYears, getProducts, getVendors, searchCVEs } from "@/lib/nvd";
 import { isValidSeverity } from "@/utils/severity";
 import { DEFAULT_PAGE_SIZE, isValidCategory } from "@/utils/constants";
@@ -105,14 +108,8 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const raw = await searchParams;
   const params = parseParams(raw);
-
-  const [result, years, vendors, products, cwes] = await Promise.all([
-    searchCVEs(params),
-    getAvailableYears(),
-    getVendors(),
-    getProducts(),
-    getAvailableCWEs(),
-  ]);
+  const resultPromise = searchCVEs(params);
+  const facetsPromise = getSearchFacets();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 animate-fade-in">
@@ -135,79 +132,130 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             </p>
           </div>
 
-          <aside aria-label="Ringkasan hasil pencarian" className="grid grid-cols-2 gap-5 border-t border-border pt-5 sm:gap-8 lg:grid-cols-1 lg:content-end lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
-            <div>
-              <p className="data-tag text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Cocok dengan pencarian</p>
-              <p className="data-tag mt-2 text-4xl font-medium leading-none text-accent sm:text-5xl">{result.total.toLocaleString("id-ID")}</p>
-              <p className="mt-2 text-xs text-muted-foreground">kerentanan ditemukan</p>
-            </div>
-            <div className="border-l border-border pl-5 lg:border-l-0 lg:border-t lg:pl-0 lg:pt-5">
-              <p className="data-tag text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Halaman hasil</p>
-              <p className="data-tag mt-2 text-2xl font-medium text-foreground">
-                {result.total > 0 ? `${String(result.page).padStart(2, "0")} / ${String(result.totalPages).padStart(2, "0")}` : "—"}
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">{result.results.length} entri di halaman ini</p>
-            </div>
-          </aside>
+          <Suspense fallback={<SearchSummaryFallback />}>
+            <SearchSummary resultPromise={resultPromise} />
+          </Suspense>
         </div>
       </section>
 
-      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-10">
-        <aside>
-          <SearchFilters
-            query={params.query ?? ""}
-            years={years}
-            vendors={vendors}
-            products={products}
-            cwes={cwes}
-            selected={{
-              severity: params.severity ?? [],
-              year: params.year?.[0],
-              vendor: params.vendor?.[0],
-              product: params.product?.[0],
-              cwe: params.cwe?.[0],
-              category: params.category,
-              publishedFrom: params.publishedFrom,
-              publishedTo: params.publishedTo,
-              modifiedFrom: params.modifiedFrom,
-              modifiedTo: params.modifiedTo,
-              sortBy: params.sortBy ?? "publishedDate",
-              sortOrder: params.sortOrder ?? "desc",
-            }}
-          />
-        </aside>
+      <Suspense fallback={<SearchContentFallback />}>
+        <SearchResults params={params} raw={raw} resultPromise={resultPromise} facetsPromise={facetsPromise} />
+      </Suspense>
+    </div>
+  );
+}
 
-        <section aria-label="Hasil pencarian">
-          <div className="mb-5 flex items-end justify-between gap-4 border-b border-border pb-4">
-            <div>
-              <p className="eyebrow mb-2 text-[10px]">Daftar hasil</p>
-              <h2 className="font-display text-2xl font-medium tracking-tight text-foreground">
-                {params.query ? `“${params.query}”` : "Semua kerentanan"}
-              </h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {params.query ? "Hasil yang sesuai dengan kata kunci Anda." : "Gunakan filter untuk mempersempit direktori."}
-              </p>
-            </div>
-            <span className="data-tag hidden text-xs text-muted-foreground sm:block">
-              {result.results.length.toString().padStart(2, "0")} / {DEFAULT_PAGE_SIZE.toString().padStart(2, "0")}
-            </span>
-          </div>
-          {result.results.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {result.results.map((cve, index) => (
-                  <CVECard key={cve.id} cve={cve} featured={index === 0} />
-                ))}
-              </div>
-              <div className="mt-10">
-                <Pagination currentPage={result.page} totalPages={result.totalPages} searchParams={raw} />
-              </div>
-            </>
-          )}
-        </section>
+type SearchFacets = Awaited<ReturnType<typeof getSearchFacets>>;
+
+async function getSearchFacets() {
+  return Promise.all([getAvailableYears(), getVendors(), getProducts(), getAvailableCWEs()] as const);
+}
+
+async function SearchSummary({ resultPromise }: { resultPromise: ReturnType<typeof searchCVEs> }) {
+  const result = await resultPromise;
+  return (
+    <aside aria-label="Ringkasan hasil pencarian" className="grid grid-cols-2 gap-5 border-t border-border pt-5 sm:gap-8 lg:grid-cols-1 lg:content-end lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+      <div>
+        <p className="data-tag text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Cocok dengan pencarian</p>
+        <p className="data-tag mt-2 text-4xl font-medium leading-none text-accent sm:text-5xl">{result.total.toLocaleString("id-ID")}</p>
+        <p className="mt-2 text-xs text-muted-foreground">kerentanan ditemukan</p>
       </div>
+      <div className="border-l border-border pl-5 lg:border-l-0 lg:border-t lg:pl-0 lg:pt-5">
+        <p className="data-tag text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Halaman hasil</p>
+        <p className="data-tag mt-2 text-2xl font-medium text-foreground">
+          {result.total > 0 ? `${String(result.page).padStart(2, "0")} / ${String(result.totalPages).padStart(2, "0")}` : "—"}
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">{result.results.length} entri di halaman ini</p>
+      </div>
+    </aside>
+  );
+}
+
+function SearchSummaryFallback() {
+  return (
+    <aside aria-busy="true" aria-label="Memuat ringkasan hasil pencarian" className="grid grid-cols-2 gap-5 border-t border-border pt-5 sm:gap-8 lg:grid-cols-1 lg:content-end lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+      <div className="space-y-3">
+        <Skeleton className="h-3 w-40" />
+        <Skeleton className="h-10 w-24" />
+        <Skeleton className="h-3 w-32" />
+      </div>
+      <div className="space-y-3 border-l border-border pl-5 lg:border-l-0 lg:border-t lg:pl-0 lg:pt-5">
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-8 w-20" />
+        <Skeleton className="h-3 w-32" />
+      </div>
+    </aside>
+  );
+}
+
+async function SearchResults({
+  params,
+  raw,
+  resultPromise,
+  facetsPromise,
+}: {
+  params: SearchCVEParams;
+  raw: Record<string, string | string[] | undefined>;
+  resultPromise: ReturnType<typeof searchCVEs>;
+  facetsPromise: Promise<SearchFacets>;
+}) {
+  const [result, [years, vendors, products, cwes]] = await Promise.all([resultPromise, facetsPromise]);
+  return (
+    <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-10">
+      <aside>
+        <SearchFilters
+          query={params.query ?? ""}
+          years={years}
+          vendors={vendors}
+          products={products}
+          cwes={cwes}
+          selected={{
+            severity: params.severity ?? [], year: params.year?.[0], vendor: params.vendor?.[0], product: params.product?.[0],
+            cwe: params.cwe?.[0], category: params.category, publishedFrom: params.publishedFrom, publishedTo: params.publishedTo,
+            modifiedFrom: params.modifiedFrom, modifiedTo: params.modifiedTo, sortBy: params.sortBy ?? "publishedDate",
+            sortOrder: params.sortOrder ?? "desc",
+          }}
+        />
+      </aside>
+      <section aria-label="Hasil pencarian">
+        <div className="mb-5 flex items-end justify-between gap-4 border-b border-border pb-4">
+          <div>
+            <p className="eyebrow mb-2 text-[10px]">Daftar hasil</p>
+            <h2 className="font-display text-2xl font-medium tracking-tight text-foreground">{params.query ? `“${params.query}”` : "Semua kerentanan"}</h2>
+            <p className="mt-1 text-xs text-muted-foreground">{params.query ? "Hasil yang sesuai dengan kata kunci Anda." : "Gunakan filter untuk mempersempit direktori."}</p>
+          </div>
+          <span className="data-tag hidden text-xs text-muted-foreground sm:block">{result.results.length.toString().padStart(2, "0")} / {DEFAULT_PAGE_SIZE.toString().padStart(2, "0")}</span>
+        </div>
+        {result.results.length === 0 ? <EmptyState /> : (
+          <>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {result.results.map((cve, index) => <CVECard key={cve.id} cve={cve} featured={index === 0} />)}
+            </div>
+            <div className="mt-10"><Pagination currentPage={result.page} totalPages={result.totalPages} searchParams={raw} /></div>
+          </>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function SearchContentFallback() {
+  return (
+    <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-10" aria-busy="true">
+      <aside className="space-y-4 border-t-4 border-t-accent pt-5" aria-label="Memuat filter">
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-40 w-full" />
+      </aside>
+      <section aria-label="Memuat hasil pencarian">
+        <div className="mb-5 space-y-3 border-b border-border pb-4">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-8 w-64 max-w-full" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <CVEGridSkeleton count={4} />
+      </section>
     </div>
   );
 }

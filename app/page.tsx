@@ -1,10 +1,13 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Database } from "lucide-react";
 
 import { SearchBar } from "@/components/search/search-bar";
 import { CVECard } from "@/components/cve/cve-card";
 import { CategoryCard } from "@/components/cve/category-card";
+import { CVEGridSkeleton } from "@/components/common/loading-skeleton";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   getCategories,
   getCriticalCVEs,
@@ -18,20 +21,13 @@ import { glossaryTerms } from "@/lib/glossary-data";
 import { formatNumberId, safeJsonLdStringify, truncate } from "@/utils/format";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/utils/constants";
 
-export const revalidate = 3600;
+// Keep the route request-rendered so Suspense can stream the hero immediately.
+// Individual NVD requests keep their own revalidation windows in lib/nvd.ts.
+export const revalidate = 0;
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-export default async function HomePage() {
-  const [latest, critical, high, vendors, products, categories, stats] = await Promise.all([
-    getLatestCVEs(6),
-    getCriticalCVEs(4),
-    getHighCVEs(4),
-    getVendors(10),
-    getProducts(10),
-    getCategories(),
-    getStats(),
-  ]);
+export default function HomePage() {
   const featuredTerms = glossaryTerms.slice(0, 4);
 
   const websiteJsonLd = {
@@ -107,9 +103,9 @@ export default async function HomePage() {
               <span className="data-tag text-[10px] text-muted-foreground">120 HARI</span>
             </div>
             <dl className="mt-4 divide-y divide-border border-y border-border">
-              <StatItem value={formatNumberId(stats.total)} label="CVE terbaru" />
-              <StatItem value={formatNumberId(stats.critical)} label="tingkat kritis" tone="critical" />
-              <StatItem value={formatNumberId(stats.vendors)} label="vendor" />
+              <Suspense fallback={<CoverageStatsFallback />}>
+                <HomeCoverageStats />
+              </Suspense>
             </dl>
             <Link href="/sources" className="mt-5 inline-flex items-center gap-1.5 text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-accent hover:underline">
               <Database className="size-3.5" />
@@ -121,76 +117,33 @@ export default async function HomePage() {
       </section>
 
       {/* LATEST CVEs */}
-      <SectionShell
-        title="CVE Terbaru"
-        description="Kerentanan yang paling baru ditambahkan ke basis data ini."
-        href="/search"
-      >
-        {latest.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {latest.map((cve, index) => (
-              <CVECard key={cve.id} cve={cve} featured={index === 0} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground py-4">Data kerentanan terbaru sedang tidak tersedia saat ini.</p>
-        )}
-      </SectionShell>
+      <Suspense fallback={<CveSectionFallback title="CVE Terbaru" description="Kerentanan yang paling baru ditambahkan ke basis data ini." href="/search" count={6} />}>
+        <HomeLatestCves />
+      </Suspense>
 
       {/* CRITICAL CVEs */}
       <div className="navy-panel border-y border-border">
-        <SectionShell
-          title="CVE Tingkat Kritis"
-          description="Kerentanan dengan dampak paling parah — perlu perhatian dan penambalan segera."
-          href="/search?severity=CRITICAL"
-        >
-          {critical.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {critical.map((cve) => (
-                <CVECard key={cve.id} cve={cve} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground py-4">Data kerentanan kritis sedang tidak tersedia saat ini.</p>
-          )}
-        </SectionShell>
+        <Suspense fallback={<CveSectionFallback title="CVE Tingkat Kritis" description="Kerentanan dengan dampak paling parah — perlu perhatian dan penambalan segera." href="/search?severity=CRITICAL" count={4} />}>
+          <HomeCriticalCves />
+        </Suspense>
       </div>
 
       {/* HIGH SEVERITY CVEs */}
       <div className="border-b border-border">
-        <SectionShell
-          title="CVE Tingkat Tinggi"
-          description="Signifikan dan patut diwaspadai, meski tidak seekstrem tingkat kritis."
-          href="/search?severity=HIGH"
-        >
-          {high.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {high.map((cve) => (
-                <CVECard key={cve.id} cve={cve} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground py-4">Data kerentanan tingkat tinggi sedang tidak tersedia saat ini.</p>
-          )}
-        </SectionShell>
+        <Suspense fallback={<CveSectionFallback title="CVE Tingkat Tinggi" description="Signifikan dan patut diwaspadai, meski tidak seekstrem tingkat kritis." href="/search?severity=HIGH" count={4} />}>
+          <HomeHighCves />
+        </Suspense>
       </div>
 
       {/* VENDORS & PRODUCTS */}
-      <SectionShell title="Vendor & Produk" description="Jelajahi kerentanan berdasarkan vendor atau produk tertentu.">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-16">
-          <FacetList title="Vendor terbaru" items={vendors} parameter="vendor" />
-          <FacetList title="Produk terbaru" items={products} parameter="product" />
-        </div>
-      </SectionShell>
+      <Suspense fallback={<FacetSectionFallback />}>
+        <HomeFacets />
+      </Suspense>
 
       {/* SECURITY CATEGORIES */}
-      <SectionShell title="Kategori Keamanan" description="Pilih area sistem untuk mempersempit pencarian.">
-        <div className="grid grid-cols-1 border-t border-border sm:grid-cols-2 sm:gap-x-10">
-          {categories.map((cat) => (
-            <CategoryCard key={cat.slug} slug={cat.slug} name={cat.name} descriptionId={cat.descriptionId} count={cat.count} />
-          ))}
-        </div>
-      </SectionShell>
+      <Suspense fallback={<CategorySectionFallback />}>
+        <HomeCategories />
+      </Suspense>
 
       {/* LEARNING SECTION */}
       <section className="border-t border-border/70 px-4 py-16 sm:px-6 lg:px-8">
@@ -226,6 +179,138 @@ export default async function HomePage() {
         </div>
       </section>
     </div>
+  );
+}
+
+async function HomeCoverageStats() {
+  const stats = await getStats();
+  return (
+    <>
+      <StatItem value={formatNumberId(stats.total)} label="CVE terbaru" />
+      <StatItem value={formatNumberId(stats.critical)} label="tingkat kritis" tone="critical" />
+      <StatItem value={formatNumberId(stats.vendors)} label="vendor" />
+    </>
+  );
+}
+
+function CoverageStatsFallback() {
+  return (
+    <>
+      <StatItem value="—" label="CVE terbaru" />
+      <StatItem value="—" label="tingkat kritis" tone="critical" />
+      <StatItem value="—" label="vendor" />
+    </>
+  );
+}
+
+async function HomeLatestCves() {
+  const latest = await getLatestCVEs(6, true);
+  return (
+    <SectionShell title="CVE Terbaru" description="Kerentanan yang paling baru ditambahkan ke basis data ini." href="/search">
+      {latest.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {latest.map((cve, index) => <CVECard key={cve.id} cve={cve} featured={index === 0} />)}
+        </div>
+      ) : (
+        <p className="py-4 text-sm text-muted-foreground">Data kerentanan terbaru sedang tidak tersedia saat ini.</p>
+      )}
+    </SectionShell>
+  );
+}
+
+async function HomeCriticalCves() {
+  const critical = await getCriticalCVEs(4);
+  return (
+    <SectionShell title="CVE Tingkat Kritis" description="Kerentanan dengan dampak paling parah — perlu perhatian dan penambalan segera." href="/search?severity=CRITICAL">
+      {critical.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {critical.map((cve) => <CVECard key={cve.id} cve={cve} />)}
+        </div>
+      ) : (
+        <p className="py-4 text-sm text-muted-foreground">Data kerentanan kritis sedang tidak tersedia saat ini.</p>
+      )}
+    </SectionShell>
+  );
+}
+
+async function HomeHighCves() {
+  const high = await getHighCVEs(4);
+  return (
+    <SectionShell title="CVE Tingkat Tinggi" description="Signifikan dan patut diwaspadai, meski tidak seekstrem tingkat kritis." href="/search?severity=HIGH">
+      {high.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {high.map((cve) => <CVECard key={cve.id} cve={cve} />)}
+        </div>
+      ) : (
+        <p className="py-4 text-sm text-muted-foreground">Data kerentanan tingkat tinggi sedang tidak tersedia saat ini.</p>
+      )}
+    </SectionShell>
+  );
+}
+
+function CveSectionFallback({ title, description, href, count }: { title: string; description: string; href: string; count: number }) {
+  return (
+    <SectionShell title={title} description={description} href={href}>
+      <div aria-busy="true" aria-label={`Memuat ${title.toLowerCase()}`}>
+        <CVEGridSkeleton count={count} />
+      </div>
+    </SectionShell>
+  );
+}
+
+async function HomeFacets() {
+  const [vendors, products] = await Promise.all([getVendors(10), getProducts(10)]);
+  return (
+    <SectionShell title="Vendor & Produk" description="Jelajahi kerentanan berdasarkan vendor atau produk tertentu.">
+      <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-16">
+        <FacetList title="Vendor terbaru" items={vendors} parameter="vendor" />
+        <FacetList title="Produk terbaru" items={products} parameter="product" />
+      </div>
+    </SectionShell>
+  );
+}
+
+function FacetSectionFallback() {
+  return (
+    <SectionShell title="Vendor & Produk" description="Jelajahi kerentanan berdasarkan vendor atau produk tertentu.">
+      <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-16" aria-busy="true" aria-label="Memuat daftar vendor dan produk">
+        {["Vendor terbaru", "Produk terbaru"].map((title) => (
+          <div key={title}>
+            <h3 className="font-display text-base font-medium text-foreground">{title}</h3>
+            <div className="mt-3 space-y-3 border-y border-border py-4">
+              {Array.from({ length: 4 }).map((_, index) => <Skeleton key={index} className="h-4 w-full" />)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </SectionShell>
+  );
+}
+
+async function HomeCategories() {
+  const categories = await getCategories();
+  return (
+    <SectionShell title="Kategori Keamanan" description="Pilih area sistem untuk mempersempit pencarian.">
+      <div className="grid grid-cols-1 border-t border-border sm:grid-cols-2 sm:gap-x-10">
+        {categories.map((cat) => <CategoryCard key={cat.slug} slug={cat.slug} name={cat.name} descriptionId={cat.descriptionId} count={cat.count} />)}
+      </div>
+    </SectionShell>
+  );
+}
+
+function CategorySectionFallback() {
+  return (
+    <SectionShell title="Kategori Keamanan" description="Pilih area sistem untuk mempersempit pencarian.">
+      <div className="grid grid-cols-1 gap-y-6 border-t border-border sm:grid-cols-2 sm:gap-x-10" aria-busy="true" aria-label="Memuat kategori keamanan">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className="space-y-3 border-b border-border py-5">
+            <Skeleton className="h-5 w-2/3" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        ))}
+      </div>
+    </SectionShell>
   );
 }
 
