@@ -63,7 +63,12 @@ export function Pagination({ currentPage, totalPages, searchParams, basePath = "
             …
           </span>
         ) : (
-          <PageLink key={page} href={buildHref(basePath, searchParams, page)} active={page === currentPage}>
+          <PageLink
+            key={page}
+            href={buildHref(basePath, searchParams, page)}
+            active={page === currentPage}
+            prefetch={page === currentPage + 1}
+          >
             {page}
           </PageLink>
         )
@@ -84,12 +89,14 @@ function PageLink({
   href,
   active,
   disabled,
+  prefetch,
   children,
   ...props
 }: {
   href: string;
   active?: boolean;
   disabled?: boolean;
+  prefetch?: boolean;
   children: React.ReactNode;
 } & React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   const classes = cn(
@@ -109,7 +116,7 @@ function PageLink({
   }
 
   return (
-    <Link href={href} className={classes} {...props}>
+    <Link href={href} prefetch={prefetch} className={classes} {...props}>
       {children}
     </Link>
   );
