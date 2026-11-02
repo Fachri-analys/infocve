@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAuthorizedDependencyScan } from "@/lib/scanner/scan-repository";
+import { getAuthorizedDependencyScanPersistent } from "@/lib/scanner/scan-repository";
 
 export const dynamic = "force-dynamic";
 
@@ -7,7 +7,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   const { id } = await context.params;
   if (!isScanId(id)) return notFound();
   const token = request.headers.get("x-scan-token") ?? "";
-  const report = getAuthorizedDependencyScan(id, token);
+  const report = await getAuthorizedDependencyScanPersistent(id, token);
   if (!report) return notFound();
   return NextResponse.json({ report }, { headers: { "Cache-Control": "no-store" } });
 }

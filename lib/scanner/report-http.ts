@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
-import { getAuthorizedDependencyScan } from "./scan-repository";
+import { getAuthorizedDependencyScanPersistent } from "./scan-repository";
 import { buildSecurityPdf } from "./report";
 
-export function authorizedReport(request: Request, scanId: string) {
+export async function authorizedReport(request: Request, scanId: string) {
   if (!isScanId(scanId)) return null;
-  return getAuthorizedDependencyScan(scanId, request.headers.get("x-scan-token") ?? "");
+  return getAuthorizedDependencyScanPersistent(scanId, request.headers.get("x-scan-token") ?? "");
 }
 
-export function jsonReportResponse(report: NonNullable<ReturnType<typeof authorizedReport>>) {
+export function jsonReportResponse(report: NonNullable<Awaited<ReturnType<typeof authorizedReport>>>) {
   return NextResponse.json(report, {
     headers: {
       "Cache-Control": "no-store",
@@ -16,7 +16,7 @@ export function jsonReportResponse(report: NonNullable<ReturnType<typeof authori
   });
 }
 
-export function pdfReportResponse(report: NonNullable<ReturnType<typeof authorizedReport>>) {
+export function pdfReportResponse(report: NonNullable<Awaited<ReturnType<typeof authorizedReport>>>) {
   const pdf = new Uint8Array(buildSecurityPdf(report));
   return new NextResponse(pdf, {
     headers: {

@@ -4,8 +4,8 @@ Inventaris ini dibuat dari `package-lock.json` (lockfile v3) dan metadata paket 
 
 Kolom author menyalin deklarasi author/contributor dari metadata paket. Kolom copyright menyalin baris copyright dari file LICENSE/NOTICE jika tersedia; keduanya adalah pernyataan upstream, bukan verifikasi independen bahwa orang/organisasi tersebut memegang seluruh hak. Repository, lisensi, atau pemberitahuan pemegang hak yang tidak ditemukan ditandai **Needs Review**. Halaman npm hanya link metadata/artifact, bukan pengganti repository resmi. Paket platform yang tidak terpasang lokal memerlukan pemeriksaan upstream untuk file notice lengkap.
 
-Paket terkunci tercatat: **529**. Semua paket dihitung, termasuk dependency transitif, development, optional, dan paket spesifik platform. InfoCVE tidak mengubah lisensi atau copyright komponen ini.
-Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; **396** memiliki baris copyright yang terdeteksi; **222** paket ditandai **Needs Review** (repository tidak tercantum: 106; author tidak tercantum: 210; notice copyright tidak ditemukan: 133; file LICENSE/NOTICE lokal tidak ditemukan: 124; lisensi tidak dinyatakan/perlu ditinjau: 0). Kolom author bukan bukti pemilik hak.
+Paket terkunci tercatat: **533**. Semua paket dihitung, termasuk dependency transitif, development, optional, dan paket spesifik platform. InfoCVE tidak mengubah lisensi atau copyright komponen ini.
+Cakupan metadata saat dibuat: **408** paket memiliki file LICENSE/NOTICE lokal; **399** memiliki baris copyright yang terdeteksi; **223** paket ditandai **Needs Review** (repository tidak tercantum: 107; author tidak tercantum: 211; notice copyright tidak ditemukan: 134; file LICENSE/NOTICE lokal tidak ditemukan: 125; lisensi tidak dinyatakan/perlu ditinjau: 0). Kolom author bukan bukti pemilik hak.
 
 ## Inventaris dependency
 
@@ -37,7 +37,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | @eslint/config-array | 0.21.2 | Transitif · development | [repository](https://github.com/eslint/rewrite) | Nicholas C. Zakas | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40eslint%2Fconfig-array) |
 | @eslint/config-helpers | 0.4.2 | Transitif · development | [repository](https://github.com/eslint/rewrite) | **Needs Review** · tidak dinyatakan | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40eslint%2Fconfig-helpers) |
 | @eslint/core | 0.17.0 | Transitif · development | [repository](https://github.com/eslint/rewrite) | Nicholas C. Zakas | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40eslint%2Fcore) |
-| @eslint/eslintrc | 3.3.6 | Transitif · development | [repository](https://github.com/eslint/eslintrc) | Nicholas C. Zakas | Copyright OpenJS Foundation and other contributors, &lt;www.openjsf.org&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40eslint%2Feslintrc) |
+| @eslint/eslintrc | 3.3.7 | Transitif · development | [repository](https://github.com/eslint/eslintrc) | Nicholas C. Zakas | Copyright OpenJS Foundation and other contributors, &lt;www.openjsf.org&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40eslint%2Feslintrc) |
 | @eslint/js | 9.39.5 | Transitif · development | [repository](https://github.com/eslint/eslint) | **Needs Review** · tidak dinyatakan | Copyright OpenJS Foundation and other contributors, &lt;www.openjsf.org&gt; | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40eslint%2Fjs) |
 | @eslint/object-schema | 2.1.7 | Transitif · development | [repository](https://github.com/eslint/rewrite) | Nicholas C. Zakas | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40eslint%2Fobject-schema) |
 | @eslint/plugin-kit | 0.4.1 | Transitif · development | [repository](https://github.com/eslint/rewrite) | Nicholas C. Zakas | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40eslint%2Fplugin-kit) |
@@ -49,52 +49,55 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | @humanwhocodes/module-importer | 1.0.1 | Transitif · development | [repository](https://github.com/humanwhocodes/module-importer) | Nicholas C. Zaks | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40humanwhocodes%2Fmodule-importer) |
 | @humanwhocodes/retry | 0.4.3 | Transitif · development | [repository](https://github.com/humanwhocodes/retry) | Nicholas C. Zaks | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40humanwhocodes%2Fretry) |
 | @img/colour | 1.1.0 | Transitif · optional | [repository](https://github.com/lovell/colour) | **Needs Review** · tidak dinyatakan | Copyright (c) 2012 Heather Arthur; Copyright (c) 2011-2016 Heather Arthur &lt;fayearthur@gmail.com&gt;.; Copyright (c) 2016-2021 Josh Junon &lt;josh@junon.me&gt;.; Copyright (c) 2011 Heather Arthur &lt;fayearthur@gmail.com&gt;; Copyright (c) 2015 Dmitry Ivanov | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40img%2Fcolour) |
-| @img/sharp-darwin-arm64 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-darwin-arm64) |
-| @img/sharp-darwin-x64 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-darwin-x64) |
-| @img/sharp-freebsd-wasm32 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-freebsd-wasm32) |
-| @img/sharp-libvips-darwin-arm64 | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-darwin-arm64) |
-| @img/sharp-libvips-darwin-x64 | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-darwin-x64) |
-| @img/sharp-libvips-linux-arm | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-arm) |
-| @img/sharp-libvips-linux-arm64 | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-arm64) |
-| @img/sharp-libvips-linux-ppc64 | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-ppc64) |
-| @img/sharp-libvips-linux-riscv64 | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-riscv64) |
-| @img/sharp-libvips-linux-s390x | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-s390x) |
-| @img/sharp-libvips-linux-x64 | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-x64) |
-| @img/sharp-libvips-linuxmusl-arm64 | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linuxmusl-arm64) |
-| @img/sharp-libvips-linuxmusl-x64 | 1.3.2 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linuxmusl-x64) |
-| @img/sharp-linux-arm | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-arm) |
-| @img/sharp-linux-arm64 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-arm64) |
-| @img/sharp-linux-ppc64 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-ppc64) |
-| @img/sharp-linux-riscv64 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-riscv64) |
-| @img/sharp-linux-s390x | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-s390x) |
-| @img/sharp-linux-x64 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-x64) |
-| @img/sharp-linuxmusl-arm64 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linuxmusl-arm64) |
-| @img/sharp-linuxmusl-x64 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linuxmusl-x64) |
-| @img/sharp-wasm32 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 AND LGPL-3.0-or-later AND MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-wasm32) |
-| @img/sharp-webcontainers-wasm32 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-webcontainers-wasm32) |
-| @img/sharp-win32-arm64 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 AND LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-win32-arm64) |
-| @img/sharp-win32-ia32 | 0.35.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 AND LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-win32-ia32) |
-| @img/sharp-win32-x64 | 0.35.3 | Transitif · optional | [repository](https://github.com/lovell/sharp) | Lovell Fuller &lt;npm@lovell.info&gt; | Copyright [yyyy] [name of copyright owner] | Apache-2.0 AND LGPL-3.0-or-later | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-win32-x64) |
+| @img/sharp-darwin-arm64 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-darwin-arm64) |
+| @img/sharp-darwin-x64 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-darwin-x64) |
+| @img/sharp-freebsd-wasm32 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-freebsd-wasm32) |
+| @img/sharp-libvips-darwin-arm64 | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-darwin-arm64) |
+| @img/sharp-libvips-darwin-x64 | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-darwin-x64) |
+| @img/sharp-libvips-linux-arm | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-arm) |
+| @img/sharp-libvips-linux-arm64 | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-arm64) |
+| @img/sharp-libvips-linux-ppc64 | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-ppc64) |
+| @img/sharp-libvips-linux-riscv64 | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-riscv64) |
+| @img/sharp-libvips-linux-s390x | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-s390x) |
+| @img/sharp-libvips-linux-x64 | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linux-x64) |
+| @img/sharp-libvips-linuxmusl-arm64 | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linuxmusl-arm64) |
+| @img/sharp-libvips-linuxmusl-x64 | 1.3.4 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-libvips-linuxmusl-x64) |
+| @img/sharp-linux-arm | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-arm) |
+| @img/sharp-linux-arm64 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-arm64) |
+| @img/sharp-linux-ppc64 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-ppc64) |
+| @img/sharp-linux-riscv64 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-riscv64) |
+| @img/sharp-linux-s390x | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-s390x) |
+| @img/sharp-linux-x64 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linux-x64) |
+| @img/sharp-linuxmusl-arm64 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linuxmusl-arm64) |
+| @img/sharp-linuxmusl-x64 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-linuxmusl-x64) |
+| @img/sharp-wasm32 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 AND LGPL-3.0-or-later AND MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-wasm32) |
+| @img/sharp-webcontainers-wasm32 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-webcontainers-wasm32) |
+| @img/sharp-win32-arm64 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 AND LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-win32-arm64) |
+| @img/sharp-win32-ia32 | 0.35.5 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | Apache-2.0 AND LGPL-3.0-or-later | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-win32-ia32) |
+| @img/sharp-win32-x64 | 0.35.5 | Transitif · optional | [repository](https://github.com/lovell/sharp) | Lovell Fuller &lt;npm@lovell.info&gt; | Copyright [yyyy] [name of copyright owner] | Apache-2.0 AND LGPL-3.0-or-later | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40img%2Fsharp-win32-x64) |
 | @jridgewell/gen-mapping | 0.3.13 | Transitif · development | [repository](https://github.com/jridgewell/sourcemaps) | Justin Ridgewell &lt;justin@ridgewell.name&gt; | Copyright 2024 Justin Ridgewell &lt;justin@ridgewell.name&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40jridgewell%2Fgen-mapping) |
 | @jridgewell/remapping | 2.3.5 | Transitif · development | [repository](https://github.com/jridgewell/sourcemaps) | Justin Ridgewell &lt;justin@ridgewell.name&gt; | Copyright 2024 Justin Ridgewell &lt;justin@ridgewell.name&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40jridgewell%2Fremapping) |
 | @jridgewell/resolve-uri | 3.1.2 | Transitif · development | [repository](https://github.com/jridgewell/resolve-uri) | Justin Ridgewell &lt;justin@ridgewell.name&gt; | Copyright 2019 Justin Ridgewell &lt;jridgewell@google.com&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40jridgewell%2Fresolve-uri) |
 | @jridgewell/sourcemap-codec | 1.5.5 | Transitif · development | [repository](https://github.com/jridgewell/sourcemaps) | Justin Ridgewell &lt;justin@ridgewell.name&gt; | Copyright 2024 Justin Ridgewell &lt;justin@ridgewell.name&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40jridgewell%2Fsourcemap-codec) |
 | @jridgewell/trace-mapping | 0.3.31 | Transitif · development | [repository](https://github.com/jridgewell/sourcemaps) | Justin Ridgewell &lt;justin@ridgewell.name&gt; | Copyright 2024 Justin Ridgewell &lt;justin@ridgewell.name&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40jridgewell%2Ftrace-mapping) |
-| @next/env | 16.3.0 | Transitif · runtime | [repository](https://github.com/vercel/next.js) | Next.js Team &lt;support@vercel.com&gt; | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fenv) |
-| @next/eslint-plugin-next | 16.2.12 | Transitif · development | [repository](https://github.com/vercel/next.js) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Feslint-plugin-next) |
-| @next/swc-darwin-arm64 | 16.3.0 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-darwin-arm64) |
-| @next/swc-darwin-x64 | 16.3.0 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-darwin-x64) |
-| @next/swc-linux-arm64-gnu | 16.3.0 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-linux-arm64-gnu) |
-| @next/swc-linux-arm64-musl | 16.3.0 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-linux-arm64-musl) |
-| @next/swc-linux-x64-gnu | 16.3.0 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-linux-x64-gnu) |
-| @next/swc-linux-x64-musl | 16.3.0 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-linux-x64-musl) |
-| @next/swc-win32-arm64-msvc | 16.3.0 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-win32-arm64-msvc) |
-| @next/swc-win32-x64-msvc | 16.3.0 | Transitif · optional | [repository](https://github.com/vercel/next.js) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-win32-x64-msvc) |
+| @neondatabase/serverless | 1.2.0 | Langsung · runtime | [repository](https://github.com/neondatabase/serverless) | Neon | Copyright (c) 2022 - 2025 Neon Inc. | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40neondatabase%2Fserverless) |
+| @next/env | 16.4.3 | Transitif · runtime | [repository](https://github.com/vercel/next.js) | Next.js Team &lt;support@vercel.com&gt; | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fenv) |
+| @next/eslint-plugin-next | 16.4.3 | Transitif · development | [repository](https://github.com/vercel/next.js) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Feslint-plugin-next) |
+| @eslint-community/eslint-utils | 4.9.1 | Transitif · development | [repository](https://github.com/eslint-community/eslint-utils) | Toru Nagashima | Copyright (c) 2018 Toru Nagashima | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40eslint-community%2Feslint-utils) |
+| eslint-visitor-keys | 3.4.3 | Transitif · development | [repository](https://github.com/eslint/eslint-visitor-keys) | Toru Nagashima (https://github.com/mysticatea) | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright contributors | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/eslint-visitor-keys) |
+| @next/swc-darwin-arm64 | 16.4.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-darwin-arm64) |
+| @next/swc-darwin-x64 | 16.4.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-darwin-x64) |
+| @next/swc-linux-arm64-gnu | 16.4.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-linux-arm64-gnu) |
+| @next/swc-linux-arm64-musl | 16.4.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-linux-arm64-musl) |
+| @next/swc-linux-x64-gnu | 16.4.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-linux-x64-gnu) |
+| @next/swc-linux-x64-musl | 16.4.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-linux-x64-musl) |
+| @next/swc-win32-arm64-msvc | 16.4.3 | Transitif · optional | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-win32-arm64-msvc) |
+| @next/swc-win32-x64-msvc | 16.4.3 | Transitif · optional | [repository](https://github.com/vercel/next.js) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40next%2Fswc-win32-x64-msvc) |
 | @nodelib/fs.scandir | 2.1.5 | Transitif · development | [repository](https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.scandir) | **Needs Review** · tidak dinyatakan | Copyright (c) Denis Malinochkin | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40nodelib%2Ffs.scandir) |
 | @nodelib/fs.stat | 2.0.5 | Transitif · development | [repository](https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.stat) | **Needs Review** · tidak dinyatakan | Copyright (c) Denis Malinochkin | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40nodelib%2Ffs.stat) |
 | @nodelib/fs.walk | 1.2.8 | Transitif · development | [repository](https://github.com/nodelib/nodelib/tree/master/packages/fs/fs.walk) | **Needs Review** · tidak dinyatakan | Copyright (c) Denis Malinochkin | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40nodelib%2Ffs.walk) |
 | @nolyfill/is-core-module | 1.0.39 | Transitif · development | [repository](https://github.com/SukkaW/nolyfill) | **Needs Review** · tidak dinyatakan | Copyright (c) 2023 Sukka | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40nolyfill%2Fis-core-module) |
-| @oxc-project/types | 0.143.0 | Transitif · development | [repository](https://github.com/oxc-project/oxc) | Boshen and oxc contributors | Copyright (c) 2024-present VoidZero Inc. & Contributors; Copyright (c) 2023 Boshen | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40oxc-project%2Ftypes) |
+| @oxc-project/types | 0.156.0 | Transitif · development | [repository](https://github.com/oxc-project/oxc) | Boshen and oxc contributors | Copyright (c) 2024-present VoidZero Inc. & Contributors; Copyright (c) 2023 Boshen | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40oxc-project%2Ftypes) |
 | @radix-ui/primitive | 1.1.7 | Transitif · runtime | [repository](https://github.com/radix-ui/primitives) | **Needs Review** · tidak dinyatakan | Copyright (c) 2022 WorkOS | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40radix-ui%2Fprimitive) |
 | @radix-ui/react-accordion | 1.2.20 | Langsung · runtime | [repository](https://github.com/radix-ui/primitives) | **Needs Review** · tidak dinyatakan | Copyright (c) 2022 WorkOS | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40radix-ui%2Freact-accordion) |
 | @radix-ui/react-collapsible | 1.1.20 | Transitif · runtime | [repository](https://github.com/radix-ui/primitives) | **Needs Review** · tidak dinyatakan | Copyright (c) 2022 WorkOS | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40radix-ui%2Freact-collapsible) |
@@ -115,24 +118,25 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | @radix-ui/react-use-controllable-state | 1.2.6 | Transitif · runtime | [repository](https://github.com/radix-ui/primitives) | **Needs Review** · tidak dinyatakan | Copyright (c) 2022 WorkOS | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40radix-ui%2Freact-use-controllable-state) |
 | @radix-ui/react-use-effect-event | 0.0.5 | Transitif · runtime | [repository](https://github.com/radix-ui/primitives) | **Needs Review** · tidak dinyatakan | Copyright (c) 2022 WorkOS | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40radix-ui%2Freact-use-effect-event) |
 | @radix-ui/react-use-layout-effect | 1.1.4 | Transitif · runtime | [repository](https://github.com/radix-ui/primitives) | **Needs Review** · tidak dinyatakan | Copyright (c) 2022 WorkOS | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40radix-ui%2Freact-use-layout-effect) |
-| @rolldown/binding-android-arm64 | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-android-arm64) |
-| @rolldown/binding-darwin-arm64 | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-darwin-arm64) |
-| @rolldown/binding-darwin-x64 | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-darwin-x64) |
-| @rolldown/binding-freebsd-x64 | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-freebsd-x64) |
-| @rolldown/binding-linux-arm-gnueabihf | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-arm-gnueabihf) |
-| @rolldown/binding-linux-arm64-gnu | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-arm64-gnu) |
-| @rolldown/binding-linux-arm64-musl | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-arm64-musl) |
-| @rolldown/binding-linux-ppc64-gnu | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-ppc64-gnu) |
-| @rolldown/binding-linux-s390x-gnu | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-s390x-gnu) |
-| @rolldown/binding-linux-x64-gnu | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-x64-gnu) |
-| @rolldown/binding-linux-x64-musl | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-x64-musl) |
-| @rolldown/binding-openharmony-arm64 | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-openharmony-arm64) |
-| @rolldown/binding-win32-arm64-msvc | 1.2.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-win32-arm64-msvc) |
-| @rolldown/binding-win32-x64-msvc | 1.2.3 | Transitif · development | [repository](https://github.com/rolldown/rolldown) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-win32-x64-msvc) |
+| @rolldown/binding-android-arm-eabi | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-android-arm-eabi) |
+| @rolldown/binding-android-arm64 | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-android-arm64) |
+| @rolldown/binding-darwin-arm64 | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-darwin-arm64) |
+| @rolldown/binding-darwin-x64 | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-darwin-x64) |
+| @rolldown/binding-freebsd-x64 | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-freebsd-x64) |
+| @rolldown/binding-linux-arm-gnueabihf | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-arm-gnueabihf) |
+| @rolldown/binding-linux-arm64-gnu | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-arm64-gnu) |
+| @rolldown/binding-linux-arm64-musl | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-arm64-musl) |
+| @rolldown/binding-linux-ppc64-gnu | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-ppc64-gnu) |
+| @rolldown/binding-linux-s390x-gnu | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-s390x-gnu) |
+| @rolldown/binding-linux-x64-gnu | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-x64-gnu) |
+| @rolldown/binding-linux-x64-musl | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-linux-x64-musl) |
+| @rolldown/binding-openharmony-arm64 | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-openharmony-arm64) |
+| @rolldown/binding-win32-arm64-msvc | 1.2.16 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-win32-arm64-msvc) |
+| @rolldown/binding-win32-x64-msvc | 1.2.16 | Transitif · development | [repository](https://github.com/rolldown/rolldown) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fbinding-win32-x64-msvc) |
 | @rolldown/pluginutils | 1.0.1 | Transitif · development | [repository](https://github.com/rolldown/plugins) | **Needs Review** · tidak dinyatakan | Copyright (c) 2026-present, rolldown/plugins repository contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40rolldown%2Fpluginutils) |
 | @rtsao/scc | 1.1.0 | Transitif · development | [repository](https://github.com/rtsao/scc) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 Ryan Tsao | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40rtsao%2Fscc) |
 | @standard-schema/spec | 1.1.0 | Transitif · development | [repository](https://github.com/standard-schema/standard-schema) | Colin McDonnell | Copyright (c) 2024 Colin McDonnell | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40standard-schema%2Fspec) |
-| @swc/helpers | 0.5.15 | Transitif · runtime | [repository](https://github.com/swc-project/swc) | 강동윤 &lt;kdy1997.dev@gmail.com&gt; | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright 2024 SWC contributors. | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40swc%2Fhelpers) |
+| @swc/helpers | 0.5.23 | Transitif · runtime | [repository](https://github.com/swc-project/swc) | 강동윤 &lt;kdy1997.dev@gmail.com&gt; | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright 2024 SWC contributors. | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/%40swc%2Fhelpers) |
 | @tailwindcss/node | 4.3.3 | Transitif · development | [repository](https://github.com/tailwindlabs/tailwindcss) | **Needs Review** · tidak dinyatakan | Copyright (c) Tailwind Labs, Inc. | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40tailwindcss%2Fnode) |
 | @tailwindcss/oxide | 4.3.3 | Transitif · development | [repository](https://github.com/tailwindlabs/tailwindcss) | **Needs Review** · tidak dinyatakan | Copyright (c) Tailwind Labs, Inc. | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40tailwindcss%2Foxide) |
 | @tailwindcss/oxide-android-arm64 | 4.3.3 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40tailwindcss%2Foxide-android-arm64) |
@@ -157,21 +161,21 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | @types/node | 20.19.43 | Langsung · development | [repository](https://github.com/DefinitelyTyped/DefinitelyTyped) | **Needs Review** · tidak dinyatakan | Copyright (c) Microsoft Corporation. | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40types%2Fnode) |
 | @types/react | 19.2.17 | Langsung · development | [repository](https://github.com/DefinitelyTyped/DefinitelyTyped) | **Needs Review** · tidak dinyatakan | Copyright (c) Microsoft Corporation. | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40types%2Freact) |
 | @types/react-dom | 19.2.3 | Langsung · development | [repository](https://github.com/DefinitelyTyped/DefinitelyTyped) | **Needs Review** · tidak dinyatakan | Copyright (c) Microsoft Corporation. | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40types%2Freact-dom) |
-| @typescript-eslint/eslint-plugin | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Feslint-plugin) |
-| ignore | 7.0.6 | Transitif · development | [repository](https://github.com/kaelzhang/node-ignore) | kael | Copyright (c) 2013 Kael Zhang &lt;i@kael.me&gt;, contributors | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/ignore) |
-| @typescript-eslint/parser | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Fparser) |
-| @typescript-eslint/project-service | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2025 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Fproject-service) |
-| @typescript-eslint/scope-manager | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Fscope-manager) |
-| @typescript-eslint/tsconfig-utils | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2025 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Ftsconfig-utils) |
-| @typescript-eslint/type-utils | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Ftype-utils) |
-| @typescript-eslint/types | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Ftypes) |
-| @typescript-eslint/typescript-estree | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Ftypescript-estree) |
+| @typescript-eslint/eslint-plugin | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Feslint-plugin) |
+| ignore | 7.0.14 | Transitif · development | [repository](https://github.com/kaelzhang/node-ignore) | kael | Copyright (c) 2013 Kael Zhang &lt;i@kael.me&gt;, contributors | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/ignore) |
+| @typescript-eslint/parser | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Fparser) |
+| @typescript-eslint/project-service | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2025 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Fproject-service) |
+| @typescript-eslint/scope-manager | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Fscope-manager) |
+| @typescript-eslint/tsconfig-utils | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2025 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Ftsconfig-utils) |
+| @typescript-eslint/type-utils | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Ftype-utils) |
+| @typescript-eslint/types | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Ftypes) |
+| @typescript-eslint/typescript-estree | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Ftypescript-estree) |
 | balanced-match | 4.0.4 | Transitif · development | [repository](https://github.com/juliangruber/balanced-match) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan | [npm metadata](https://www.npmjs.com/package/balanced-match) |
-| brace-expansion | 5.0.9 | Transitif · development | [repository](https://github.com/juliangruber/brace-expansion) | **Needs Review** · tidak dinyatakan | Copyright Julian Gruber &lt;julian@juliangruber.com&gt; | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/brace-expansion) |
+| brace-expansion | 5.0.12 | Transitif · development | [repository](https://github.com/juliangruber/brace-expansion) | **Needs Review** · tidak dinyatakan | Copyright Julian Gruber &lt;julian@juliangruber.com&gt; | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/brace-expansion) |
 | minimatch | 10.2.6 | Transitif · development | [repository](https://github.com/isaacs/minimatch) | Isaac Z. Schlueter &lt;i@izs.me&gt; (http://blog.izs.me) | copyright in it. | BlueOak-1.0.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/minimatch) |
 | semver | 7.8.5 | Transitif · development | [repository](https://github.com/npm/node-semver) | GitHub Inc. | Copyright (c) Isaac Z. Schlueter and Contributors; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/semver) |
-| @typescript-eslint/utils | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Futils) |
-| @typescript-eslint/visitor-keys | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Fvisitor-keys) |
+| @typescript-eslint/utils | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Futils) |
+| @typescript-eslint/visitor-keys | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40typescript-eslint%2Fvisitor-keys) |
 | eslint-visitor-keys | 5.0.1 | Transitif · development | [repository](https://github.com/eslint/js) | Toru Nagashima (https://github.com/mysticatea) | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright contributors | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/eslint-visitor-keys) |
 | @unrs/resolver-binding-android-arm-eabi | 1.12.2 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40unrs%2Fresolver-binding-android-arm-eabi) |
 | @unrs/resolver-binding-android-arm64 | 1.12.2 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40unrs%2Fresolver-binding-android-arm64) |
@@ -197,13 +201,13 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | @unrs/resolver-binding-win32-arm64-msvc | 1.12.2 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40unrs%2Fresolver-binding-win32-arm64-msvc) |
 | @unrs/resolver-binding-win32-ia32-msvc | 1.12.2 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40unrs%2Fresolver-binding-win32-ia32-msvc) |
 | @unrs/resolver-binding-win32-x64-msvc | 1.12.2 | Transitif · development | [repository](https://github.com/unrs/unrs-resolver) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/%40unrs%2Fresolver-binding-win32-x64-msvc) |
-| @vitest/expect | 4.1.10 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fexpect) |
-| @vitest/mocker | 4.1.10 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fmocker) |
-| @vitest/pretty-format | 4.1.10 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fpretty-format) |
-| @vitest/runner | 4.1.10 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Frunner) |
-| @vitest/snapshot | 4.1.10 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fsnapshot) |
-| @vitest/spy | 4.1.10 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fspy) |
-| @vitest/utils | 4.1.10 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Futils) |
+| @vitest/expect | 4.1.12 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fexpect) |
+| @vitest/mocker | 4.1.12 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fmocker) |
+| @vitest/pretty-format | 4.1.12 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fpretty-format) |
+| @vitest/runner | 4.1.12 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Frunner) |
+| @vitest/snapshot | 4.1.12 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fsnapshot) |
+| @vitest/spy | 4.1.12 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Fspy) |
+| @vitest/utils | 4.1.12 | Transitif · development | [repository](https://github.com/vitest-dev/vitest) | **Needs Review** · tidak dinyatakan | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/%40vitest%2Futils) |
 | acorn | 8.18.0 | Transitif · development | [repository](https://github.com/acornjs/acorn) | **Needs Review** · tidak dinyatakan | Copyright (C) 2012-2022 by various contributors (see AUTHORS) | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/acorn) |
 | acorn-jsx | 5.3.2 | Transitif · development | [repository](https://github.com/acornjs/acorn-jsx) | **Needs Review** · tidak dinyatakan | Copyright (C) 2012-2017 by Ingvar Stepanyan | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/acorn-jsx) |
 | ajv | 6.15.0 | Transitif · development | [repository](https://github.com/ajv-validator/ajv) | Evgeny Poberezkin | Copyright (c) 2015-2017 Evgeny Poberezkin | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/ajv) |
@@ -227,7 +231,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | axobject-query | 4.1.0 | Transitif · development | [repository](https://github.com/A11yance/axobject-query) | Jesse Beach &lt;splendidnoise@gmail.com&gt; | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright 2020 A11yance | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/axobject-query) |
 | balanced-match | 1.0.2 | Transitif · development | [repository](https://github.com/juliangruber/balanced-match) | Julian Gruber | Copyright (c) 2013 Julian Gruber &lt;julian@juliangruber.com&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/balanced-match) |
 | baseline-browser-mapping | 2.11.6 | Transitif · runtime | [repository](https://github.com/web-platform-dx/baseline-browser-mapping) | **Needs Review** · tidak dinyatakan | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/baseline-browser-mapping) |
-| brace-expansion | 1.1.18 | Transitif · development | [repository](https://github.com/juliangruber/brace-expansion) | Julian Gruber | Copyright (c) 2013 Julian Gruber &lt;julian@juliangruber.com&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/brace-expansion) |
+| brace-expansion | 1.1.21 | Transitif · development | [repository](https://github.com/juliangruber/brace-expansion) | Julian Gruber | Copyright (c) 2013 Julian Gruber &lt;julian@juliangruber.com&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/brace-expansion) |
 | braces | 3.0.3 | Transitif · development | [repository](https://github.com/micromatch/braces) | Jon Schlinkert (https://github.com/jonschlinkert) | Copyright (c) 2014-present, Jon Schlinkert. | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/braces) |
 | browserslist | 4.28.7 | Transitif · development | [repository](https://github.com/browserslist/browserslist) | Andrey Sitnik &lt;andrey@sitnik.es&gt; | Copyright 2014 Andrey Sitnik &lt;andrey@sitnik.es&gt; and other contributors; COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/browserslist) |
 | call-bind | 1.0.9 | Transitif · development | [repository](https://github.com/ljharb/call-bind) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2020 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/call-bind) |
@@ -235,7 +239,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | call-bound | 1.0.4 | Transitif · development | [repository](https://github.com/ljharb/call-bound) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2024 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/call-bound) |
 | callsites | 3.1.0 | Transitif · development | [repository](https://github.com/sindresorhus/callsites) | Sindre Sorhus | Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (sindresorhus.com) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/callsites) |
 | caniuse-lite | 1.0.30001806 | Transitif · runtime | [repository](https://github.com/browserslist/caniuse-lite) | Ben Briggs | copyright and certain other rights. Our licenses are; copyright--then that use is not regulated by the license. Our | CC-BY-4.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/caniuse-lite) |
-| chai | 6.2.2 | Transitif · development | [repository](https://github.com/chaijs/chai) | Jake Luer &lt;jake@alogicalparadox.com&gt; | Copyright (c) 2017 Chai.js Assertion Library | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/chai) |
+| chai | 6.3.0 | Transitif · development | [repository](https://github.com/chaijs/chai) | Jake Luer &lt;jake@alogicalparadox.com&gt; | Copyright (c) 2017 Chai.js Assertion Library | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/chai) |
 | chalk | 4.1.2 | Transitif · development | [repository](https://github.com/chalk/chalk) | **Needs Review** · tidak dinyatakan | Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (sindresorhus.com) | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/chalk) |
 | class-variance-authority | 0.7.1 | Langsung · runtime | [repository](https://github.com/joe-bell/cva) | Joe Bell (https://joebell.co.uk) | copyright notice that is included in or attached to the work; copyright license to reproduce, prepare Derivative Works of,; Copyright 2022 Joe Bell | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/class-variance-authority) |
 | client-only | 0.0.1 | Transitif · runtime | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/client-only) |
@@ -274,7 +278,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | escalade | 3.2.0 | Transitif · development | [repository](https://github.com/lukeed/escalade) | Luke Edwards | Copyright (c) Luke Edwards &lt;luke.edwards05@gmail.com&gt; (lukeed.com) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/escalade) |
 | escape-string-regexp | 4.0.0 | Transitif · development | [repository](https://github.com/sindresorhus/escape-string-regexp) | Sindre Sorhus | Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (https://sindresorhus.com) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/escape-string-regexp) |
 | eslint | 9.39.5 | Langsung · development | [repository](https://github.com/eslint/eslint) | Nicholas C. Zakas &lt;nicholas+npm@nczconsulting.com&gt; | Copyright OpenJS Foundation and other contributors, &lt;www.openjsf.org&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/eslint) |
-| eslint-config-next | 16.2.12 | Langsung · development | [repository](https://github.com/vercel/next.js) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/eslint-config-next) |
+| eslint-config-next | 16.4.3 | Langsung · development | [repository](https://github.com/vercel/next.js) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/eslint-config-next) |
 | globals | 16.4.0 | Transitif · development | [repository](https://github.com/sindresorhus/globals) | Sindre Sorhus | Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (https://sindresorhus.com) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/globals) |
 | eslint-import-resolver-node | 0.3.10 | Transitif · development | [repository](https://github.com/import-js/eslint-plugin-import) | Ben Mosher (me@benmosher.com) | Copyright (c) 2015 Ben Mosher | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/eslint-import-resolver-node) |
 | debug | 3.2.7 | Transitif · development | [repository](https://github.com/visionmedia/debug) | TJ Holowaychuk &lt;tj@vision-media.ca&gt; | Copyright (c) 2014 TJ Holowaychuk &lt;tj@vision-media.ca&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/debug) |
@@ -300,7 +304,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | glob-parent | 5.1.2 | Transitif · development | [repository](https://github.com/gulpjs/glob-parent) | Gulp Team &lt;team@gulpjs.com&gt; (https://gulpjs.com/) | Copyright (c) 2015, 2019 Elan Shanker; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/glob-parent) |
 | fast-json-stable-stringify | 2.1.0 | Transitif · development | [repository](https://github.com/epoberezkin/fast-json-stable-stringify) | James Halliday | Copyright (c) 2017 Evgeny Poberezkin; Copyright (c) 2013 James Halliday; COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/fast-json-stable-stringify) |
 | fast-levenshtein | 2.0.6 | Transitif · development | [repository](https://github.com/hiddentao/fast-levenshtein) | Ramesh Nair &lt;ram@hiddentao.com&gt; (http://www.hiddentao.com/) | Copyright (c) 2013 [Ramesh Nair](http://www.hiddentao.com/) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/fast-levenshtein) |
-| fastq | 1.20.1 | Transitif · development | [repository](https://github.com/mcollina/fastq) | Matteo Collina &lt;hello@matteocollina.com&gt; | Copyright (c) 2015-2020, Matteo Collina &lt;matteo.collina@gmail.com&gt;; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/fastq) |
+| fastq | 1.20.3 | Transitif · development | [repository](https://github.com/mcollina/fastq) | Matteo Collina &lt;hello@matteocollina.com&gt; | Copyright (c) 2015-2020, Matteo Collina &lt;matteo.collina@gmail.com&gt;; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/fastq) |
 | file-entry-cache | 8.0.0 | Transitif · development | [repository](https://github.com/jaredwray/file-entry-cache) | Jared Wray | Copyright (c) Roy Riojas & Jared Wray | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/file-entry-cache) |
 | fill-range | 7.1.1 | Transitif · development | [repository](https://github.com/jonschlinkert/fill-range) | Jon Schlinkert (https://github.com/jonschlinkert) | Copyright (c) 2014-present, Jon Schlinkert. | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/fill-range) |
 | find-up | 5.0.0 | Transitif · development | [repository](https://github.com/sindresorhus/find-up) | Sindre Sorhus | Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (https://sindresorhus.com) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/find-up) |
@@ -369,7 +373,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | iterator.prototype | 1.1.5 | Transitif · development | [repository](https://github.com/ljharb/Iterator.prototype) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2022 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/iterator.prototype) |
 | jiti | 2.7.0 | Transitif · development | [repository](https://github.com/unjs/jiti) | **Needs Review** · tidak dinyatakan | Copyright (c) Pooya Parsa &lt;pooya@pi0.io&gt; | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/jiti) |
 | js-tokens | 4.0.0 | Transitif · development | [repository](https://github.com/lydell/js-tokens) | Simon Lydell | Copyright (c) 2014, 2015, 2016, 2017, 2018 Simon Lydell | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/js-tokens) |
-| js-yaml | 4.3.0 | Transitif · development | [repository](https://github.com/nodeca/js-yaml) | Vladimir Zapparov &lt;dervus.grim@gmail.com&gt; | Copyright (C) 2011-2015 by Vitaly Puzrin | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/js-yaml) |
+| js-yaml | 4.3.2 | Transitif · development | [repository](https://github.com/nodeca/js-yaml) | Vladimir Zapparov &lt;dervus.grim@gmail.com&gt; | Copyright (C) 2011-2015 by Vitaly Puzrin | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/js-yaml) |
 | jsesc | 3.1.0 | Transitif · development | [repository](https://github.com/mathiasbynens/jsesc) | Mathias Bynens | Copyright Mathias Bynens &lt;https://mathiasbynens.be/&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/jsesc) |
 | json-buffer | 3.0.1 | Transitif · development | [repository](https://github.com/dominictarr/json-buffer) | Dominic Tarr &lt;dominic.tarr@gmail.com&gt; (http://dominictarr.com) | Copyright (c) 2013 Dominic Tarr | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/json-buffer) |
 | json-schema-traverse | 0.4.1 | Transitif · development | [repository](https://github.com/epoberezkin/json-schema-traverse) | Evgeny Poberezkin | Copyright (c) 2017 Evgeny Poberezkin | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/json-schema-traverse) |
@@ -404,10 +408,10 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | minimatch | 3.1.5 | Transitif · development | [repository](https://github.com/isaacs/minimatch) | Isaac Z. Schlueter &lt;i@izs.me&gt; (http://blog.izs.me) | Copyright (c) Isaac Z. Schlueter and Contributors; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/minimatch) |
 | minimist | 1.2.8 | Transitif · development | [repository](https://github.com/minimistjs/minimist) | James Halliday | COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/minimist) |
 | ms | 2.1.3 | Transitif · development | [repository](https://github.com/vercel/ms) | **Needs Review** · tidak dinyatakan | Copyright (c) 2020 Vercel, Inc. | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/ms) |
-| nanoid | 3.3.18 | Transitif · runtime | [repository](https://github.com/ai/nanoid) | Andrey Sitnik &lt;andrey@sitnik.ru&gt; | Copyright 2017 Andrey Sitnik &lt;andrey@sitnik.ru&gt;; COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/nanoid) |
+| nanoid | 3.3.20 | Transitif · runtime | [repository](https://github.com/ai/nanoid) | Andrey Sitnik &lt;andrey@sitnik.ru&gt; | Copyright 2017 Andrey Sitnik &lt;andrey@sitnik.ru&gt;; COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/nanoid) |
 | napi-postinstall | 0.3.4 | Transitif · development | [repository](https://github.com/un-ts/napi-postinstall) | JounQin &lt;admin@1stg.me&gt; (https://www.1stG.me) | Copyright (c) 2021-present UnTS | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/napi-postinstall) |
 | natural-compare | 1.4.0 | Transitif · development | [repository](https://github.com/litejs/natural-compare-lite) | Lauri Rooden (https://github.com/litejs/natural-compare-lite) | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/natural-compare) |
-| next | 16.3.0 | Langsung · runtime | [repository](https://github.com/vercel/next.js) | **Needs Review** · tidak dinyatakan | Copyright (c) 2025 Vercel, Inc. | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/next) |
+| next | 16.4.3 | Langsung · runtime | [repository](https://github.com/vercel/next.js) | **Needs Review** · tidak dinyatakan | Copyright (c) 2025 Vercel, Inc. | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/next) |
 | postcss | 8.5.23 | Transitif · runtime | [repository](https://github.com/postcss/postcss) | Andrey Sitnik &lt;andrey@sitnik.es&gt; | Copyright 2013 Andrey Sitnik &lt;andrey@sitnik.es&gt;; COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/postcss) |
 | node-exports-info | 1.6.2 | Transitif · development | [repository](https://github.com/inspect-js/node-exports-info) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2022 Inspect JS | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/node-exports-info) |
 | node-releases | 2.0.51 | Transitif · development | [repository](https://github.com/chicoxyzzy/node-releases) | Sergey Rubanov &lt;chi187@gmail.com&gt; | Copyright (c) 2017 Sergey Rubanov (https://github.com/chicoxyzzy) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/node-releases) |
@@ -432,7 +436,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | picocolors | 1.1.1 | Transitif · runtime | [repository](https://github.com/alexeyraspopov/picocolors) | Alexey Raspopov | Copyright (c) 2021-2024 Oleksii Raspopov, Kostiantyn Denysov, Anton Verinov; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/picocolors) |
 | picomatch | 2.3.2 | Transitif · development | [repository](https://github.com/micromatch/picomatch) | Jon Schlinkert (https://github.com/jonschlinkert) | Copyright (c) 2017-present, Jon Schlinkert. | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/picomatch) |
 | possible-typed-array-names | 1.1.0 | Transitif · development | [repository](https://github.com/ljharb/possible-typed-array-names) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2024 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/possible-typed-array-names) |
-| postcss | 8.5.26 | Transitif · development | [repository](https://github.com/postcss/postcss) | Andrey Sitnik &lt;andrey@sitnik.es&gt; | Copyright 2013 Andrey Sitnik &lt;andrey@sitnik.es&gt;; COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/postcss) |
+| postcss | 8.5.32 | Transitif · development | [repository](https://github.com/postcss/postcss) | Andrey Sitnik &lt;andrey@sitnik.es&gt; | Copyright 2013 Andrey Sitnik &lt;andrey@sitnik.es&gt;; COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/postcss) |
 | prelude-ls | 1.2.1 | Transitif · development | [repository](https://github.com/gkz/prelude-ls) | George Zahariev &lt;z@georgezahariev.com&gt; | Copyright (c) George Zahariev | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/prelude-ls) |
 | prop-types | 15.8.1 | Transitif · development | [repository](https://github.com/facebook/prop-types) | **Needs Review** · tidak dinyatakan | Copyright (c) 2013-present, Facebook, Inc. | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/prop-types) |
 | punycode | 2.3.1 | Transitif · development | [repository](https://github.com/mathiasbynens/punycode.js) | Mathias Bynens | Copyright Mathias Bynens &lt;https://mathiasbynens.be/&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/punycode) |
@@ -449,7 +453,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | resolve-from | 4.0.0 | Transitif · development | [repository](https://github.com/sindresorhus/resolve-from) | Sindre Sorhus | Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (sindresorhus.com) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/resolve-from) |
 | resolve-pkg-maps | 1.0.0 | Transitif · development | [repository](https://github.com/privatenumber/resolve-pkg-maps) | Hiroki Osame | Copyright (c) Hiroki Osame &lt;hiroki.osame@gmail.com&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/resolve-pkg-maps) |
 | reusify | 1.1.0 | Transitif · development | [repository](https://github.com/mcollina/reusify) | Matteo Collina &lt;hello@matteocollina.com&gt; | Copyright (c) 2015-2024 Matteo Collina | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/reusify) |
-| rolldown | 1.2.3 | Transitif · development | [repository](https://github.com/rolldown/rolldown) | **Needs Review** · tidak dinyatakan | Copyright (c) 2024-present VoidZero Inc. & Contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/rolldown) |
+| rolldown | 1.2.16 | Transitif · development | [repository](https://github.com/rolldown/rolldown) | **Needs Review** · tidak dinyatakan | Copyright (c) 2024-present VoidZero Inc. & Contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/rolldown) |
 | run-parallel | 1.2.0 | Transitif · development | [repository](https://github.com/feross/run-parallel) | Feross Aboukhadijeh | Copyright (c) Feross Aboukhadijeh; COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/run-parallel) |
 | safe-array-concat | 1.1.4 | Transitif · development | [repository](https://github.com/ljharb/safe-array-concat) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2023 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/safe-array-concat) |
 | safe-push-apply | 1.0.0 | Transitif · development | [repository](https://github.com/ljharb/safe-push-apply) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2024 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/safe-push-apply) |
@@ -460,7 +464,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | set-function-length | 1.2.2 | Transitif · development | [repository](https://github.com/ljharb/set-function-length) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) Jordan Harband and contributors | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/set-function-length) |
 | set-function-name | 2.0.2 | Transitif · development | [repository](https://github.com/ljharb/set-function-name) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) Jordan Harband and contributors | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/set-function-name) |
 | set-proto | 1.0.0 | Transitif · development | [repository](https://github.com/ljharb/set-proto) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2024 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/set-proto) |
-| sharp | 0.35.3 | Transitif · optional | [repository](https://github.com/lovell/sharp) | Lovell Fuller &lt;npm@lovell.info&gt; | Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/sharp) |
+| sharp | 0.35.5 | Transitif · optional | [repository](https://github.com/lovell/sharp) | Lovell Fuller &lt;npm@lovell.info&gt; | Copyright [yyyy] [name of copyright owner] | Apache-2.0 | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/sharp) |
 | semver | 7.8.5 | Transitif · optional | [repository](https://github.com/npm/node-semver) | GitHub Inc. | Copyright (c) Isaac Z. Schlueter and Contributors; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/semver) |
 | shebang-command | 2.0.0 | Transitif · development | [repository](https://github.com/kevva/shebang-command) | Kevin Mårtensson | Copyright (c) Kevin Mårtensson &lt;kevinmartensson@gmail.com&gt; (github.com/kevva) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/shebang-command) |
 | shebang-regex | 3.0.0 | Transitif · development | [repository](https://github.com/sindresorhus/shebang-regex) | Sindre Sorhus | Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (sindresorhus.com) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/shebang-regex) |
@@ -469,7 +473,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | side-channel-map | 1.0.1 | Transitif · development | [repository](https://github.com/ljharb/side-channel-map) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2024 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/side-channel-map) |
 | side-channel-weakmap | 1.0.2 | Transitif · development | [repository](https://github.com/ljharb/side-channel-weakmap) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2019 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/side-channel-weakmap) |
 | siginfo | 2.0.0 | Transitif · development | [repository](https://github.com/emilbayes/siginfo) | Emil Bay &lt;github@tixz.dk&gt; | Copyright (c) 2017, Emil Bay &lt;github@tixz.dk&gt;; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/siginfo) |
-| source-map-js | 1.2.1 | Transitif · runtime | [repository](https://github.com/7rulnik/source-map-js) | Valentin 7rulnik Semirulnik &lt;v7rulnik@gmail.com&gt; | Copyright (c) 2009-2011, Mozilla Foundation and contributors | BSD-3-Clause | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/source-map-js) |
+| source-map-js | 1.2.2 | Transitif · runtime | [repository](https://github.com/7rulnik/source-map-js) | Valentin 7rulnik Semirulnik &lt;v7rulnik@gmail.com&gt; | Copyright (c) 2009-2011, Mozilla Foundation and contributors | BSD-3-Clause | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/source-map-js) |
 | stable-hash | 0.0.5 | Transitif · development | [repository](https://github.com/shuding/stable-hash) | Shu Ding | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/stable-hash) |
 | stackback | 0.0.2 | Transitif · development | [repository](https://github.com/shtylman/node-stackback) | Roman Shtylman &lt;shtylman@gmail.com&gt; | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/stackback) |
 | std-env | 4.2.0 | Transitif · development | [repository](https://github.com/unjs/std-env) | **Needs Review** · tidak dinyatakan | Copyright (c) Pooya Parsa &lt;pooya@pi0.io&gt; | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/std-env) |
@@ -493,7 +497,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | tinyglobby | 0.2.17 | Transitif · development | [repository](https://github.com/SuperchupuDev/tinyglobby) | Superchupu | Copyright (c) 2024 Madeline Gurriarán | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/tinyglobby) |
 | fdir | 6.5.0 | Transitif · development | [repository](https://github.com/thecodrr/fdir) | thecodrr &lt;thecodrr@protonmail.com&gt; | Copyright 2023 Abdullah Atta | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/fdir) |
 | picomatch | 4.0.5 | Transitif · development | [repository](https://github.com/micromatch/picomatch) | Jon Schlinkert (https://github.com/jonschlinkert) | Copyright (c) 2017-present, Jon Schlinkert. | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/picomatch) |
-| tinyrainbow | 3.1.1 | Transitif · development | [repository](https://github.com/tinylibs/tinyrainbow) | **Needs Review** · tidak dinyatakan | Copyright (c) 2022 Tinylibs | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/tinyrainbow) |
+| tinyrainbow | 3.2.0 | Transitif · development | [repository](https://github.com/tinylibs/tinyrainbow) | **Needs Review** · tidak dinyatakan | Copyright (c) 2022 Tinylibs | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/tinyrainbow) |
 | to-regex-range | 5.0.1 | Transitif · development | [repository](https://github.com/micromatch/to-regex-range) | Jon Schlinkert (https://github.com/jonschlinkert) | Copyright (c) 2015-present, Jon Schlinkert. | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/to-regex-range) |
 | ts-api-utils | 2.5.0 | Transitif · development | [repository](https://github.com/JoshuaKGoldberg/ts-api-utils) | JoshuaKGoldberg | **Needs Review** · tidak ditemukan | MIT | 1 file disertakan di bawah | Needs Review: notice copyright/pemegang hak tidak ditemukan | [npm metadata](https://www.npmjs.com/package/ts-api-utils) |
 | tsconfig-paths | 3.15.0 | Transitif · development | [repository](https://github.com/dividab/tsconfig-paths) | Jonas Kello | Copyright (c) 2016 Jonas Kello | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/tsconfig-paths) |
@@ -505,7 +509,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | typed-array-byte-offset | 1.0.4 | Transitif · development | [repository](https://github.com/inspect-js/typed-array-byte-offset) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2020 Inspect JS | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/typed-array-byte-offset) |
 | typed-array-length | 1.0.8 | Transitif · development | [repository](https://github.com/inspect-js/typed-array-length) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2020 Inspect JS | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/typed-array-length) |
 | typescript | 5.9.3 | Langsung · development | [repository](https://github.com/microsoft/TypeScript) | Microsoft Corp. | **Needs Review** · tidak ditemukan | Apache-2.0 | 1 file disertakan di bawah | Needs Review: notice copyright/pemegang hak tidak ditemukan | [npm metadata](https://www.npmjs.com/package/typescript) |
-| typescript-eslint | 8.65.0 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/typescript-eslint) |
+| typescript-eslint | 8.72.1 | Transitif · development | [repository](https://github.com/typescript-eslint/typescript-eslint) | **Needs Review** · tidak dinyatakan | Copyright (c) 2019 typescript-eslint and other contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/typescript-eslint) |
 | unbox-primitive | 1.1.0 | Transitif · development | [repository](https://github.com/ljharb/unbox-primitive) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2019 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/unbox-primitive) |
 | undici-types | 6.21.0 | Transitif · development | [repository](https://github.com/nodejs/undici) | **Needs Review** · tidak dinyatakan | Copyright (c) Matteo Collina and Undici contributors | MIT | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum | [npm metadata](https://www.npmjs.com/package/undici-types) |
 | unrs-resolver | 1.12.2 | Transitif · development | [repository](https://github.com/unrs/unrs-resolver) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MIT | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/unrs-resolver) |
@@ -513,7 +517,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | uri-js | 4.4.1 | Transitif · development | [repository](http://github.com/garycourt/uri-js) | Gary Court &lt;gary.court@gmail.com&gt; | Copyright 2011 Gary Court. All rights reserved. | BSD-2-Clause | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/uri-js) |
 | use-callback-ref | 1.3.3 | Transitif · runtime | [repository](https://github.com/theKashey/use-callback-ref/) | theKashey &lt;thekashey@gmail.com&gt; | Copyright (c) 2017 Anton Korzunov | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/use-callback-ref) |
 | use-sidecar | 1.1.3 | Transitif · runtime | [repository](https://github.com/theKashey/use-sidecar) | theKashey &lt;thekashey@gmail.com&gt; | Copyright (c) 2017 Anton Korzunov | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/use-sidecar) |
-| vite | 8.2.1 | Transitif · development | [repository](https://github.com/vitejs/vite) | Evan You | Copyright (c) 2019-present, VoidZero Inc. and Vite contributors | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/vite) |
+| vite | 8.3.5 | Transitif · development | [repository](https://github.com/vitejs/vite) | Evan You | Copyright (c) 2019-present, VoidZero Inc. and Vite contributors | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/vite) |
 | lightningcss | 1.33.0 | Transitif · development | [repository](https://github.com/parcel-bundler/lightningcss) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MPL-2.0 | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan | [npm metadata](https://www.npmjs.com/package/lightningcss) |
 | lightningcss-android-arm64 | 1.33.0 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MPL-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/lightningcss-android-arm64) |
 | lightningcss-darwin-arm64 | 1.33.0 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MPL-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/lightningcss-darwin-arm64) |
@@ -526,8 +530,8 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | lightningcss-linux-x64-musl | 1.33.0 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MPL-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/lightningcss-linux-x64-musl) |
 | lightningcss-win32-arm64-msvc | 1.33.0 | Transitif · development | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MPL-2.0 | **Needs Review** · notice tidak ada di instalasi | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan; repository resmi tidak tercantum; file LICENSE/NOTICE tidak ditemukan di instalasi lokal | [npm metadata](https://www.npmjs.com/package/lightningcss-win32-arm64-msvc) |
 | lightningcss-win32-x64-msvc | 1.33.0 | Transitif · development | [repository](https://github.com/parcel-bundler/lightningcss) | **Needs Review** · tidak dinyatakan | **Needs Review** · tidak ditemukan | MPL-2.0 | 1 file disertakan di bawah | Needs Review: author yang dinyatakan upstream tidak tercantum; notice copyright/pemegang hak tidak ditemukan | [npm metadata](https://www.npmjs.com/package/lightningcss-win32-x64-msvc) |
-| picomatch | 4.0.5 | Transitif · development | [repository](https://github.com/micromatch/picomatch) | Jon Schlinkert (https://github.com/jonschlinkert) | Copyright (c) 2017-present, Jon Schlinkert. | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/picomatch) |
-| vitest | 4.1.10 | Langsung · development | [repository](https://github.com/vitest-dev/vitest) | Anthony Fu &lt;anthonyfu117@hotmail.com&gt; | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/vitest) |
+| picomatch | 4.0.7 | Transitif · development | [repository](https://github.com/micromatch/picomatch) | Jon Schlinkert (https://github.com/jonschlinkert) | Copyright (c) 2017-present, Jon Schlinkert. | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/picomatch) |
+| vitest | 4.1.12 | Langsung · development | [repository](https://github.com/vitest-dev/vitest) | Anthony Fu &lt;anthonyfu117@hotmail.com&gt; | Copyright (c) 2021-Present VoidZero Inc. and Vitest contributors | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/vitest) |
 | picomatch | 4.0.5 | Transitif · development | [repository](https://github.com/micromatch/picomatch) | Jon Schlinkert (https://github.com/jonschlinkert) | Copyright (c) 2017-present, Jon Schlinkert. | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/picomatch) |
 | which | 2.0.2 | Transitif · development | [repository](https://github.com/isaacs/node-which) | Isaac Z. Schlueter &lt;i@izs.me&gt; (http://blog.izs.me) | Copyright (c) Isaac Z. Schlueter and Contributors; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/which) |
 | which-boxed-primitive | 1.1.1 | Transitif · development | [repository](https://github.com/inspect-js/which-boxed-primitive) | Jordan Harband &lt;ljharb@gmail.com&gt; | Copyright (c) 2019 Jordan Harband | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/which-boxed-primitive) |
@@ -538,7 +542,7 @@ Cakupan metadata saat dibuat: **405** paket memiliki file LICENSE/NOTICE lokal; 
 | word-wrap | 1.2.5 | Transitif · development | [repository](https://github.com/jonschlinkert/word-wrap) | Jon Schlinkert (https://github.com/jonschlinkert) | Copyright (c) 2014-2016, Jon Schlinkert | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/word-wrap) |
 | yallist | 3.1.1 | Transitif · development | [repository](https://github.com/isaacs/yallist) | Isaac Z. Schlueter &lt;i@izs.me&gt; (http://blog.izs.me/) | Copyright (c) Isaac Z. Schlueter and Contributors; copyright notice and this permission notice appear in all copies. | ISC | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/yallist) |
 | yocto-queue | 0.1.0 | Transitif · development | [repository](https://github.com/sindresorhus/yocto-queue) | Sindre Sorhus | Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (https://sindresorhus.com) | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/yocto-queue) |
-| zod | 4.4.3 | Transitif · development | [repository](https://github.com/colinhacks/zod) | Colin McDonnell &lt;zod@colinhacks.com&gt; | Copyright (c) 2025 Colin McDonnell | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/zod) |
+| zod | 4.6.7 | Transitif · development | [repository](https://github.com/colinhacks/zod) | Colin McDonnell &lt;zod@colinhacks.com&gt; | Copyright (c) 2025 Colin McDonnell | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/zod) |
 | zod-validation-error | 4.0.2 | Transitif · development | [repository](https://github.com/causaly/zod-validation-error) | Dimitrios C. Michalakos | Copyright 2022 Causaly, Inc &lt;front-end@causaly.com&gt; | MIT | 1 file disertakan di bawah | Metadata tersedia; cocokkan dengan distribusi upstream | [npm metadata](https://www.npmjs.com/package/zod-validation-error) |
 
 ## Salinan file LICENSE / NOTICE yang tersedia
@@ -2026,7 +2030,7 @@ File notice berikut disalin tanpa perubahan dari paket terpasang.
 </pre>
 </details>
 
-### @eslint/eslintrc@3.3.6
+### @eslint/eslintrc@3.3.7
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -3670,7 +3674,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </pre>
 </details>
 
-### @img/sharp-win32-x64@0.35.3
+### @img/sharp-win32-x64@0.35.5
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -4027,6 +4031,285 @@ SOFTWARE.
 </pre>
 </details>
 
+### @neondatabase/serverless@1.2.0
+
+File notice berikut disalin tanpa perubahan dari paket terpasang.
+
+<details>
+<summary>LICENSE</summary>
+
+<pre>
+MIT License
+
+Copyright (c) 2022 - 2025 Neon Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+</pre>
+</details>
+
+### @eslint-community/eslint-utils@4.9.1
+
+File notice berikut disalin tanpa perubahan dari paket terpasang.
+
+<details>
+<summary>LICENSE</summary>
+
+<pre>
+MIT License
+
+Copyright (c) 2018 Toru Nagashima
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+</pre>
+</details>
+
+### eslint-visitor-keys@3.4.3
+
+File notice berikut disalin tanpa perubahan dari paket terpasang.
+
+<details>
+<summary>LICENSE</summary>
+
+<pre>
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "{}"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright contributors
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+</pre>
+</details>
+
 ### @nodelib/fs.scandir@2.1.5
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
@@ -4159,7 +4442,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @oxc-project/types@0.143.0
+### @oxc-project/types@0.156.0
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -4951,7 +5234,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @swc/helpers@0.5.15
+### @swc/helpers@0.5.23
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5526,7 +5809,7 @@ File notice berikut disalin tanpa perubahan dari paket terpasang.
 </pre>
 </details>
 
-### @typescript-eslint/eslint-plugin@8.65.0
+### @typescript-eslint/eslint-plugin@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5559,7 +5842,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### ignore@7.0.6
+### ignore@7.0.14
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5591,7 +5874,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 </pre>
 </details>
 
-### @typescript-eslint/parser@8.65.0
+### @typescript-eslint/parser@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5624,7 +5907,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @typescript-eslint/project-service@8.65.0
+### @typescript-eslint/project-service@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5657,7 +5940,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @typescript-eslint/scope-manager@8.65.0
+### @typescript-eslint/scope-manager@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5690,7 +5973,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @typescript-eslint/tsconfig-utils@8.65.0
+### @typescript-eslint/tsconfig-utils@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5723,7 +6006,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @typescript-eslint/type-utils@8.65.0
+### @typescript-eslint/type-utils@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5756,7 +6039,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @typescript-eslint/types@8.65.0
+### @typescript-eslint/types@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5789,7 +6072,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @typescript-eslint/typescript-estree@8.65.0
+### @typescript-eslint/typescript-estree@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5857,7 +6140,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### brace-expansion@5.0.9
+### brace-expansion@5.0.12
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -5986,7 +6269,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 </pre>
 </details>
 
-### @typescript-eslint/utils@8.65.0
+### @typescript-eslint/utils@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -6019,7 +6302,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @typescript-eslint/visitor-keys@8.65.0
+### @typescript-eslint/visitor-keys@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -6265,7 +6548,7 @@ File notice berikut disalin tanpa perubahan dari paket terpasang.
 </pre>
 </details>
 
-### @vitest/expect@4.1.10
+### @vitest/expect@4.1.12
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -6298,7 +6581,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @vitest/mocker@4.1.10
+### @vitest/mocker@4.1.12
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -6331,7 +6614,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @vitest/pretty-format@4.1.10
+### @vitest/pretty-format@4.1.12
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -6364,7 +6647,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @vitest/runner@4.1.10
+### @vitest/runner@4.1.12
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -6397,7 +6680,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @vitest/snapshot@4.1.10
+### @vitest/snapshot@4.1.12
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -6430,7 +6713,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @vitest/spy@4.1.10
+### @vitest/spy@4.1.12
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -6463,7 +6746,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### @vitest/utils@4.1.10
+### @vitest/utils@4.1.12
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -8429,7 +8712,7 @@ File notice berikut disalin tanpa perubahan dari paket terpasang.
 </pre>
 </details>
 
-### brace-expansion@1.1.18
+### brace-expansion@1.1.21
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -9054,7 +9337,7 @@ Creative Commons may be contacted at creativecommons.org.
 </pre>
 </details>
 
-### chai@6.2.2
+### chai@6.3.0
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -12044,7 +12327,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 </pre>
 </details>
 
-### fastq@1.20.1
+### fastq@1.20.3
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -14141,7 +14424,7 @@ THE SOFTWARE.
 </pre>
 </details>
 
-### js-yaml@4.3.0
+### js-yaml@4.3.2
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -15565,7 +15848,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### nanoid@3.3.18
+### nanoid@3.3.20
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -15630,7 +15913,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### next@16.3.0
+### next@16.4.3
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -16440,7 +16723,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### postcss@8.5.26
+### postcss@8.5.32
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -16956,7 +17239,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### rolldown@1.2.3
+### rolldown@1.2.16
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -17283,7 +17566,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### sharp@0.35.3
+### sharp@0.35.5
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -17712,7 +17995,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 </pre>
 </details>
 
-### source-map-js@1.2.1
+### source-map-js@1.2.2
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -18407,7 +18690,7 @@ THE SOFTWARE.
 </pre>
 </details>
 
-### tinyrainbow@3.1.1
+### tinyrainbow@3.2.0
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -18829,7 +19112,7 @@ END OF TERMS AND CONDITIONS
 </pre>
 </details>
 
-### typescript-eslint@8.65.0
+### typescript-eslint@8.72.1
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -19049,7 +19332,7 @@ SOFTWARE.
 </pre>
 </details>
 
-### vite@8.2.1
+### vite@8.3.5
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -19084,7 +19367,7 @@ SOFTWARE.
 
 # Licenses of bundled dependencies
 The published Vite artifact additionally contains code with the following licenses:
-Apache-2.0, BSD-2-Clause, CC0-1.0, ISC, MIT
+BSD-2-Clause, CC0-1.0, ISC, MIT
 
 # Bundled dependencies:
 ## @jridgewell/gen-mapping, @jridgewell/remapping, @jridgewell/sourcemap-codec, @jridgewell/trace-mapping
@@ -19188,215 +19471,6 @@ Repository: https://github.com/rollup/plugins
 &gt; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 &gt; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 &gt; THE SOFTWARE.
-
----------------------------------------
-
-## @vercel/detect-agent
-License: Apache-2.0
-By: Vercel
-Repository: https://github.com/vercel/vercel
-
-&gt; Apache License
-&gt;                            Version 2.0, January 2004
-&gt;                         http://www.apache.org/licenses/
-&gt; 
-&gt;    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
-&gt; 
-&gt;    1. Definitions.
-&gt; 
-&gt;       "License" shall mean the terms and conditions for use, reproduction,
-&gt;       and distribution as defined by Sections 1 through 9 of this document.
-&gt; 
-&gt;       "Licensor" shall mean the copyright owner or entity authorized by
-&gt;       the copyright owner that is granting the License.
-&gt; 
-&gt;       "Legal Entity" shall mean the union of the acting entity and all
-&gt;       other entities that control, are controlled by, or are under common
-&gt;       control with that entity. For the purposes of this definition,
-&gt;       "control" means (i) the power, direct or indirect, to cause the
-&gt;       direction or management of such entity, whether by contract or
-&gt;       otherwise, or (ii) ownership of fifty percent (50%) or more of the
-&gt;       outstanding shares, or (iii) beneficial ownership of such entity.
-&gt; 
-&gt;       "You" (or "Your") shall mean an individual or Legal Entity
-&gt;       exercising permissions granted by this License.
-&gt; 
-&gt;       "Source" form shall mean the preferred form for making modifications,
-&gt;       including but not limited to software source code, documentation
-&gt;       source, and configuration files.
-&gt; 
-&gt;       "Object" form shall mean any form resulting from mechanical
-&gt;       transformation or translation of a Source form, including but
-&gt;       not limited to compiled object code, generated documentation,
-&gt;       and conversions to other media types.
-&gt; 
-&gt;       "Work" shall mean the work of authorship, whether in Source or
-&gt;       Object form, made available under the License, as indicated by a
-&gt;       copyright notice that is included in or attached to the work
-&gt;       (an example is provided in the Appendix below).
-&gt; 
-&gt;       "Derivative Works" shall mean any work, whether in Source or Object
-&gt;       form, that is based on (or derived from) the Work and for which the
-&gt;       editorial revisions, annotations, elaborations, or other modifications
-&gt;       represent, as a whole, an original work of authorship. For the purposes
-&gt;       of this License, Derivative Works shall not include works that remain
-&gt;       separable from, or merely link (or bind by name) to the interfaces of,
-&gt;       the Work and Derivative Works thereof.
-&gt; 
-&gt;       "Contribution" shall mean any work of authorship, including
-&gt;       the original version of the Work and any modifications or additions
-&gt;       to that Work or Derivative Works thereof, that is intentionally
-&gt;       submitted to Licensor for inclusion in the Work by the copyright owner
-&gt;       or by an individual or Legal Entity authorized to submit on behalf of
-&gt;       the copyright owner. For the purposes of this definition, "submitted"
-&gt;       means any form of electronic, verbal, or written communication sent
-&gt;       to the Licensor or its representatives, including but not limited to
-&gt;       communication on electronic mailing lists, source code control systems,
-&gt;       and issue tracking systems that are managed by, or on behalf of, the
-&gt;       Licensor for the purpose of discussing and improving the Work, but
-&gt;       excluding communication that is conspicuously marked or otherwise
-&gt;       designated in writing by the copyright owner as "Not a Contribution."
-&gt; 
-&gt;       "Contributor" shall mean Licensor and any individual or Legal Entity
-&gt;       on behalf of whom a Contribution has been received by Licensor and
-&gt;       subsequently incorporated within the Work.
-&gt; 
-&gt;    2. Grant of Copyright License. Subject to the terms and conditions of
-&gt;       this License, each Contributor hereby grants to You a perpetual,
-&gt;       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-&gt;       copyright license to reproduce, prepare Derivative Works of,
-&gt;       publicly display, publicly perform, sublicense, and distribute the
-&gt;       Work and such Derivative Works in Source or Object form.
-&gt; 
-&gt;    3. Grant of Patent License. Subject to the terms and conditions of
-&gt;       this License, each Contributor hereby grants to You a perpetual,
-&gt;       worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-&gt;       (except as stated in this section) patent license to make, have made,
-&gt;       use, offer to sell, sell, import, and otherwise transfer the Work,
-&gt;       where such license applies only to those patent claims licensable
-&gt;       by such Contributor that are necessarily infringed by their
-&gt;       Contribution(s) alone or by combination of their Contribution(s)
-&gt;       with the Work to which such Contribution(s) was submitted. If You
-&gt;       institute patent litigation against any entity (including a
-&gt;       cross-claim or counterclaim in a lawsuit) alleging that the Work
-&gt;       or a Contribution incorporated within the Work constitutes direct
-&gt;       or contributory patent infringement, then any patent licenses
-&gt;       granted to You under this License for that Work shall terminate
-&gt;       as of the date such litigation is filed.
-&gt; 
-&gt;    4. Redistribution. You may reproduce and distribute copies of the
-&gt;       Work or Derivative Works thereof in any medium, with or without
-&gt;       modifications, and in Source or Object form, provided that You
-&gt;       meet the following conditions:
-&gt; 
-&gt;       (a) You must give any other recipients of the Work or
-&gt;           Derivative Works a copy of this License; and
-&gt; 
-&gt;       (b) You must cause any modified files to carry prominent notices
-&gt;           stating that You changed the files; and
-&gt; 
-&gt;       (c) You must retain, in the Source form of any Derivative Works
-&gt;           that You distribute, all copyright, patent, trademark, and
-&gt;           attribution notices from the Source form of the Work,
-&gt;           excluding those notices that do not pertain to any part of
-&gt;           the Derivative Works; and
-&gt; 
-&gt;       (d) If the Work includes a "NOTICE" text file as part of its
-&gt;           distribution, then any Derivative Works that You distribute must
-&gt;           include a readable copy of the attribution notices contained
-&gt;           within such NOTICE file, excluding those notices that do not
-&gt;           pertain to any part of the Derivative Works, in at least one
-&gt;           of the following places: within a NOTICE text file distributed
-&gt;           as part of the Derivative Works; within the Source form or
-&gt;           documentation, if provided along with the Derivative Works; or,
-&gt;           within a display generated by the Derivative Works, if and
-&gt;           wherever such third-party notices normally appear. The contents
-&gt;           of the NOTICE file are for informational purposes only and
-&gt;           do not modify the License. You may add Your own attribution
-&gt;           notices within Derivative Works that You distribute, alongside
-&gt;           or as an addendum to the NOTICE text from the Work, provided
-&gt;           that such additional attribution notices cannot be construed
-&gt;           as modifying the License.
-&gt; 
-&gt;       You may add Your own copyright statement to Your modifications and
-&gt;       may provide additional or different license terms and conditions
-&gt;       for use, reproduction, or distribution of Your modifications, or
-&gt;       for any such Derivative Works as a whole, provided Your use,
-&gt;       reproduction, and distribution of the Work otherwise complies with
-&gt;       the conditions stated in this License.
-&gt; 
-&gt;    5. Submission of Contributions. Unless You explicitly state otherwise,
-&gt;       any Contribution intentionally submitted for inclusion in the Work
-&gt;       by You to the Licensor shall be under the terms and conditions of
-&gt;       this License, without any additional terms or conditions.
-&gt;       Notwithstanding the above, nothing herein shall supersede or modify
-&gt;       the terms of any separate license agreement you may have executed
-&gt;       with Licensor regarding such Contributions.
-&gt; 
-&gt;    6. Trademarks. This License does not grant permission to use the trade
-&gt;       names, trademarks, service marks, or product names of the Licensor,
-&gt;       except as required for reasonable and customary use in describing the
-&gt;       origin of the Work and reproducing the content of the NOTICE file.
-&gt; 
-&gt;    7. Disclaimer of Warranty. Unless required by applicable law or
-&gt;       agreed to in writing, Licensor provides the Work (and each
-&gt;       Contributor provides its Contributions) on an "AS IS" BASIS,
-&gt;       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-&gt;       implied, including, without limitation, any warranties or conditions
-&gt;       of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-&gt;       PARTICULAR PURPOSE. You are solely responsible for determining the
-&gt;       appropriateness of using or redistributing the Work and assume any
-&gt;       risks associated with Your exercise of permissions under this License.
-&gt; 
-&gt;    8. Limitation of Liability. In no event and under no legal theory,
-&gt;       whether in tort (including negligence), contract, or otherwise,
-&gt;       unless required by applicable law (such as deliberate and grossly
-&gt;       negligent acts) or agreed to in writing, shall any Contributor be
-&gt;       liable to You for damages, including any direct, indirect, special,
-&gt;       incidental, or consequential damages of any character arising as a
-&gt;       result of this License or out of the use or inability to use the
-&gt;       Work (including but not limited to damages for loss of goodwill,
-&gt;       work stoppage, computer failure or malfunction, or any and all
-&gt;       other commercial damages or losses), even if such Contributor
-&gt;       has been advised of the possibility of such damages.
-&gt; 
-&gt;    9. Accepting Warranty or Additional Liability. While redistributing
-&gt;       the Work or Derivative Works thereof, You may choose to offer,
-&gt;       and charge a fee for, acceptance of support, warranty, indemnity,
-&gt;       or other liability obligations and/or rights consistent with this
-&gt;       License. However, in accepting such obligations, You may act only
-&gt;       on Your own behalf and on Your sole responsibility, not on behalf
-&gt;       of any other Contributor, and only if You agree to indemnify,
-&gt;       defend, and hold each Contributor harmless for any liability
-&gt;       incurred by, or claims asserted against, such Contributor by reason
-&gt;       of your accepting any such warranty or additional liability.
-&gt; 
-&gt;    END OF TERMS AND CONDITIONS
-&gt; 
-&gt;    APPENDIX: How to apply the Apache License to your work.
-&gt; 
-&gt;       To apply the Apache License to your work, attach the following
-&gt;       boilerplate notice, with the fields enclosed by brackets "[]"
-&gt;       replaced with your own identifying information. (Don't include
-&gt;       the brackets!)  The text should be enclosed in the appropriate
-&gt;       comment syntax for the file format. We also recommend that a
-&gt;       file or class name and description of purpose be included on the
-&gt;       same "printed page" as the copyright notice for easier
-&gt;       identification within third-party archives.
-&gt; 
-&gt;    Copyright 2017 Vercel, Inc.
-&gt; 
-&gt;    Licensed under the Apache License, Version 2.0 (the "License");
-&gt;    you may not use this file except in compliance with the License.
-&gt;    You may obtain a copy of the License at
-&gt; 
-&gt;        http://www.apache.org/licenses/LICENSE-2.0
-&gt; 
-&gt;    Unless required by applicable law or agreed to in writing, software
-&gt;    distributed under the License is distributed on an "AS IS" BASIS,
-&gt;    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-&gt;    See the License for the specific language governing permissions and
-&gt;    limitations under the License.
 
 ---------------------------------------
 
@@ -19583,7 +19657,7 @@ Repositories: https://github.com/sindresorhus/bundle-name, https://github.com/si
 
 ## cac
 License: MIT
-By: egoist
+By: egoist, Kevin Deng &lt;sxzz@sxzz.moe&gt;
 Repository: https://github.com/cacjs/cac
 
 &gt; The MIT License (MIT)
@@ -19730,35 +19804,6 @@ Repository: https://github.com/expressjs/cors
 &gt; CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 &gt; TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 &gt; SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
----------------------------------------
-
-## cross-spawn
-License: MIT
-By: André Cruz
-Repository: https://github.com/moxystudio/node-cross-spawn
-
-&gt; The MIT License (MIT)
-&gt; 
-&gt; Copyright (c) 2018 Made With MOXY Lda &lt;hello@moxy.studio&gt;
-&gt; 
-&gt; Permission is hereby granted, free of charge, to any person obtaining a copy
-&gt; of this software and associated documentation files (the "Software"), to deal
-&gt; in the Software without restriction, including without limitation the rights
-&gt; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-&gt; copies of the Software, and to permit persons to whom the Software is
-&gt; furnished to do so, subject to the following conditions:
-&gt; 
-&gt; The above copyright notice and this permission notice shall be included in
-&gt; all copies or substantial portions of the Software.
-&gt; 
-&gt; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-&gt; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-&gt; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-&gt; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-&gt; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-&gt; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-&gt; THE SOFTWARE.
 
 ---------------------------------------
 
@@ -20285,29 +20330,6 @@ Repository: https://github.com/Rich-Harris/is-reference
 
 ---------------------------------------
 
-## isexe, which
-License: ISC
-By: Isaac Z. Schlueter
-Repositories: https://github.com/isaacs/isexe, https://github.com/isaacs/node-which
-
-&gt; The ISC License
-&gt; 
-&gt; Copyright (c) Isaac Z. Schlueter and Contributors
-&gt; 
-&gt; Permission to use, copy, modify, and/or distribute this software for any
-&gt; purpose with or without fee is hereby granted, provided that the above
-&gt; copyright notice and this permission notice appear in all copies.
-&gt; 
-&gt; THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-&gt; WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-&gt; MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-&gt; ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-&gt; WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-&gt; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-&gt; IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
----------------------------------------
-
 ## js-tokens
 License: MIT
 By: Simon Lydell
@@ -20728,23 +20750,6 @@ Repository: https://github.com/pillarjs/parseurl
 
 ---------------------------------------
 
-## path-key, shebang-regex
-License: MIT
-By: Sindre Sorhus
-Repositories: https://github.com/sindresorhus/path-key, https://github.com/sindresorhus/shebang-regex
-
-&gt; MIT License
-&gt; 
-&gt; Copyright (c) Sindre Sorhus &lt;sindresorhus@gmail.com&gt; (sindresorhus.com)
-&gt; 
-&gt; Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-&gt; 
-&gt; The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-&gt; 
-&gt; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
----------------------------------------
-
 ## periscopic
 License: MIT
 Repository: https://github.com/Rich-Harris/periscopic
@@ -20939,7 +20944,7 @@ Repository: https://github.com/css-modules/postcss-modules-values
 
 ## postcss-selector-parser
 License: MIT
-By: Ben Briggs, Chris Eppstein
+By: Maxime Thirouin, Ben Briggs, Chris Eppstein
 Repository: https://github.com/postcss/postcss-selector-parser
 
 &gt; Copyright (c) Ben Briggs &lt;beneb.info@gmail.com&gt; (http://beneb.info)
@@ -21055,23 +21060,6 @@ Repositories: https://github.com/lukeed/resolve.exports, https://github.com/luke
 
 ---------------------------------------
 
-## shebang-command
-License: MIT
-By: Kevin Mårtensson
-Repository: https://github.com/kevva/shebang-command
-
-&gt; MIT License
-&gt; 
-&gt; Copyright (c) Kevin Mårtensson &lt;kevinmartensson@gmail.com&gt; (github.com/kevva)
-&gt; 
-&gt; Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-&gt; 
-&gt; The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-&gt; 
-&gt; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
----------------------------------------
-
 ## shell-quote
 License: MIT
 By: James Halliday
@@ -21141,6 +21129,34 @@ Repository: https://github.com/jshttp/statuses
 
 ---------------------------------------
 
+## std-env
+License: MIT
+Repository: https://github.com/unjs/std-env
+
+&gt; MIT License
+&gt; 
+&gt; Copyright (c) Pooya Parsa &lt;pooya@pi0.io&gt;
+&gt; 
+&gt; Permission is hereby granted, free of charge, to any person obtaining a copy
+&gt; of this software and associated documentation files (the "Software"), to deal
+&gt; in the Software without restriction, including without limitation the rights
+&gt; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&gt; copies of the Software, and to permit persons to whom the Software is
+&gt; furnished to do so, subject to the following conditions:
+&gt; 
+&gt; The above copyright notice and this permission notice shall be included in all
+&gt; copies or substantial portions of the Software.
+&gt; 
+&gt; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&gt; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&gt; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&gt; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&gt; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&gt; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+&gt; SOFTWARE.
+
+---------------------------------------
+
 ## string-hash
 License: CC0-1.0
 By: The Dark Sky Company
@@ -21156,6 +21172,35 @@ Repository: https://github.com/antfu/strip-literal
 &gt; MIT License
 &gt; 
 &gt; Copyright (c) 2022 Anthony Fu &lt;https://github.com/antfu&gt;
+&gt; 
+&gt; Permission is hereby granted, free of charge, to any person obtaining a copy
+&gt; of this software and associated documentation files (the "Software"), to deal
+&gt; in the Software without restriction, including without limitation the rights
+&gt; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+&gt; copies of the Software, and to permit persons to whom the Software is
+&gt; furnished to do so, subject to the following conditions:
+&gt; 
+&gt; The above copyright notice and this permission notice shall be included in all
+&gt; copies or substantial portions of the Software.
+&gt; 
+&gt; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+&gt; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+&gt; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+&gt; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+&gt; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+&gt; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+&gt; SOFTWARE.
+
+---------------------------------------
+
+## tinyexec
+License: MIT
+By: James Garbutt
+Repository: https://github.com/tinylibs/tinyexec
+
+&gt; MIT License
+&gt; 
+&gt; Copyright (c) 2024 Tinylibs
 &gt; 
 &gt; Permission is hereby granted, free of charge, to any person obtaining a copy
 &gt; of this software and associated documentation files (the "Software"), to deal
@@ -22153,7 +22198,7 @@ defined by the Mozilla Public License, v. 2.0.
 </pre>
 </details>
 
-### picomatch@4.0.5
+### picomatch@4.0.7
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -22186,7 +22231,7 @@ THE SOFTWARE.
 </pre>
 </details>
 
-### vitest@4.1.10
+### vitest@4.1.12
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 
@@ -23316,7 +23361,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 </pre>
 </details>
 
-### zod@4.4.3
+### zod@4.6.7
 
 File notice berikut disalin tanpa perubahan dari paket terpasang.
 

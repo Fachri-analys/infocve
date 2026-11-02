@@ -23,6 +23,6 @@ export async function runUploadedNpmScan(request: Request, previous?: Dependency
     scannedAt: new Date().toISOString(),
   };
   const comparedReport = previous ? compareDependencyScans(previous, report) : report;
-  saveDependencyScan(comparedReport, accessToken);
+  await saveDependencyScan(comparedReport, accessToken);
   return { report: comparedReport, accessToken };
 }

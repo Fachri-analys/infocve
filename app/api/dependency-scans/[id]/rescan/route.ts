@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAuthorizedDependencyScan, pruneExpiredScans } from "@/lib/scanner/scan-repository";
+import { getAuthorizedDependencyScanPersistent, pruneExpiredScans } from "@/lib/scanner/scan-repository";
 import { runUploadedNpmScan } from "@/lib/scanner/scan-service";
 import { ScanUploadError } from "@/lib/scanner/upload";
 import { getClientIp, scanRateLimiter } from "@/lib/security/rate-limit";
@@ -28,12 +28,12 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   }
 
   // Prune scans older than configured retention window
-  pruneExpiredScans();
+  await pruneExpiredScans().catch(() => 0);
 
   const { id } = await context.params;
   if (!isScanId(id)) return hiddenNotFound();
   const token = request.headers.get("x-scan-token") ?? "";
-  const previous = getAuthorizedDependencyScan(id, token);
+  const previous = await getAuthorizedDependencyScanPersistent(id, token);
   if (!previous) return hiddenNotFound();
 
   try {

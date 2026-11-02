@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   }
 
   // Prune scans older than configured retention window
-  pruneExpiredScans();
+  await pruneExpiredScans().catch(() => 0);
 
   try {
     const result = await runUploadedNpmScan(request);

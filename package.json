@@ -12,11 +12,13 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:neon": "node scripts/test-neon-integration.mjs",
     "sync": "node scripts/sync-cli.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@neondatabase/serverless": "^1.2.0",
     "@radix-ui/react-accordion": "^1.2.20",
     "@radix-ui/react-dialog": "^1.1.23",
     "@radix-ui/react-slot": "^1.3.3",

@@ -3,6 +3,8 @@ import { SyncEngine } from "@/lib/sync/sync-engine";
 import { getClientIp, syncRateLimiter, timingSafeStringCompare } from "@/lib/security/rate-limit";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
