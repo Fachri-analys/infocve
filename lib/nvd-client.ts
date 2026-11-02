@@ -3,10 +3,10 @@ import "server-only";
 import type { NvdCveApiResponse, NvdErrorResponse, NvdQueryParams } from "@/lib/nvd-types";
 
 const NVD_BASE_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0";
-const DEFAULT_TIMEOUT_MS = 15_000;
-const MAX_ATTEMPTS = 4; // 1 initial try + up to 3 retries
-const BASE_RETRY_DELAY_MS = 800;
-const MAX_RETRY_DELAY_MS = 12_000;
+const DEFAULT_TIMEOUT_MS = 6_000;
+const MAX_ATTEMPTS = 2; // 1 initial try + 1 fast retry
+const BASE_RETRY_DELAY_MS = 500;
+const MAX_RETRY_DELAY_MS = 2_000;
 
 class NvdRateLimiter {
   private timestamps: number[] = [];
@@ -22,6 +22,12 @@ class NvdRateLimiter {
       const oldest = this.timestamps[0] ?? now;
       const waitTime = windowMs - (now - oldest) + 100;
       if (waitTime > 0) {
+        // Never freeze the server-side render thread for tens of seconds.
+        // If the upstream quota is full, throw rate-limit immediately so
+        // caller falls back to local SQLite/cached data instantly.
+        if (waitTime > 1_500) {
+          throw new NvdApiError("rate-limit", 429, "NVD rate limit window full; fast fallback to local cache");
+        }
         await sleep(waitTime);
       }
       return this.acquire(hasApiKey);

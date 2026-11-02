@@ -57,3 +57,7 @@ data/*.sqlite-wal
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.neon
+
+.vercel
+.env*
