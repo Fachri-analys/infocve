@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { NvdCveApiResponse, NvdErrorResponse, NvdQueryParams } from "@/lib/nvd-types";
+import type { NvdCveApiResponse, NvdQueryParams } from "@/lib/nvd-types";
 
 const NVD_BASE_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0";
 const DEFAULT_TIMEOUT_MS = 6_000;
@@ -76,15 +76,21 @@ function isRetryableKind(kind: NvdErrorKind): boolean {
   return kind === "timeout" || kind === "network" || kind === "rate-limit" || kind === "server";
 }
 
-async function safeParseErrorBody(response: Response): Promise<NvdErrorResponse | null> {
+export function getNvdErrorDetail(headers: Headers, body: unknown): string | undefined {
+  const headerMessage = headers.get("message")?.trim();
+  if (headerMessage) return headerMessage.slice(0, 500);
+  if (body && typeof body === "object" && "message" in body && typeof body.message === "string") {
+    return body.message.slice(0, 500);
+  }
+  return undefined;
+}
+
+async function safeParseErrorBody(response: Response): Promise<string | undefined> {
   try {
     const json = (await response.json()) as unknown;
-    if (json && typeof json === "object" && "message" in json) {
-      return json as NvdErrorResponse;
-    }
-    return null;
+    return getNvdErrorDetail(response.headers, json);
   } catch {
-    return null;
+    return getNvdErrorDetail(response.headers, null);
   }
 }
 
@@ -171,7 +177,7 @@ export async function fetchNvd(params: NvdQueryParams, options: FetchNvdOptions 
       const isLastAttempt = attempt === maxAttempts - 1;
 
       if (!isRetryableKind(kind) || isLastAttempt) {
-        throw new NvdApiError(kind, response.status, errorBody?.message);
+      throw new NvdApiError(kind, response.status, errorBody);
       }
 
       const retryAfter = response.headers.get("retry-after");
