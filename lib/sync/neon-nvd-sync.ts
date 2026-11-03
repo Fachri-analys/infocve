@@ -13,7 +13,8 @@ import { acquireNvdSyncSlot } from "./nvd-rate-limit";
 export const NEON_SYNC_LIMITS = {
   pageSize: 2_000,
   pagesPerRun: 1,
-  nvdTimeoutMs: 20_000,
+  nvdTimeoutMs: 10_000,
+  nvdAttempts: 2,
   cisaTimeoutMs: 8_000,
   epssTimeoutMs: 3_000,
   epssBatchSize: 100,
@@ -90,19 +91,34 @@ export async function syncNvdToNeon(): Promise<NeonSyncResult> {
       const params = windowType === "backfill"
         ? { pubStartDate: windowStart, pubEndDate: windowEnd, resultsPerPage: NEON_SYNC_LIMITS.pageSize, startIndex }
         : { lastModStartDate: windowStart, lastModEndDate: windowEnd, resultsPerPage: NEON_SYNC_LIMITS.pageSize, startIndex };
-      const response = await fetchNvd(params, { noStore: true, timeoutMs: NEON_SYNC_LIMITS.nvdTimeoutMs });
+      const response = await fetchNvd(params, {
+        noStore: true,
+        timeoutMs: NEON_SYNC_LIMITS.nvdTimeoutMs,
+        maxAttempts: NEON_SYNC_LIMITS.nvdAttempts,
+        maxRetryDelayMs: 1_000,
+      });
       totalResults = response.totalResults;
       const records = response.vulnerabilities.map(({ cve }) => cve);
       const cves = normalizeNvdCveRecords(records, true);
-      const epssById = await fetchEpssInBatches(epss, cves.map((cve) => cve.id));
-      const { catalog: cisaCatalog, available: cisaAvailable } = await cisaPromise;
-      if (!cisaAvailable) warnings.push("CISA KEV unavailable; CVE page was saved without refreshed KEV enrichment.");
-      if (epssById.size === 0 && cves.length > 0) warnings.push("EPSS unavailable or returned no matching scores for this page.");
-      for (const cve of cves) attachSyncSignals(cve, cisaCatalog, epssById);
-      itemsSynced += await upsertNeonCves(cves, sql);
-      pagesProcessed += 1;
-      startIndex += records.length;
-      await updateNeonSyncState({ owner, windowStart, windowEnd, windowType, nextIndex: startIndex, totalResults }, sql);
+      await persistNvdPageSafely(
+        cves,
+        async (items) => { await upsertNeonCves(items, sql); },
+        async (items) => {
+          const [epssById, { catalog: cisaCatalog, available: cisaAvailable }] = await Promise.all([
+            fetchEpssInBatches(epss, items.map((cve) => cve.id)),
+            cisaPromise,
+          ]);
+          if (!cisaAvailable) warnings.push("CISA KEV unavailable; CVE page was saved without refreshed KEV enrichment.");
+          if (epssById.size === 0 && items.length > 0) warnings.push("EPSS unavailable or returned no matching scores for this page.");
+          for (const cve of items) attachSyncSignals(cve, cisaCatalog, epssById);
+        },
+        async () => {
+          pagesProcessed += 1;
+          startIndex += records.length;
+          await updateNeonSyncState({ owner, windowStart, windowEnd, windowType, nextIndex: startIndex, totalResults }, sql);
+        }
+      );
+      itemsSynced += cves.length;
       if (records.length === 0) break;
     }
 
@@ -124,6 +140,18 @@ export async function syncNvdToNeon(): Promise<NeonSyncResult> {
   } finally {
     await releaseNeonSyncLease(owner, sql);
   }
+}
+
+export async function persistNvdPageSafely<T extends object>(
+  cves: T[],
+  persist: (items: T[]) => Promise<void>,
+  enrich: (items: T[]) => Promise<void>,
+  checkpoint: () => Promise<void>
+): Promise<void> {
+  await persist(cves);
+  await enrich(cves);
+  await persist(cves);
+  await checkpoint();
 }
 
 export async function fetchEpssInBatches(adapter: EpssSourceAdapter, ids: string[]): Promise<Map<string, EPSSScore>> {

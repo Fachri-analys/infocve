@@ -112,6 +112,10 @@ interface FetchNvdOptions {
   tags?: string[];
   /** Avoid Next data cache for the scheduled sync pipeline. */
   noStore?: boolean;
+  /** Override the retry count for bounded scheduled jobs. */
+  maxAttempts?: number;
+  /** Cap Retry-After delays so scheduled functions remain within their runtime budget. */
+  maxRetryDelayMs?: number;
 }
 
 /**
@@ -137,6 +141,8 @@ interface FetchNvdOptions {
 export async function fetchNvd(params: NvdQueryParams, options: FetchNvdOptions = {}): Promise<NvdCveApiResponse> {
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const revalidate = options.revalidateSeconds ?? 3600;
+  const maxAttempts = Math.max(1, Math.min(options.maxAttempts ?? MAX_ATTEMPTS, MAX_ATTEMPTS));
+  const maxRetryDelayMs = Math.max(0, options.maxRetryDelayMs ?? MAX_RETRY_DELAY_MS);
   const url = buildUrl(params);
   const apiKey = process.env.NVD_API_KEY?.trim();
   const headers: HeadersInit = {
@@ -144,7 +150,7 @@ export async function fetchNvd(params: NvdQueryParams, options: FetchNvdOptions 
     ...(apiKey ? { apiKey } : {}),
   };
 
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const controller = new AbortController();
     const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -162,7 +168,7 @@ export async function fetchNvd(params: NvdQueryParams, options: FetchNvdOptions 
 
       const kind = classifyStatus(response.status);
       const errorBody = await safeParseErrorBody(response);
-      const isLastAttempt = attempt === MAX_ATTEMPTS - 1;
+      const isLastAttempt = attempt === maxAttempts - 1;
 
       if (!isRetryableKind(kind) || isLastAttempt) {
         throw new NvdApiError(kind, response.status, errorBody?.message);
@@ -170,13 +176,13 @@ export async function fetchNvd(params: NvdQueryParams, options: FetchNvdOptions 
 
       const retryAfter = response.headers.get("retry-after");
       const retryAfterMs = retryAfter === null ? NaN : Number(retryAfter) * 1000;
-      await sleep(Number.isFinite(retryAfterMs) ? retryAfterMs : backoffDelay(attempt));
+      await sleep(Math.min(Number.isFinite(retryAfterMs) ? retryAfterMs : backoffDelay(attempt), maxRetryDelayMs));
     } catch (error) {
       if (error instanceof NvdApiError) throw error;
 
       const isAbort = error instanceof Error && error.name === "AbortError";
       const kind: NvdErrorKind = isAbort ? "timeout" : "network";
-      const isLastAttempt = attempt === MAX_ATTEMPTS - 1;
+      const isLastAttempt = attempt === maxAttempts - 1;
 
       if (isLastAttempt) throw new NvdApiError(kind);
       await sleep(backoffDelay(attempt));

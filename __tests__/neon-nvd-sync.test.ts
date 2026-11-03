@@ -1,11 +1,36 @@
 import { describe, expect, it } from "vitest";
-import { getNvdSyncDateRange, mapWithConcurrency, NEON_SYNC_LIMITS } from "@/lib/sync/neon-nvd-sync";
+import { getNvdSyncDateRange, mapWithConcurrency, NEON_SYNC_LIMITS, persistNvdPageSafely } from "@/lib/sync/neon-nvd-sync";
 import { summarizeSyncStatus } from "@/lib/sync/sync-status";
 
 describe("incremental NVD sync date windows", () => {
+  it("persists core CVEs before enrichment and advances the cursor only after enrichment is persisted", async () => {
+    const events: string[] = [];
+    const cves: Array<{ id: string; epss?: number }> = [{ id: "CVE-2026-1000" }];
+    await persistNvdPageSafely(
+      cves,
+      async (items) => { events.push(items[0]?.epss ? "persist-enriched" : "persist-core"); },
+      async (items) => { events.push("enrich"); items[0]!.epss = 0.42; },
+      async () => { events.push("checkpoint"); }
+    );
+    expect(events).toEqual(["persist-core", "enrich", "persist-enriched", "checkpoint"]);
+  });
+
+  it("keeps the page cursor unchanged if enrichment fails after raw CVEs were saved", async () => {
+    const events: string[] = [];
+    await expect(persistNvdPageSafely(
+      [{ id: "CVE-2026-1000" }],
+      async () => { events.push("persist-core"); },
+      async () => { throw new Error("provider timeout"); },
+      async () => { events.push("checkpoint"); }
+    )).rejects.toThrow("provider timeout");
+    expect(events).toEqual(["persist-core"]);
+  });
+
   it("bounds each invocation to one persisted NVD page and bounded enrichments", () => {
     expect(NEON_SYNC_LIMITS.pagesPerRun).toBe(1);
     expect(NEON_SYNC_LIMITS.pageSize).toBe(2_000);
+    expect(NEON_SYNC_LIMITS.nvdTimeoutMs).toBe(10_000);
+    expect(NEON_SYNC_LIMITS.nvdAttempts).toBe(2);
     expect(NEON_SYNC_LIMITS.epssBatchSize).toBe(100);
     expect(NEON_SYNC_LIMITS.epssConcurrency).toBe(5);
     expect(NEON_SYNC_LIMITS.cnaBatchSize).toBe(16);
