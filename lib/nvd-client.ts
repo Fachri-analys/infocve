@@ -48,7 +48,7 @@ function buildUrl(params: NvdQueryParams): string {
   const url = new URL(NVD_BASE_URL);
   for (const [key, value] of Object.entries(params)) {
     if (value === undefined || value === null || value === "") continue;
-    url.searchParams.set(key, String(value));
+    url.searchParams.set(key, value instanceof Date ? value.toISOString() : String(value));
   }
   return url.toString();
 }
