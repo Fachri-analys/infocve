@@ -36,7 +36,8 @@ export class NvdApiError extends Error {
 
   constructor(kind: NvdErrorKind, status?: number, detail?: string) {
     const base = FRIENDLY_MESSAGES_ID[kind];
-    super(detail ? `${base} (${detail})` : base);
+    const context = [status ? `HTTP ${status}` : undefined, detail].filter(Boolean).join(": ");
+    super(context ? `${base} (${context})` : base);
     this.name = "NvdApiError";
     this.kind = kind;
     this.status = status;
