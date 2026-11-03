@@ -11,10 +11,10 @@ import type { CVE, EPSSScore } from "@/types/cve";
 import { acquireNvdSyncSlot } from "./nvd-rate-limit";
 
 export const NEON_SYNC_LIMITS = {
-  pageSize: 2_000,
+  pageSize: 1_000,
   pagesPerRun: 1,
-  nvdTimeoutMs: 10_000,
-  nvdAttempts: 2,
+  nvdTimeoutMs: 45_000,
+  nvdAttempts: 1,
   cisaTimeoutMs: 8_000,
   epssTimeoutMs: 3_000,
   epssBatchSize: 100,

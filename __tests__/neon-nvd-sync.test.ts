@@ -28,9 +28,9 @@ describe("incremental NVD sync date windows", () => {
 
   it("bounds each invocation to one persisted NVD page and bounded enrichments", () => {
     expect(NEON_SYNC_LIMITS.pagesPerRun).toBe(1);
-    expect(NEON_SYNC_LIMITS.pageSize).toBe(2_000);
-    expect(NEON_SYNC_LIMITS.nvdTimeoutMs).toBe(10_000);
-    expect(NEON_SYNC_LIMITS.nvdAttempts).toBe(2);
+    expect(NEON_SYNC_LIMITS.pageSize).toBe(1_000);
+    expect(NEON_SYNC_LIMITS.nvdTimeoutMs).toBe(45_000);
+    expect(NEON_SYNC_LIMITS.nvdAttempts).toBe(1);
     expect(NEON_SYNC_LIMITS.epssBatchSize).toBe(100);
     expect(NEON_SYNC_LIMITS.epssConcurrency).toBe(5);
     expect(NEON_SYNC_LIMITS.cnaBatchSize).toBe(16);
