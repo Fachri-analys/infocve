@@ -2,12 +2,12 @@
 
 [![CI](https://github.com/Fachri-analys/infocve/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Fachri-analys/infocve/actions/workflows/ci.yml)
 [![Node.js >=22.5.0](https://img.shields.io/badge/Node.js-%3E%3D22.5.0-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Next.js 16.3.0](https://img.shields.io/badge/Next.js-16.3.0-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
+[![Next.js 16.4.3](https://img.shields.io/badge/Next.js-16.4.3-000000?logo=next.js&logoColor=white)](https://nextjs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 > Platform intelijen kerentanan siber (CVE) untuk Indonesia — menyajikan data teknis, skor dampak CVSS, probabilitas eksploitasi EPSS, status eksploitasi aktif CISA KEV, dan rekomendasi prioritas tindakan dalam bahasa yang jelas dan mudah dipahami.
 
-InfoCVE mengintegrasikan feed resmi dari **National Vulnerability Database (NVD NIST)**, **CISA Known Exploited Vulnerabilities (KEV)**, **FIRST Exploit Prediction Scoring System (EPSS)**, dan **GitHub Security Advisories (GHSA)** ke dalam basis data intelijen lokal berbasis SQLite tertanam (`node:sqlite`).
+InfoCVE mengambil data CVE langsung dari **National Vulnerability Database (NVD NIST)** dan menggabungkannya dengan **CISA Known Exploited Vulnerabilities (KEV)**, **FIRST Exploit Prediction Scoring System (EPSS)**, serta **GitHub Security Advisories (GHSA)**. Pengembangan lokal memakai SQLite tertanam (`node:sqlite`). Pada Vercel, PostgreSQL Neon menyimpan riwayat pemindaian dan sampel NVD yang dipakai untuk statistik beranda/dashboard; file SQLite serverless tetap bersifat sementara.
 
 ## 🖥️ Pratinjau Antarmuka
 
@@ -78,9 +78,11 @@ Buka peramban Anda di: **[http://localhost:3000](http://localhost:3000)**
 | :--- | :--- | :--- | :--- |
 | `NEXT_PUBLIC_SITE_URL` | Opsional (Lokal) / Wajib (Produksi) | `http://localhost:3000` | URL publik aplikasi untuk canonical link, sitemap, dan OpenGraph. |
 | `NVD_API_KEY` | Opsional | *(Kosong)* | Kunci API resmi NIST NVD. Menaikkan batas rate limit dari 5 req/30s menjadi 50 req/30s. [Daftar gratis di NIST](https://nvd.nist.gov/developers/request-an-api-key). |
+| `DATABASE_URL` atau `POSTGRES_URL` | Disarankan di Vercel | *(Kosong)* | Pooled connection string Neon untuk riwayat scanner dan cache bersama sampel statistik NVD. Simpan sebagai environment variable server-side, jangan gunakan awalan `NEXT_PUBLIC_`. |
 | `GITHUB_TOKEN` | Opsional | *(Kosong)* | Personal Access Token GitHub untuk sinkronisasi GitHub Security Advisories (GHSA). |
 | `ADMIN_SECRET` | Direkomendasikan | *(Kosong)* | Token otorisasi Bearer untuk mengamankan endpoint trigger sinkronisasi (`POST /api/sync`). |
 | `INFOCVE_DATA_DIR` | Opsional | `./data` | Direktori penyimpanan file database SQLite lokal (`infocve.sqlite`). |
+| `TEST_DATABASE_URL` | Opsional (pengujian integrasi) | *(Kosong)* | Neon database/branch khusus test untuk `npm run test:neon`; jangan arahkan ke database produksi. |
 | `NOTIFICATIONS_ENABLED` | Opsional | `false` | Set `true` untuk mengaktifkan notifikasi webhook saat ada CVE Kritis / KEV baru. |
 | `NOTIFICATION_WEBHOOK_URL`| Opsional | *(Kosong)* | URL webhook tujuan (Discord / Slack / webhook kustom). |
 | `SYNC_INTERVAL_MINUTES` | Opsional | `60` | Interval penjadwalan sinkronisasi data latar belakang. |
@@ -184,12 +186,17 @@ pm2 start npm --name "infocve" -- start
 1. Import repositori ke dashboard Vercel.
 2. Tambahkan Environment Variables di Project Settings:
    - `NEXT_PUBLIC_SITE_URL` = `https://domain-anda.vercel.app`
-   - `NVD_API_KEY` (opsional)
-   - `ADMIN_SECRET` (opsional)
-   - `INFOCVE_DATA_DIR` = `/tmp` (karena lingkungan serverless hanya mengizinkan penulisan di direktori `/tmp`).
-3. Deploy. Feed API live (NVD, CISA KEV, EPSS) akan otomatis di-cache menggunakan Next.js Incremental Static Regeneration (ISR).
+   - `DATABASE_URL` = pooled connection string Neon (disarankan agar riwayat scan dan sampel statistik konsisten di semua function instance).
+   - `NVD_API_KEY` (disarankan untuk mengurangi dampak rate limit NVD; bukan pengganti cache).
+   - `ADMIN_SECRET` (wajib jika endpoint `/api/sync` akan dipakai).
+   - `INFOCVE_DATA_DIR` tidak membuat SQLite persisten; pada Vercel filesystem aplikasi bersifat sementara.
+3. Deploy. Pencarian dan detail CVE mengambil data NVD live melalui API dan cache request Next.js. Beranda/dashboard membaca sampel NVD dari Neon agar function instance dapat memakai data yang sama.
 
-> **Penyimpanan fitur scanner dan antrean translation**: `/tmp` pada serverless bersifat sementara dan tidak dibagi antar-instance. Riwayat pemindaian, cache terjemahan, dan antrean retry memerlukan SQLite pada persistent disk serta proses server yang tetap hidup; gunakan hosting self-hosted/persistent volume untuk jaminan tersebut.
+**Cakupan statistik:** NVD tidak menyediakan endpoint agregasi. Setelah cache diperbarui, angka di kartu statistik merangkum maksimal 100 CVE dalam jendela publikasi 120 hari, bukan jumlah semua CVE di NVD. Sampel berhasil disimpan di Neon dan dipakai ulang selama 7 hari; cache lama dapat tetap dipakai sampai masa tersebut habis. Saat cache belum ada, aplikasi meminta satu halaman kecil dari NVD; jika pengambilan gagal dan belum ada cache tersimpan, UI menampilkan `—` (data belum tersedia), bukan mengklaim nol CVE. Pencarian CVE tetap memakai jalur API tersendiri.
+
+**Pengecekan setelah deploy:** buka `/api/health` dan pastikan respons menunjukkan `status: healthy` serta `database: Neon Postgres`. Lalu muat beranda dan dashboard. Jika angka belum muncul, pastikan `DATABASE_URL`/`POSTGRES_URL` dan `NVD_API_KEY` dipasang pada environment **Production**, lalu redeploy. API key meningkatkan kuota NVD, tetapi tidak mengisi database katalog SQLite sementara di Vercel.
+
+> `/api/sync` masih menyinkronkan katalog lokal SQLite. Pada Vercel file tersebut tidak dibagi antar function dan tidak persisten; jangan menganggap hasil sync sebagai katalog bersama. Pencarian/detail CVE memakai NVD API, sampel ringkasan memakai cache Neon, dan pemindai dependency memeriksa sumber advisori langsung.
 
 ---
 

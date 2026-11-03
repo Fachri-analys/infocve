@@ -89,11 +89,11 @@ rentang tanggal yang mungkin lebih dari 120 hari.
    dari salah menandai "sudah ditangani NVD".
 
 Konsekuensinya: pada kombinasi filter yang kompleks, hasil pencarian
-mencerminkan 200 CVE paling relevan dari NVD untuk permintaan itu, bukan
-seluruh basis data NVD (yang berisi 200.000+ entri). Ini adalah trade-off
-yang jujur untuk arsitektur tanpa basis data sendiri (sesuai batasan
-proyek: "tidak ada database") — bukan bug, tapi konsekuensi yang perlu
-diketahui.
+mencerminkan batch hingga 200 CVE dari NVD untuk permintaan itu, bukan
+seluruh sejarah NVD. Ini batas query client-side yang dipakai untuk filter
+yang tidak tersedia secara native; tabel cache Neon untuk sampel dashboard
+bukan katalog pencarian penuh. Filter yang NVD dukung secara native tetap
+menggunakan `totalResults` NVD untuk paginasi.
 
 `getCVEsByYear(year)` adalah pengecualian yang disengaja: karena ini fungsi
 bernama eksplisit (bukan bagian dari filter gabungan), ia memecah satu
@@ -105,20 +105,35 @@ keseluruhan tahun, bukan perkiraan dari satu batch.
 ## 5. Facet (vendor/produk/kategori/tahun/CWE) & statistik beranda
 
 `getVendors`, `getProducts`, `getCategories`, `getAvailableYears`,
-`getAvailableCWEs`, dan `getStats` semuanya berasal dari **satu** fetch
-bersama (`getFacetSample()` di `lib/nvd.ts`): 2.000 CVE terbaru (120 hari
-terakhir, `resultsPerPage` maksimum NVD), di-cache 6 jam. Karena keenamnya
-memanggil `fetch()` dengan URL/parameter yang identik, cache `fetch` bawaan
-Next.js otomatis men-dedup-nya menjadi satu permintaan jaringan sungguhan,
-walau dipanggil dari 6 fungsi berbeda secara paralel di halaman beranda.
+`getAvailableCWEs`, dan `getStats` memakai satu sampel bersama dari
+`getFacetSample()` di `lib/nvd.ts`. Sampel tersebut meminta **maksimal 100
+CVE** dalam jendela publikasi 120 hari terakhir melalui satu halaman NVD.
+Ini sengaja dibatasi untuk menjaga cold render pada function serverless tetap
+ringan; jangan gunakan sampel ini sebagai indeks pencarian penuh.
 
-**Keterbatasan yang perlu disadari:** angka-angka ini merepresentasikan
-"200 hari terakhir", bukan seluruh sejarah NVD — cocok dengan label UI-nya
-sendiri ("CVE Terbaru", "Vendor Terbaru"), tapi jangan diperlakukan sebagai
-statistik global. Kalau nanti dibutuhkan angka global yang akurat, satu-
-satunya cara sungguhan adalah menyimpan salinan data NVD sendiri (mis. di
-basis data) dan meng-agregasi dari situ — di luar cakupan proyek ini karena
-spesifikasi awal secara eksplisit melarang basis data.
+Di Vercel, `lib/nvd-facet-cache.ts` menyimpan sampel terakhir yang berhasil
+ke tabel Neon `infocve_nvd_facet_cache`. Sampel dipakai ulang selama 7 hari,
+termasuk lintas function instance dan deployment. Jika belum ada sampel,
+aplikasi meminta satu halaman kecil dari NVD lalu menyimpan respons sukses.
+Jika permintaan NVD gagal, cache lama tetap dipakai bila tersedia. Cache
+Neon memerlukan `DATABASE_URL` atau `POSTGRES_URL`; tanpa konfigurasi itu,
+Vercel tetap mencoba NVD langsung tetapi tidak memiliki cache bersama.
+Pengembangan lokal dapat memakai SQLite sebagai fallback.
+
+Angka kartu beranda seperti "CVE terbaru", jumlah kritis, dan vendor
+merangkum sampel ini, bukan seluruh katalog NVD. Setelah cache diperbarui,
+total sampel paling banyak 100. Cache dari versi sebelumnya dapat tetap
+digunakan sampai masa 7 harinya berakhir. Jumlah hasil pencarian biasa berasal dari
+`totalResults` untuk query tersebut dan bukan angka sampel statistik.
+NVD tidak menyediakan endpoint agregasi global untuk menghitung seluruh
+vendor atau kategori.
+
+Jika belum ada cache dan NVD tidak dapat dihubungi, `getStats()` menandai
+data sebagai tidak tersedia; beranda menampilkan `—`, bukan angka nol yang
+menyesatkan. Periksa `/api/health` untuk memastikan koneksi Neon sehat dan
+lihat log runtime Vercel untuk kegagalan NVD/cache. `NVD_API_KEY` menaikkan
+kuota request NVD, sedangkan `DATABASE_URL`/`POSTGRES_URL` menyediakan
+penyimpanan cache bersama; keduanya memiliki fungsi berbeda.
 
 ## 6. Normalisasi — hal-hal yang tidak disediakan NVD secara langsung
 
@@ -198,7 +213,11 @@ terhadap rate limit di trafik nyata, di atas retry logic:
 |---|---|
 | Detail satu CVE (`getCVEById`) | 6 jam |
 | Pencarian & daftar (`searchCVEs`, `getLatestCVEs`, dst.) | 1 jam |
-| Sampel facet (vendor/produk/kategori/tahun/CWE/statistik) | 6 jam |
+| Sampel facet di cache fetch NVD | 7 hari |
+
+Di samping cache fetch Next.js, Vercel menyimpan respons sampel yang berhasil
+di Neon selama 7 hari. Cache database menjadi fallback bersama untuk render
+serverless dan tetap dapat dipakai ketika request NVD berikutnya gagal.
 
 Angka-angka ini konstanta biasa (`REVALIDATE` di `lib/nvd.ts`) — ubah
 sesuai kebutuhan tanpa menyentuh logika lain.

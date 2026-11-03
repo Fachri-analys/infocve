@@ -43,6 +43,13 @@ InfoCVE mengadopsi pola arsitektur **Multi-Source Vulnerability Intelligence & A
 └─────────────────────────────────────────────────────────────┘
 ```
 
+### Penyimpanan sesuai lingkungan
+
+- **Pengembangan dan self-hosting:** SQLite (`node:sqlite`) menyimpan katalog sinkronisasi lokal serta data aplikasi pada disk host.
+- **Vercel:** filesystem function bersifat sementara. Pencarian dan detail CVE mengambil NVD API; sampel statistik NVD maksimal 100 record disimpan di tabel Neon `infocve_nvd_facet_cache` dan dipakai ulang selama 7 hari. Riwayat scanner juga menggunakan Neon ketika `DATABASE_URL` atau `POSTGRES_URL` tersedia.
+- Sinkronisasi `/api/sync` masih mengisi SQLite lokal, bukan katalog bersama Neon. Sampel statistik Neon bukan database katalog lengkap dan tidak menjadi sumber untuk pencarian CVE.
+- Cache NVD Neon dipakai lintas function instance dan jadi fallback jika NVD sementara gagal. Tanpa database Neon, aplikasi tetap dapat meminta NVD secara langsung, tetapi tidak memiliki cache bersama yang persisten.
+
 ---
 
 ## 🔒 Prinsip Desain Keamanan

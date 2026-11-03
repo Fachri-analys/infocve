@@ -54,7 +54,7 @@ Deployment ke server mandiri adalah opsi paling direkomendasikan karena basis da
 
 ## ⚡ 2. Deployment demo ke Vercel (Serverless)
 
-Vercel dapat menjalankan UI dan route Next.js InfoCVE. Riwayat pemindai memakai PostgreSQL Neon bila `DATABASE_URL` (atau `POSTGRES_URL`) dipasang; data laporan tetap tersedia saat request masuk ke instance function lain. Tanpa URL database, aplikasi memakai SQLite lokal dan data hanya berlaku pada instance tersebut. Katalog CVE, cache terjemahan, dan status sinkronisasi masih memakai SQLite dan belum menjadi data bersama antarfungsi Vercel.
+Vercel dapat menjalankan UI dan route Next.js InfoCVE. Neon (`DATABASE_URL` atau `POSTGRES_URL`) menyimpan riwayat pemindai dan sampel NVD yang digunakan untuk statistik beranda/dashboard. File SQLite untuk katalog sinkronisasi, cache terjemahan, dan status sinkronisasi tetap bersifat lokal-sementara di serverless; data itu tidak dibagi antar function instance. Pencarian dan detail CVE mengambil NVD API secara langsung.
 
 ### Langkah-langkah:
 
@@ -63,17 +63,16 @@ Vercel dapat menjalankan UI dan route Next.js InfoCVE. Riwayat pemindai memakai 
    - Pilih repositori `Fachri-analys/infocve`.
    - Framework preset akan terdeteksi otomatis sebagai **Next.js**.
 
-2. **Siapkan database riwayat scanner**:
+2. **Siapkan database persisten**:
    - Buat project PostgreSQL di Neon, atau pasang integrasi Neon dari Vercel Marketplace.
    - Salin pooled connection string untuk project tersebut.
    - Untuk menguji koneksi dari lokal, buat Neon branch/database uji terpisah dari produksi, isi `TEST_DATABASE_URL` di `.env.local`, lalu jalankan `npm run test:neon`. Test menguji penyimpanan, pembacaan, token akses, hubungan scan ulang, dan retensi. Jangan arahkan test ke database produksi karena pemeriksaan retensi menghapus record yang sudah kedaluwarsa.
-   - Di Vercel → **Settings → Environment Variables**, tambahkan `DATABASE_URL` (Production; tambahkan Preview jika dipakai untuk demo).
-   - Jangan menaruh URL database pada kode, `NEXT_PUBLIC_*`, atau commit git. Tabel riwayat scan dibuat otomatis saat endpoint scanner pertama kali dipanggil.
+   - Di Vercel → **Settings → Environment Variables**, tambahkan `DATABASE_URL` (Production; tambahkan Preview jika dipakai untuk demo). URL yang sama dipakai untuk riwayat scan dan cache sampel NVD.
+   - Jangan menaruh URL database pada kode, `NEXT_PUBLIC_*`, atau commit git. Tabel riwayat scan dan cache NVD dibuat otomatis saat pertama diperlukan.
 
 3. **Pengaturan Environment Variables lainnya**:
    Di tab **Environment Variables**, tambahkan:
    - `NEXT_PUBLIC_SITE_URL` = `https://nama-proyek-anda.vercel.app` (atau domain kustom Anda).
-   - `INFOCVE_DATA_DIR` = `/tmp` (direktori sementara untuk SQLite; bukan penyimpanan persisten).
    - `NVD_API_KEY` (disarankan untuk mengurangi dampak rate limit NVD).
    - `ADMIN_SECRET` (wajib jika sinkronisasi dipicu melalui endpoint `/api/sync`).
    - Pilih runtime Node.js `22.x` atau lebih baru; InfoCVE membutuhkan Node.js `22.5+` untuk `node:sqlite`.
@@ -87,8 +86,15 @@ Vercel dapat menjalankan UI dan route Next.js InfoCVE. Riwayat pemindai memakai 
      ```
      `ADMIN_SECRET` lokal harus sama dengan nilai di Vercel. `NVD_API_KEY` dibaca oleh function dari Environment Variables Vercel.
    - Buka URL production, jalankan pemindai dari halaman **Cari CVE**, lalu muat ulang hasil scan untuk memastikan laporan bisa dibaca kembali. Token akses hasil scan disimpan di browser yang membuatnya.
-   - Sync CVE di `/api/sync` tetap menulis ke SQLite sementara. Karena itu, jangan menganggap katalog CVE yang disinkronkan dari satu function akan terlihat oleh function lain; untuk demo, pemindai dependency tetap mengecek OSV.dev dan GHSA secara langsung.
+   - Sync CVE di `/api/sync` tetap menulis ke SQLite sementara. Karena itu, jangan menganggap katalog CVE yang disinkronkan dari satu function akan terlihat oleh function lain. Pencarian/detail CVE memakai NVD API; statistik ringkasan memakai sampel maksimal 100 CVE dalam jendela publikasi 120 hari yang di-cache di Neon selama 7 hari. Tanpa cache dan saat NVD gagal, beranda menampilkan `—` untuk menandai data belum tersedia.
    - Video pemindaian yang sudah direkam tetap berguna sebagai cadangan jika layanan advisori eksternal sedang bermasalah.
+
+### Memastikan data CVE tampil
+
+1. Pastikan `DATABASE_URL` (atau `POSTGRES_URL`) dan `NVD_API_KEY` terpasang untuk environment **Production**, lalu redeploy setelah mengubah environment variable.
+2. Buka `https://domain-anda.vercel.app/api/health`. Respons sehat harus mencantumkan `status: healthy`, `database: Neon Postgres`, dan `cveData: NVD API with persistent Neon facet cache`.
+3. Buka beranda. Kartu statistik merangkum sampel 100 CVE, bukan seluruh jumlah CVE NVD. Pencarian dapat menampilkan total hasil query yang lebih besar.
+4. Jika kartu masih menunjukkan `—`, periksa Runtime Logs deployment untuk kegagalan koneksi Neon atau respons NVD. API key meningkatkan kuota NVD; `DATABASE_URL` menyediakan cache persisten lintas instance. Keduanya menyelesaikan masalah yang berbeda.
 
 Route `/api/sync` memakai Node.js runtime dan batas eksekusi 60 detik supaya sinkronisasi yang lebih lama dari default singkat tidak langsung timeout. Sinkronisasi otomatis melalui Vercel Cron tidak diperlukan untuk demo; Cron tidak membuat SQLite menjadi persisten.
 
