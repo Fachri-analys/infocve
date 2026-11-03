@@ -15,9 +15,7 @@ InfoCVE mengambil data CVE dari **National Vulnerability Database (NVD NIST)** d
 
 ## 📄 Proposal Proyek
 
-Proposal teknis InfoCVE untuk Kartika Cyber Hackathon 2026 tersedia dalam format Word. Dokumen menjelaskan fitur yang sudah berjalan, hasil verifikasi terbaru, sumber data, batasan, dan rencana pengembangan.
-
-[Unduh proposal InfoCVE (DOCX)](Proposal_InfoCVE_KartikaCyberHackathon2026.docx)
+Proposal teknis InfoCVE untuk Kartika Cyber Hackathon 2026 tersedia dalam format PDF. Dokumen menjelaskan fitur yang sudah berjalan, hasil verifikasi terbaru, sumber data, batasan, dan rencana pengembangan.
 
 [Baca proposal InfoCVE (PDF)](Proposal_InfoCVE_KartikaCyberHackathon2026.pdf)
 
