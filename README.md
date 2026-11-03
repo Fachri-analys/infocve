@@ -19,6 +19,8 @@ Proposal teknis InfoCVE untuk Kartika Cyber Hackathon 2026 tersedia dalam format
 
 [Unduh proposal InfoCVE (DOCX)](Proposal_InfoCVE_KartikaCyberHackathon2026.docx)
 
+[Baca proposal InfoCVE (PDF)](Proposal_InfoCVE_KartikaCyberHackathon2026.pdf)
+
 ---
 
 ## 🚀 Fitur Utama
