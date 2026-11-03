@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createHash, randomInt } from "node:crypto";
 import { neon } from "@neondatabase/serverless";
-import { getNeonFacetCounts, searchNeonCves, upsertNeonCves } from "@/lib/db/neon-cve-repository";
+import { getNeonDashboardAggregates, getNeonFacetCounts, searchNeonCves, upsertNeonCves } from "@/lib/db/neon-cve-repository";
 import { checkSharedRateLimit, scanRateLimiter } from "@/lib/security/rate-limit";
 import { processPendingNeonTranslations } from "@/lib/translation/neon-queue";
 import { processPendingNeonCna } from "@/lib/cve/neon-cna-queue";
@@ -93,6 +93,10 @@ describe.skipIf(!testDatabaseUrl)("Neon catalog integration", () => {
     expect(facets.vendors).toContainEqual({ value: "InfoCVE Integration", count: 1 });
     expect(facets.products).toContainEqual({ value: "Catalog Fixture", count: 1 });
     expect(facets.cwes).toContainEqual({ id: "CWE-79", name: expect.any(String) });
+
+    const dashboard = await getNeonDashboardAggregates();
+    expect(dashboard.total).toBeGreaterThanOrEqual(1);
+    expect(dashboard.cwes).toContainEqual(expect.objectContaining({ id: "CWE-79" }));
 
     await neon(testDatabaseUrl!).query("UPDATE infocve_cves SET vendor = 'Unknown Vendor', product = ' Unknown Product ' WHERE id = $1", [testId]);
     const unknownFacets = await getNeonFacetCounts({ query: testId });
