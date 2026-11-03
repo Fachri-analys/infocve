@@ -47,7 +47,7 @@ InfoCVE mengadopsi pola arsitektur **Multi-Source Vulnerability Intelligence & A
 
 - **Pengembangan dan self-hosting:** SQLite (`node:sqlite`) menyimpan katalog sinkronisasi lokal serta data aplikasi pada disk host.
 - **Vercel:** filesystem function bersifat sementara; katalog `infocve_cves`, cursor sinkronisasi, cache/antrean terjemahan, rate limit, dan riwayat scanner disimpan di Neon.
-- `GET /api/sync` yang dilindungi `CRON_SECRET` menjalankan backfill 120 hari dan sinkronisasi inkremental NVD. Satu invokasi menyimpan maksimal satu halaman 2.000 entri, lalu memperbarui cursor; lease di `infocve_sync_state` mencegah job berjalan bersamaan. EPSS memakai maksimal lima request paralel, sementara lookup CNA yang belum lengkap disimpan di `infocve_cna_queue` dan dibatasi 16 lookup per invokasi.
+- `GET /api/sync` yang dilindungi `CRON_SECRET` menjalankan backfill 120 hari dan sinkronisasi inkremental NVD. Satu invokasi mengambil maksimal satu halaman 1.000 entri (timeout NVD 45 detik, satu percobaan), menyimpan CVE inti lebih dulu, lalu memperkaya EPSS/CISA dan memperbarui cursor. Lease di `infocve_sync_state` mencegah job berjalan bersamaan. Backfill berstatus `incomplete` sampai cursor melewati seluruh hasil; Cron harian melanjutkan halaman berikutnya. Nilai PostgreSQL `TIMESTAMPTZ` yang dikembalikan sebagai objek `Date` dikonversi ke ISO 8601 sebelum diserialisasi dalam query NVD. EPSS memakai maksimal lima request paralel, sementara lookup CNA yang belum lengkap disimpan di `infocve_cna_queue` dan dibatasi 16 lookup per invokasi.
 - Pencarian, jumlah total, facet, statistik, dan dashboard membaca agregat katalog Neon. Detail memakai Neon terlebih dahulu lalu NVD live sebagai fallback. Tanpa Neon, lingkungan lokal menggunakan SQLite.
 
 ---
