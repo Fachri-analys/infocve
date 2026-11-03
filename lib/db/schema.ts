@@ -7,6 +7,7 @@ export const CREATE_TABLES_SQL = `
 -- CVE core table
 CREATE TABLE IF NOT EXISTS cves (
   id TEXT PRIMARY KEY,
+  vuln_status TEXT NOT NULL DEFAULT 'Analyzed',
   title TEXT NOT NULL,
   description_en TEXT NOT NULL,
   description_id TEXT NOT NULL,

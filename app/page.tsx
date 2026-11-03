@@ -99,8 +99,8 @@ export default function HomePage() {
 
           <aside aria-label="Ringkasan cakupan data" className="self-end border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
             <div className="flex items-center justify-between gap-4">
-              <p className="eyebrow text-[10px]">Cakupan NVD</p>
-              <span className="data-tag text-[10px] text-muted-foreground">120 HARI</span>
+              <p className="eyebrow text-[10px]">Katalog NVD</p>
+              <span className="data-tag text-[10px] text-muted-foreground">TERSINKRON</span>
             </div>
             <dl className="mt-4 divide-y divide-border border-y border-border">
               <Suspense fallback={<CoverageStatsFallback />}>

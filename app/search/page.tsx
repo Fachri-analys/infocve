@@ -109,7 +109,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const raw = await searchParams;
   const params = parseParams(raw);
   const resultPromise = searchCVEs(params);
-  const facetsPromise = getSearchFacets();
+  const facetsPromise = getSearchFacets(params);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8 animate-fade-in">
@@ -147,8 +147,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
 type SearchFacets = Awaited<ReturnType<typeof getSearchFacets>>;
 
-async function getSearchFacets() {
-  return Promise.all([getAvailableYears(), getVendors(), getProducts(), getAvailableCWEs()] as const);
+async function getSearchFacets(params: SearchCVEParams) {
+  return Promise.all([getAvailableYears(params), getVendors(undefined, params), getProducts(undefined, params), getAvailableCWEs(params)] as const);
 }
 
 async function SearchSummary({ resultPromise }: { resultPromise: ReturnType<typeof searchCVEs> }) {
@@ -156,14 +156,14 @@ async function SearchSummary({ resultPromise }: { resultPromise: ReturnType<type
   return (
     <aside aria-label="Ringkasan hasil pencarian" className="grid grid-cols-2 gap-5 border-t border-border pt-5 sm:gap-8 lg:grid-cols-1 lg:content-end lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
       <div>
-        <p className="data-tag text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Cocok dengan pencarian</p>
-        <p className="data-tag mt-2 text-4xl font-medium leading-none text-accent sm:text-5xl">{result.total.toLocaleString("id-ID")}</p>
-        <p className="mt-2 text-xs text-muted-foreground">kerentanan ditemukan</p>
+        <p className="data-tag text-[10px] uppercase tracking-[0.16em] text-muted-foreground">{result.available === false ? "Status katalog" : "Cocok dengan pencarian"}</p>
+        <p className="data-tag mt-2 text-4xl font-medium leading-none text-accent sm:text-5xl">{result.available === false ? "—" : result.total.toLocaleString("id-ID")}</p>
+        <p className="mt-2 text-xs text-muted-foreground">{result.available === false ? "data belum dapat diakses" : "kerentanan ditemukan"}</p>
       </div>
       <div className="border-l border-border pl-5 lg:border-l-0 lg:border-t lg:pl-0 lg:pt-5">
         <p className="data-tag text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Halaman hasil</p>
         <p className="data-tag mt-2 text-2xl font-medium text-foreground">
-          {result.total > 0 ? `${String(result.page).padStart(2, "0")} / ${String(result.totalPages).padStart(2, "0")}` : "—"}
+          {result.available !== false && result.total > 0 ? `${String(result.page).padStart(2, "0")} / ${String(result.totalPages).padStart(2, "0")}` : "—"}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">{result.results.length} entri di halaman ini</p>
       </div>
@@ -226,7 +226,11 @@ async function SearchResults({
           </div>
           <span className="data-tag hidden text-xs text-muted-foreground sm:block">{result.results.length.toString().padStart(2, "0")} / {DEFAULT_PAGE_SIZE.toString().padStart(2, "0")}</span>
         </div>
-        {result.results.length === 0 ? <EmptyState /> : (
+        {result.available === false ? (
+          <div role="alert" className="border border-border bg-muted/20 p-6 text-sm leading-6 text-muted-foreground">
+            Katalog CVE belum dapat diakses. Hasil kosong belum bisa dipastikan; coba lagi setelah koneksi database pulih.
+          </div>
+        ) : result.results.length === 0 ? <EmptyState /> : (
           <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {result.results.map((cve, index) => <CVECard key={cve.id} cve={cve} featured={index === 0} />)}

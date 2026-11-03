@@ -1,15 +1,22 @@
 import { getDb } from "@/lib/db";
-import { getLatestCVEs, getRecentCVEs } from "@/lib/nvd";
+import { fetchNvd } from "@/lib/nvd-client";
+import { normalizeNvdCveRecords } from "@/lib/nvd-normalize";
+import { fillMissingCveEntities } from "@/lib/cve/cna-fallback";
+import { acquireNvdSyncSlot } from "./nvd-rate-limit";
 import { ThreatIntelligenceAggregator } from "@/lib/sources/aggregator";
 import { CisaKevSourceAdapter } from "@/lib/sources/cisa-kev";
 import { EpssSourceAdapter } from "@/lib/sources/epss";
 import { NotificationEngine } from "@/lib/notifications/notification-engine";
+import { syncNvdToNeon } from "./neon-nvd-sync";
 
 export interface SyncRunResult {
   sourceId: string;
   success: boolean;
+  complete?: boolean;
+  warning?: boolean;
   itemsSynced: number;
   error?: string;
+  warningMessage?: string;
   durationMs: number;
 }
 
@@ -20,6 +27,22 @@ export class SyncEngine {
    * Run synchronization across all configured sources
    */
   static async runFullSync(): Promise<{ results: SyncRunResult[]; totalSynced: number }> {
+    if (process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim()) {
+      const started = Date.now();
+      const result = await syncNvdToNeon();
+      const summary: SyncRunResult = {
+        sourceId: "NVD",
+        success: result.acquired && (result.complete || result.pagesProcessed > 0),
+        complete: result.complete,
+        warning: result.warnings.length > 0,
+        itemsSynced: result.itemsSynced,
+        warningMessage: result.warnings.join(" ") || undefined,
+        error: result.acquired ? undefined : "Sync already in progress in another instance.",
+        durationMs: Date.now() - started,
+      };
+      return { results: [summary], totalSynced: result.itemsSynced };
+    }
+
     if (this.isSyncing) {
       return {
         results: [{ sourceId: "ALL", success: false, itemsSynced: 0, error: "Sync already in progress", durationMs: 0 }],
@@ -142,46 +165,28 @@ export class SyncEngine {
     const runId = this.logSyncStart("NVD");
 
     try {
-      // Wider pagination window: 50 latest + 50 recent modified
-      const latestPromise = getLatestCVEs(50);
-      const recentPromise = getRecentCVEs(50);
-
-      const settled = await Promise.allSettled([latestPromise, recentPromise]);
-      const latest = settled[0].status === "fulfilled" ? settled[0].value : [];
-      const recent = settled[1].status === "fulfilled" ? settled[1].value : [];
-
-      // If both failed, surface the error
-      if (latest.length === 0 && recent.length === 0) {
-        const errors: string[] = [];
-        if (settled[0].status === "rejected") errors.push(`latest: ${settled[0].reason}`);
-        if (settled[1].status === "rejected") errors.push(`recent: ${settled[1].reason}`);
-
-        // Both returned empty arrays (no throw, NVD just had nothing) vs actual failures
-        if (errors.length > 0) {
-          const errorMsg = `NVD feeds failed: ${errors.join("; ")}`;
-          this.logSyncEnd(runId, "FAILED", 0, errorMsg);
-          return {
-            sourceId: "NVD",
-            success: false,
-            itemsSynced: 0,
-            error: errorMsg,
-            durationMs: Date.now() - startTime,
-          };
-        }
+      const now = new Date();
+      const start = new Date(now.getTime() - 120 * 86_400_000).toISOString();
+      const end = now.toISOString();
+      const allCves = new Map<string, ReturnType<typeof normalizeNvdCveRecords>[number]>();
+      let totalResults = 0;
+      for (let startIndex = 0; ; startIndex += 2_000) {
+        await acquireNvdSyncSlot();
+        const response = await fetchNvd({ pubStartDate: start, pubEndDate: end, resultsPerPage: 2_000, startIndex }, { noStore: true, timeoutMs: 20_000 });
+        totalResults = response.totalResults;
+        const records = normalizeNvdCveRecords(response.vulnerabilities.map(({ cve }) => cve), true);
+        const enrichedEntities = await Promise.all(records.map((cve) => fillMissingCveEntities(cve)));
+        for (const cve of enrichedEntities) allCves.set(cve.id, cve);
+        await ThreatIntelligenceAggregator.enrichBatch(enrichedEntities, true);
+        if (startIndex + response.vulnerabilities.length >= totalResults || response.vulnerabilities.length === 0) break;
       }
 
-      const combinedMap = new Map<string, typeof latest[0]>();
-      for (const cve of latest) combinedMap.set(cve.id, cve);
-      for (const cve of recent) combinedMap.set(cve.id, cve);
-
-      const allCves = Array.from(combinedMap.values());
-
       // Multi-source enrichment + database persistence
-      const enriched = await ThreatIntelligenceAggregator.enrichBatch(allCves, true);
+      const enriched = [...allCves.values()];
 
       // Dispatch notifications for critical CVEs or CISA KEV additions
       for (const cve of enriched) {
-        if (cve.cvss.severity === "CRITICAL" || cve.cisaKev?.isKev) {
+        if (cve.cvss?.severity === "CRITICAL" || cve.cisaKev?.isKev) {
           NotificationEngine.dispatchVulnerabilityAlert(cve).catch(() => {});
         }
       }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { normalizeNvdCve } from "@/lib/nvd-normalize";
+import { normalizeNvdCve, normalizeNvdCveRecords } from "@/lib/nvd-normalize";
+import { getCveMetaDescription } from "@/lib/cve-metadata";
 import type { NvdCveRecord } from "@/lib/nvd-types";
 
 describe("Vulnerability Normalization (normalizeNvdCve)", () => {
@@ -56,12 +57,12 @@ describe("Vulnerability Normalization (normalizeNvdCve)", () => {
 
     const result = normalizeNvdCve(raw);
     expect(result.id).toBe("CVE-2024-12345");
-    expect(result.cvss.version).toBe("4.0");
-    expect(result.cvss.baseScore).toBe(9.3);
-    expect(result.cvss.severity).toBe("CRITICAL");
-    expect(result.cvss.attackRequirements).toBe("NONE");
-    expect(result.cvss.vulnerableSystemImpact?.confidentiality).toBe("HIGH");
-    expect(result.cvss.subsequentSystemImpact?.confidentiality).toBe("NONE");
+    expect(result.cvss!.version).toBe("4.0");
+    expect(result.cvss!.baseScore).toBe(9.3);
+    expect(result.cvss!.severity).toBe("CRITICAL");
+    expect(result.cvss!.attackRequirements).toBe("NONE");
+    expect(result.cvss!.vulnerableSystemImpact?.confidentiality).toBe("HIGH");
+    expect(result.cvss!.subsequentSystemImpact?.confidentiality).toBe("NONE");
   });
 
   it("normalizes CVSS v3.1 when v4.0 is not present", () => {
@@ -94,10 +95,10 @@ describe("Vulnerability Normalization (normalizeNvdCve)", () => {
     };
 
     const result = normalizeNvdCve(raw);
-    expect(result.cvss.version).toBe("3.1");
-    expect(result.cvss.baseScore).toBe(7.1);
-    expect(result.cvss.severity).toBe("HIGH");
-    expect(result.cvss.attackVector).toBe("LOCAL");
+    expect(result.cvss!.version).toBe("3.1");
+    expect(result.cvss!.baseScore).toBe(7.1);
+    expect(result.cvss!.severity).toBe("HIGH");
+    expect(result.cvss!.attackVector).toBe("LOCAL");
   });
 
   it("normalizes CVSS v2.0 correctly as fallback", () => {
@@ -122,10 +123,10 @@ describe("Vulnerability Normalization (normalizeNvdCve)", () => {
     };
 
     const result = normalizeNvdCve(raw);
-    expect(result.cvss.version).toBe("2.0");
-    expect(result.cvss.baseScore).toBe(7.5);
-    expect(result.cvss.severity).toBe("HIGH");
-    expect(result.cvss.attackVector).toBe("NETWORK");
+    expect(result.cvss!.version).toBe("2.0");
+    expect(result.cvss!.baseScore).toBe(7.5);
+    expect(result.cvss!.severity).toBe("HIGH");
+    expect(result.cvss!.attackVector).toBe("NETWORK");
   });
 
   it("handles CVE without CVSS score (unscored/awaiting analysis)", () => {
@@ -133,13 +134,35 @@ describe("Vulnerability Normalization (normalizeNvdCve)", () => {
       id: "CVE-2026-0001",
       published: "2026-08-01T00:00:00.000",
       lastModified: "2026-08-01T00:00:00.000",
+      vulnStatus: "Awaiting Analysis",
       descriptions: [{ lang: "en", value: "Newly submitted CVE awaiting analysis." }],
     };
 
     const result = normalizeNvdCve(raw);
-    expect(result.cvss.baseScore).toBe(0);
-    expect(result.cvss.severity).toBe("NONE");
-    expect(result.cvss.vectorString).toBe("Belum dinilai oleh NVD");
+    expect(result.cvss).toBeNull();
+    expect(result.vulnStatus).toBe("Awaiting Analysis");
+    expect(result.descriptionId).toBe("");
+  });
+
+  it("chooses translated CVE text for metadata and otherwise uses the source description or title", () => {
+    const cve = { title: "CVE title", descriptionEn: "English source description", descriptionId: "Boilerplate glossary text", translationStatus: "UNTRANSLATED" as const };
+    expect(getCveMetaDescription(cve)).toBe("English source description");
+    expect(getCveMetaDescription({ ...cve, translationStatus: "TRANSLATED", descriptionId: "Terjemahan lengkap" })).toBe("Terjemahan lengkap");
+    expect(getCveMetaDescription({ ...cve, descriptionEn: "" })).toBe("CVE title");
+  });
+
+  it("keeps rejected records addressable but removes them from list results", () => {
+    const rejected: NvdCveRecord = {
+      id: "CVE-2026-0002",
+      published: "2026-08-01T00:00:00.000",
+      lastModified: "2026-08-01T00:00:00.000",
+      vulnStatus: "Rejected",
+      descriptions: [{ lang: "en", value: "Rejected reason." }],
+    };
+
+    expect(normalizeNvdCve(rejected).vulnStatus).toBe("Rejected");
+    expect(normalizeNvdCveRecords([rejected])).toEqual([]);
+    expect(normalizeNvdCveRecords([rejected], true)[0]?.vulnStatus).toBe("Rejected");
   });
 
   it("extracts CWE and catalog details", () => {
@@ -161,7 +184,7 @@ describe("Vulnerability Normalization (normalizeNvdCve)", () => {
     const result = normalizeNvdCve(raw);
     expect(result.cwe.length).toBe(2);
     expect(result.cwe[0]?.id).toBe("CWE-79");
-    expect(result.cwe[0]?.name).toContain("Cross-Site Scripting");
+    expect(result.cwe[0]?.name).toBe("Improper Neutralization of Input During Web Page Generation");
     expect(result.cwe[1]?.id).toBe("CWE-89");
   });
 
@@ -220,5 +243,21 @@ describe("Vulnerability Normalization (normalizeNvdCve)", () => {
 
     const result = normalizeNvdCve(raw);
     expect(result.category).toBe("operating-system");
+  });
+
+  it("does not classify missing platform data as enterprise software and maps hardware CPEs correctly", () => {
+    const base: NvdCveRecord = {
+      id: "CVE-2024-8888",
+      published: "2024-01-01T00:00:00.000",
+      lastModified: "2024-01-01T00:00:00.000",
+      descriptions: [{ lang: "en", value: "A vulnerability in the product." }],
+    };
+    const hardware: NvdCveRecord = {
+      ...base,
+      configurations: [{ nodes: [{ cpeMatch: [{ vulnerable: true, criteria: "cpe:2.3:h:acme:router:1.0:*:*:*:*:*:*:*" }] }] }],
+    };
+
+    expect(normalizeNvdCve(base).category).toBe("unclassified");
+    expect(normalizeNvdCve(hardware).category).toBe("hardware");
   });
 });

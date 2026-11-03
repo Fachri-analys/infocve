@@ -7,7 +7,7 @@
 
 > Platform intelijen kerentanan siber (CVE) untuk Indonesia — menyajikan data teknis, skor dampak CVSS, probabilitas eksploitasi EPSS, status eksploitasi aktif CISA KEV, dan rekomendasi prioritas tindakan dalam bahasa yang jelas dan mudah dipahami.
 
-InfoCVE mengambil data CVE langsung dari **National Vulnerability Database (NVD NIST)** dan menggabungkannya dengan **CISA Known Exploited Vulnerabilities (KEV)**, **FIRST Exploit Prediction Scoring System (EPSS)**, serta **GitHub Security Advisories (GHSA)**. Pengembangan lokal memakai SQLite tertanam (`node:sqlite`). Pada Vercel, PostgreSQL Neon menyimpan riwayat pemindaian dan sampel NVD yang dipakai untuk statistik beranda/dashboard; file SQLite serverless tetap bersifat sementara.
+InfoCVE mengambil data CVE dari **National Vulnerability Database (NVD NIST)** dan memperkayanya dengan **CISA KEV** serta **FIRST EPSS**. Di Vercel, katalog CVE, statistik, pencarian, facet, status sinkronisasi, antrean terjemahan, rate limit, dan riwayat scanner memakai PostgreSQL Neon. Mode lokal menggunakan SQLite (`node:sqlite`).
 
 ## 🖥️ Pratinjau Antarmuka
 
@@ -27,6 +27,7 @@ InfoCVE mengambil data CVE langsung dari **National Vulnerability Database (NVD 
 - **Dynamic OpenGraph Preview**: Setiap halaman CVE menghasilkan kartu preview sosial otomatis (`/cve/[id]/opengraph-image`) saat dibagikan ke media sosial atau aplikasi perpesanan.
 - **Glosarium Keamanan (`/glossary`)**: Kamus istilah keamanan siber (Zero-day, RCE, CWE, CPE, MITRE ATT&CK, dll) dengan filter instan.
 - **Transparansi Sumber Data (`/sources`, `docs/data-sources.md`, `THIRD_PARTY_NOTICES.md`)**: Atribusi, ketentuan data, status review, serta inventaris dependency terkunci.
+- **Katalog CWE**: Nama kelemahan dibuat dari CSV Comprehensive View MITRE; sumber dan cara regenerasi tercatat di `THIRD_PARTY_NOTICES.md`.
 - **Zero-Dependency Database**: Menggunakan SQLite bawaan runtime Node.js (`node:sqlite DatabaseSync`) tanpa instalasi database server eksternal.
 
 ---
@@ -78,26 +79,31 @@ Buka peramban Anda di: **[http://localhost:3000](http://localhost:3000)**
 | :--- | :--- | :--- | :--- |
 | `NEXT_PUBLIC_SITE_URL` | Opsional (Lokal) / Wajib (Produksi) | `http://localhost:3000` | URL publik aplikasi untuk canonical link, sitemap, dan OpenGraph. |
 | `NVD_API_KEY` | Opsional | *(Kosong)* | Kunci API resmi NIST NVD. Menaikkan batas rate limit dari 5 req/30s menjadi 50 req/30s. [Daftar gratis di NIST](https://nvd.nist.gov/developers/request-an-api-key). |
-| `DATABASE_URL` atau `POSTGRES_URL` | Disarankan di Vercel | *(Kosong)* | Pooled connection string Neon untuk riwayat scanner dan cache bersama sampel statistik NVD. Simpan sebagai environment variable server-side, jangan gunakan awalan `NEXT_PUBLIC_`. |
+| `DATABASE_URL` atau `POSTGRES_URL` | Wajib di Vercel | *(Kosong)* | Pooled connection string Neon untuk katalog CVE persisten, pencarian, statistik, status sinkronisasi, antrean terjemahan, rate limit, dan riwayat scanner. Simpan server-side; jangan gunakan awalan `NEXT_PUBLIC_`. |
 | `GITHUB_TOKEN` | Opsional | *(Kosong)* | Personal Access Token GitHub untuk sinkronisasi GitHub Security Advisories (GHSA). |
 | `ADMIN_SECRET` | Direkomendasikan | *(Kosong)* | Token otorisasi Bearer untuk mengamankan endpoint trigger sinkronisasi (`POST /api/sync`). |
+| `CRON_SECRET` | Wajib untuk Vercel Cron | *(Kosong)* | Secret yang sama dengan `CRON_SECRET` Vercel; melindungi `GET /api/sync` yang dipanggil Cron. Tanpa secret, route Cron gagal tertutup. |
 | `INFOCVE_DATA_DIR` | Opsional | `./data` | Direktori penyimpanan file database SQLite lokal (`infocve.sqlite`). |
 | `TEST_DATABASE_URL` | Opsional (pengujian integrasi) | *(Kosong)* | Neon database/branch khusus test untuk `npm run test:neon`; jangan arahkan ke database produksi. |
 | `NOTIFICATIONS_ENABLED` | Opsional | `false` | Set `true` untuk mengaktifkan notifikasi webhook saat ada CVE Kritis / KEV baru. |
 | `NOTIFICATION_WEBHOOK_URL`| Opsional | *(Kosong)* | URL webhook tujuan (Discord / Slack / webhook kustom). |
-| `SYNC_INTERVAL_MINUTES` | Opsional | `60` | Interval penjadwalan sinkronisasi data latar belakang. |
-| `INFOCVE_TRANSLATION_URL` | Opsional untuk aplikasi; diperlukan untuk terjemahan otomatis | *(Tidak dikonfigurasi)* | URL endpoint `/translate` yang kompatibel dengan LibreTranslate. Provider berjalan di server dan tidak memengaruhi sinkronisasi CVE; operator harus meninjau ketentuan provider sebelum mengirim deskripsi ke layanan tersebut. |
+| `TRUST_PROXY_HEADERS` | Opsional | `false` | Percayai `X-Forwarded-For` hanya bila aplikasi dijalankan di belakang proxy yang Anda kendalikan. Vercel dikenali otomatis. |
+| `INFOCVE_TRANSLATION_URL` | Opsional; perlu untuk terjemahan otomatis | *(Tidak dikonfigurasi)* | URL endpoint `/translate` yang kompatibel dengan LibreTranslate. Antrean Neon diproses per batch oleh Cron; kegagalan provider tidak menghentikan penyimpanan CVE dan teks Inggris tetap tersedia. |
 | `INFOCVE_TRANSLATION_API_KEY` | Opsional | *(Kosong)* | API key untuk provider terjemahan yang memerlukannya. |
 | `INFOCVE_TRANSLATION_RETRY_DELAY_MS` | Opsional | `400` | Jeda awal retry provider, bertambah eksponensial untuk percobaan berikutnya. |
 | `DEPENDENCY_SCAN_RETENTION_DAYS` | Opsional | `30` | Masa retensi riwayat pemindaian dependensi sebelum dibersihkan otomatis (dalam hari). |
 | `SYNC_RATE_LIMIT_MAX` | Opsional | `5` | Batas maksimum pemanggilan sinkronisasi per IP per jendela 60 detik. |
 | `SCAN_RATE_LIMIT_MAX` | Opsional | `10` | Batas maksimum pemindaian / pemindaian ulang per IP per jendela 60 detik. |
 
+Katalog Neon menggunakan tabel `infocve_cves`, `infocve_sync_state`, `infocve_cna_queue`, `infocve_translation_cache`, dan `infocve_rate_limits`; tabel dibuat saat aplikasi pertama kali mengakses Neon. Sinkronisasi perdana mengisi jendela publikasi 120 hari, kemudian berjalan inkremental berdasarkan tanggal modifikasi NVD. Setiap invokasi menyimpan maksimal satu halaman NVD (2.000 entri) lalu melanjutkan cursor di Cron berikutnya; EPSS diambil maksimal 5 request paralel dan metadata CNA diproses lewat antrean terbatas. Job terjemahan berjalan terpisah melalui `GET /api/translations`: tiap putaran mengklaim hingga 512 deskripsi, mengirim maksimal 32 teks per request (jumlah teks sumber dibatasi 60.000 karakter), lalu memilih jumlah request berdasarkan budget kerja 42 detik serta timeout/retry agar waktu tersisa untuk penulisan Neon. Job yang belum masuk budget dikembalikan ke antrean; job terhenti yang stale akan diklaim ulang.
+
 > **Keamanan Kunci**: Semua kredensial dan API key disimpan murni di server environment (`server-only`) dan tidak pernah terekspos ke bundle JavaScript browser pengguna.
+
+Halaman memakai Content Security Policy berbasis nonce per-request untuk skrip inline, ditambah Strict-Transport-Security pada respons.
 
 ### Dependency Scanner
 
-Buka **Pemindai** dari navigasi, lalu unggah `package.json` dan `package-lock.json` dari revisi yang sama. Batas unggahan adalah 1 MB per file dan 2 MB total. InfoCVE membaca JSON sebagai data statis tanpa memasang dependency atau menjalankan script. File mentah tidak disimpan; inventory, temuan, dan status pemindaian disimpan di SQLite untuk riwayat, pemindaian ulang, dan laporan.
+Buka **Pemindai** dari navigasi, lalu unggah `package.json` dan `package-lock.json` dari revisi yang sama. Batas unggahan adalah 1 MB per file dan 2 MB total. InfoCVE membaca JSON sebagai data statis tanpa memasang dependency atau menjalankan script. File mentah tidak disimpan; inventory, temuan, dan status pemindaian disimpan di Neon pada Vercel atau SQLite lokal untuk riwayat, pemindaian ulang, dan laporan.
 
 Setiap hasil memiliki ID scan dan token akses acak. Token disimpan di `sessionStorage` tab browser dan dikirim melalui header `x-scan-token`; menjaga token berarti menjaga akses ke hasil dan laporan. API laporan tersedia di `/api/dependency-scans/{id}/report.json` dan `/api/dependency-scans/{id}/report.pdf`.
 
@@ -186,17 +192,14 @@ pm2 start npm --name "infocve" -- start
 1. Import repositori ke dashboard Vercel.
 2. Tambahkan Environment Variables di Project Settings:
    - `NEXT_PUBLIC_SITE_URL` = `https://domain-anda.vercel.app`
-   - `DATABASE_URL` = pooled connection string Neon (disarankan agar riwayat scan dan sampel statistik konsisten di semua function instance).
-   - `NVD_API_KEY` (disarankan untuk mengurangi dampak rate limit NVD; bukan pengganti cache).
-   - `ADMIN_SECRET` (wajib jika endpoint `/api/sync` akan dipakai).
+   - `DATABASE_URL` = pooled connection string Neon (wajib untuk katalog CVE bersama dan riwayat scan).
+   - `NVD_API_KEY` (disarankan untuk meningkatkan kuota request NVD).
+   - `ADMIN_SECRET` (untuk trigger manual `POST /api/sync`).
+   - `CRON_SECRET` (wajib untuk job Vercel Cron `GET /api/sync`).
    - `INFOCVE_DATA_DIR` tidak membuat SQLite persisten; pada Vercel filesystem aplikasi bersifat sementara.
-3. Deploy. Pencarian dan detail CVE mengambil data NVD live melalui API dan cache request Next.js. Beranda/dashboard membaca sampel NVD dari Neon agar function instance dapat memakai data yang sama.
+3. Deploy. Vercel Cron menjalankan `GET /api/sync` dan `GET /api/translations` setiap hari pada jam berbeda. Keduanya dilindungi `CRON_SECRET`. `POST /api/sync` tetap tersedia untuk sinkronisasi manual memakai `ADMIN_SECRET`.
 
-**Cakupan statistik:** NVD tidak menyediakan endpoint agregasi. Setelah cache diperbarui, angka di kartu statistik merangkum maksimal 100 CVE dalam jendela publikasi 120 hari, bukan jumlah semua CVE di NVD. Sampel berhasil disimpan di Neon dan dipakai ulang selama 7 hari; cache lama dapat tetap dipakai sampai masa tersebut habis. Saat cache belum ada, aplikasi meminta satu halaman kecil dari NVD; jika pengambilan gagal dan belum ada cache tersimpan, UI menampilkan `—` (data belum tersedia), bukan mengklaim nol CVE. Pencarian CVE tetap memakai jalur API tersendiri.
-
-**Pengecekan setelah deploy:** buka `/api/health` dan pastikan respons menunjukkan `status: healthy` serta `database: Neon Postgres`. Lalu muat beranda dan dashboard. Jika angka belum muncul, pastikan `DATABASE_URL`/`POSTGRES_URL` dan `NVD_API_KEY` dipasang pada environment **Production**, lalu redeploy. API key meningkatkan kuota NVD, tetapi tidak mengisi database katalog SQLite sementara di Vercel.
-
-> `/api/sync` masih menyinkronkan katalog lokal SQLite. Pada Vercel file tersebut tidak dibagi antar function dan tidak persisten; jangan menganggap hasil sync sebagai katalog bersama. Pencarian/detail CVE memakai NVD API, sampel ringkasan memakai cache Neon, dan pemindai dependency memeriksa sumber advisori langsung.
+Sinkronisasi perdana mengisi maksimal 120 hari terakhir. Tiap eksekusi menyimpan maksimal satu halaman NVD (hingga 2.000 entri), lalu melanjutkan cursor pada eksekusi berikutnya agar durasi function terkendali. Pencarian, daftar, facet, halaman dashboard, dan statistik dihitung dari katalog Neon penuh. Detail CVE mencoba database terlebih dahulu dan memakai NVD live sebagai fallback. Periksa `/api/health` untuk status database dan cursor sinkronisasi; setelah deploy pertama, jalankan `POST /api/sync` dengan admin secret atau tunggu Cron harian.
 
 ---
 

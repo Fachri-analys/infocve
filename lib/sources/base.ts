@@ -140,14 +140,15 @@ export abstract class BaseVulnerabilitySource<TRaw = unknown, TNormalized = unkn
     const timeout = setTimeout(() => controller.abort(), this.config.timeoutMs || 10000);
 
     try {
+      const noStore = init?.cache === "no-store";
       const response = await fetch(url, {
         ...init,
         headers,
         signal: controller.signal,
-        next: {
+        ...(noStore ? { cache: "no-store" as const } : { next: {
           revalidate: this.config.cacheTtlSeconds,
           ...init?.next,
-        },
+        } }),
       });
 
       clearTimeout(timeout);

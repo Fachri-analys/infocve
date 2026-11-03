@@ -47,6 +47,14 @@ export const CATEGORY_META: Record<CVECategory, Omit<SecurityCategory, "slug">> 
     name: "Infrastruktur Cloud",
     descriptionId: "Kerentanan pada layanan dan infrastruktur berbasis cloud.",
   },
+  hardware: {
+    name: "Perangkat Keras",
+    descriptionId: "Kerentanan yang terkait dengan perangkat keras atau firmware.",
+  },
+  unclassified: {
+    name: "Belum Diklasifikasikan",
+    descriptionId: "Data CPE atau indikator kategori belum cukup untuk menetapkan area kerentanan.",
+  },
 };
 
 const VALID_CATEGORIES = Object.keys(CATEGORY_META) as CVECategory[];

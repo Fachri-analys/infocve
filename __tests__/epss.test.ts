@@ -179,11 +179,11 @@ describe("EpssSourceAdapter", () => {
     expect(enriched.sources).toContain("NVD");
 
     // CRITICAL: Ensure CVSS metrics and NVD baseline data remain 100% identical
-    expect(enriched.cvss.baseScore).toBe(mockCve.cvss.baseScore);
-    expect(enriched.cvss.severity).toBe(mockCve.cvss.severity);
-    expect(enriched.cvss.vectorString).toBe(mockCve.cvss.vectorString);
-    expect(enriched.cvss.attackVector).toBe(mockCve.cvss.attackVector);
-    expect(enriched.cvss.scope).toBe(mockCve.cvss.scope);
+    expect(enriched.cvss!.baseScore).toBe(mockCve.cvss!.baseScore);
+    expect(enriched.cvss!.severity).toBe(mockCve.cvss!.severity);
+    expect(enriched.cvss!.vectorString).toBe(mockCve.cvss!.vectorString);
+    expect(enriched.cvss!.attackVector).toBe(mockCve.cvss!.attackVector);
+    expect(enriched.cvss!.scope).toBe(mockCve.cvss!.scope);
     expect(enriched.descriptionEn).toBe(mockCve.descriptionEn);
     expect(enriched.descriptionId).toBe(mockCve.descriptionId);
     expect(enriched.affected).toEqual(mockCve.affected);

@@ -10,6 +10,7 @@ import {
   computePriorityBreakdown,
   computeCisaKevStats,
   computeEpssStats,
+  attachDashboardThreatSignals,
 } from "@/lib/dashboard-stats";
 
 function createCvssMetrics(baseScore: number, severity: CVSSMetrics["severity"]): CVSSMetrics {
@@ -112,7 +113,7 @@ describe("Dashboard Statistics Aggregation", () => {
     const high = distribution.find((d) => d.severity === "HIGH");
     const medium = distribution.find((d) => d.severity === "MEDIUM");
     const low = distribution.find((d) => d.severity === "LOW");
-    const unknown = distribution.find((d) => d.severity === "UNKNOWN");
+    const unrated = distribution.find((d) => d.severity === "UNRATED");
 
     expect(critical?.count).toBe(1);
     expect(critical?.percentage).toBe(25);
@@ -120,7 +121,7 @@ describe("Dashboard Statistics Aggregation", () => {
     expect(high?.percentage).toBe(25);
     expect(medium?.count).toBe(1);
     expect(low?.count).toBe(1);
-    expect(unknown?.count).toBe(0);
+    expect(unrated?.count).toBe(0);
   });
 
   it("2. computes CVSS statistical metrics and brackets properly", () => {
@@ -131,7 +132,7 @@ describe("Dashboard Statistics Aggregation", () => {
     // (9.8 + 7.8 + 5.4 + 3.3) / 4 = 26.3 / 4 = 6.575 -> 6.6
     expect(cvss.averageScore).toBe(6.6);
     expect(cvss.maxScore).toBe(9.8);
-    expect(cvss.brackets).toHaveLength(5);
+    expect(cvss.brackets).toHaveLength(6);
 
     const criticalBracket = cvss.brackets.find((b) => b.range === "9.0 - 10.0");
     expect(criticalBracket?.count).toBe(1);
@@ -146,6 +147,13 @@ describe("Dashboard Statistics Aggregation", () => {
 
     const topProducts = computeTopItems(mockCves, (c) => c.product);
     expect(topProducts).toHaveLength(4);
+  });
+
+  it("excludes unknown labels and calculates percentages from named values", () => {
+    const values = ["Unknown Vendor", "Apache", "Apache", "Unknown Product", "n/a", "N/A"];
+    const top = computeTopItems(values, (value) => value);
+
+    expect(top).toEqual([{ name: "Apache", count: 2, percentage: 100 }]);
   });
 
   it("4. extracts top CWE weaknesses correctly", () => {
@@ -171,16 +179,18 @@ describe("Dashboard Statistics Aggregation", () => {
 
   it("6. computes InfoCVE Priority tier breakdown", () => {
     const priorities = computePriorityBreakdown(mockCves);
-    expect(priorities).toHaveLength(4);
+    expect(priorities).toHaveLength(5);
 
     const p2 = priorities.find((p) => p.tier === "P2");
     const p3 = priorities.find((p) => p.tier === "P3");
     const p4 = priorities.find((p) => p.tier === "P4");
+    const na = priorities.find((p) => p.tier === "NA");
 
     // CVE-2024-0001 (CVSS 9.8) maps to P2 because it is not in KEV and EPSS is not very high
     expect(p2?.count).toBeGreaterThanOrEqual(1);
     expect(p3?.count).toBeGreaterThanOrEqual(1);
     expect(p4?.count).toBeGreaterThanOrEqual(1);
+    expect(na?.count).toBe(0);
   });
 
   it("7. computes CISA KEV statistics accurately with catalog and ransomware data", () => {
@@ -219,6 +229,20 @@ describe("Dashboard Statistics Aggregation", () => {
     expect(epssStats.topEpssCves[0]?.id).toBe("CVE-2024-0001");
   });
 
+  it("attaches EPSS and Exploit-tag evidence to every dashboard CVE", () => {
+    const sample = [
+      { ...mockCves[3]!, references: [{ url: "https://example.test/advisory", source: "NVD", tags: ["Exploit"] }] },
+      { ...mockCves[2]!, references: [] },
+    ];
+    const scores = new Map([[sample[0]!.id, { score: 0.04, percentile: 0.4 }], [sample[1]!.id, { score: 0.2, percentile: 0.9 }]]);
+
+    attachDashboardThreatSignals(sample, new Map(), scores);
+
+    expect(sample[0]!.hasPoc).toBe(true);
+    expect(sample[0]!.epss?.score).toBe(0.04);
+    expect(sample[1]!.epss?.score).toBe(0.2);
+  });
+
   it("9. gracefully handles empty datasets without dividing by zero or throwing", () => {
     const emptyDist = computeSeverityDistribution([]);
     expect(emptyDist).toHaveLength(6);
@@ -239,7 +263,7 @@ describe("Dashboard Statistics Aggregation", () => {
     expect(emptyTrend).toHaveLength(0);
 
     const emptyPriority = computePriorityBreakdown([]);
-    expect(emptyPriority).toHaveLength(4);
+    expect(emptyPriority).toHaveLength(5);
     expect(emptyPriority.every((p) => p.count === 0 && p.percentage === 0)).toBe(true);
   });
 });

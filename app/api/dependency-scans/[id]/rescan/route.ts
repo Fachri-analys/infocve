@@ -1,18 +1,20 @@
 import { NextResponse } from "next/server";
-import { getAuthorizedDependencyScanPersistent, pruneExpiredScans } from "@/lib/scanner/scan-repository";
+import { getAuthorizedDependencyScanPersistent } from "@/lib/scanner/scan-repository";
 import { runUploadedNpmScan } from "@/lib/scanner/scan-service";
 import { ScanUploadError } from "@/lib/scanner/upload";
-import { getClientIp, scanRateLimiter } from "@/lib/security/rate-limit";
+import { checkSharedRateLimit, getClientIp, scanRateLimiter } from "@/lib/security/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const ip = getClientIp(request);
-  const rateLimit = scanRateLimiter.check(ip, {
+  const rateLimit = await checkSharedRateLimit(`scan:${ip}`, {
     maxRequests: parseInt(process.env.SCAN_RATE_LIMIT_MAX || "20", 10) || 20,
     windowSeconds: 60,
-  });
+  }, scanRateLimiter);
+
+  if (rateLimit.unavailable) return NextResponse.json({ error: "Shared rate limit storage is unavailable." }, { status: 503, headers: { "Retry-After": String(rateLimit.retryAfterSeconds), "Cache-Control": "no-store" } });
 
   if (!rateLimit.success) {
     return NextResponse.json(
@@ -26,9 +28,6 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       }
     );
   }
-
-  // Prune scans older than configured retention window
-  await pruneExpiredScans().catch(() => 0);
 
   const { id } = await context.params;
   if (!isScanId(id)) return hiddenNotFound();

@@ -8,7 +8,7 @@ import type {
   NvdLangValue,
   NvdWeakness,
 } from "@/lib/nvd-types";
-import type { AffectedProduct, CVE, CVECategory, CVEReference, CVSSMetrics, CWEReference } from "@/types/cve";
+import type { AffectedProduct, CVE, CVECategory, CVEReference, CVEVulnerabilityStatus, CVSSMetrics, CWEReference } from "@/types/cve";
 import { getCweName } from "@/lib/cwe-catalog";
 import { termDictionary } from "@/lib/dictionary";
 
@@ -62,23 +62,14 @@ function buildIndonesianAssist(descriptionEn: string): string {
   const lower = descriptionEn.toLowerCase();
   const matches = Object.values(termDictionary).filter((entry) => lower.includes(entry.term.toLowerCase()));
 
-  if (matches.length === 0) {
-    return (
-      "Deskripsi resmi (Bahasa Inggris) tersedia di atas. Belum ada istilah umum yang dikenali " +
-      "secara otomatis oleh kamus istilah kami pada deskripsi ini — kunjungi halaman Glosarium " +
-      "untuk memahami istilah-istilah keamanan siber secara umum."
-    );
-  }
+  if (matches.length === 0) return "";
 
   const explained = matches
     .slice(0, 5)
     .map((m) => `${m.term} (${m.id}${m.description ? ` — ${m.description}` : ""})`)
     .join("; ");
 
-  return (
-    `Deskripsi resmi (Bahasa Inggris) di atas menyebut istilah berikut: ${explained}. ` +
-    "Untuk penjelasan istilah keamanan siber lainnya, kunjungi halaman Glosarium."
-  );
+  return explained;
 }
 
 // ---------------------------------------------------------------------------
@@ -177,25 +168,7 @@ function mapCvssV2(data: NvdCvssV2Data, baseSeverity?: "LOW" | "MEDIUM" | "HIGH"
   };
 }
 
-/** Used only when NVD hasn't published any CVSS score yet (e.g. "Awaiting Analysis"). */
-function unscoredCvss(): CVSSMetrics {
-  return {
-    version: "3.1",
-    baseScore: 0,
-    severity: "NONE",
-    vectorString: "Belum dinilai oleh NVD",
-    attackVector: "NETWORK",
-    attackComplexity: "HIGH",
-    privilegesRequired: "HIGH",
-    userInteraction: "REQUIRED",
-    scope: "UNCHANGED",
-    confidentialityImpact: "NONE",
-    integrityImpact: "NONE",
-    availabilityImpact: "NONE",
-  };
-}
-
-function selectCvss(metrics: NvdCveRecord["metrics"]): CVSSMetrics {
+function selectCvss(metrics: NvdCveRecord["metrics"]): CVSSMetrics | null {
   const v40 = pickPrimary(metrics?.cvssMetricV40);
   if (v40) return mapCvssV4(v40.cvssData);
 
@@ -208,7 +181,14 @@ function selectCvss(metrics: NvdCveRecord["metrics"]): CVSSMetrics {
   const v2 = pickPrimary(metrics?.cvssMetricV2);
   if (v2) return mapCvssV2(v2.cvssData, v2.baseSeverity);
 
-  return unscoredCvss();
+  return null;
+}
+
+/** Normalize NVD list results while excluding records explicitly rejected by NVD. */
+export function normalizeNvdCveRecords(records: NvdCveRecord[], includeRejected = false): CVE[] {
+  return records
+    .filter((record) => includeRejected || record.vulnStatus !== "Rejected")
+    .map(normalizeNvdCve);
 }
 
 // ---------------------------------------------------------------------------
@@ -307,6 +287,7 @@ function extractAffectedProducts(configurations: NvdConfiguration[]): AffectedPr
 
 const WEB_APP_CWES = new Set(["CWE-79", "CWE-89", "CWE-352", "CWE-434", "CWE-98", "CWE-601", "CWE-611", "CWE-918"]);
 const CLOUD_KEYWORDS = /\b(aws|amazon web services|azure|google cloud|gcp|kubernetes|docker|cloud)\b/i;
+const NETWORK_KEYWORDS = /\b(router|firewall|network appliance|network device|network protocol)\b/i;
 
 function inferCategory(configurations: NvdConfiguration[], cwe: CWEReference[], descriptionEn: string): CVECategory {
   const parts = new Set<string>();
@@ -323,8 +304,9 @@ function inferCategory(configurations: NvdConfiguration[], cwe: CWEReference[], 
   if (parts.has("o")) return "operating-system";
   if (cwe.some((w) => WEB_APP_CWES.has(w.id))) return "web-application";
   if (CLOUD_KEYWORDS.test(descriptionEn)) return "cloud-infrastructure";
-  if (parts.has("h")) return "network";
-  return "enterprise-software";
+  if (parts.has("h")) return "hardware";
+  if (NETWORK_KEYWORDS.test(descriptionEn)) return "network";
+  return "unclassified";
 }
 
 // ---------------------------------------------------------------------------
@@ -377,6 +359,7 @@ export function normalizeNvdCve(raw: NvdCveRecord): CVE {
     descriptionEn,
     descriptionId: buildIndonesianAssist(descriptionEn),
     cvss: selectCvss(raw.metrics),
+    vulnStatus: raw.vulnStatus as CVEVulnerabilityStatus | undefined,
     cwe,
     vendor: primary?.vendor ?? "Unknown Vendor",
     product: primary?.product ?? "Unknown Product",

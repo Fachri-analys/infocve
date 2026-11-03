@@ -5,7 +5,7 @@ export interface NotificationPayload {
   cveId: string;
   title: string;
   severity: string;
-  score: number;
+  score?: number;
   isCisaKev: boolean;
   hasPoc: boolean;
   publishedDate: string;
@@ -159,8 +159,8 @@ export class NotificationEngine {
     const payload: NotificationPayload = {
       cveId: cve.id,
       title: cve.title,
-      severity: cve.cvss.severity,
-      score: cve.cvss.baseScore,
+      severity: cve.cvss?.severity ?? "UNRATED",
+      score: cve.cvss?.baseScore,
       isCisaKev: cve.cisaKev?.isKev ?? false,
       hasPoc: cve.hasPoc ?? false,
       publishedDate: cve.publishedDate,
@@ -175,7 +175,7 @@ export class NotificationEngine {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: `🚨 [InfoCVE Alert] ${cve.id} (${cve.cvss.severity} - ${cve.cvss.baseScore}) detected!`,
+          text: `🚨 [InfoCVE Alert] ${cve.id} (${cve.cvss ? `${cve.cvss.severity} - ${cve.cvss.baseScore}` : "CVSS belum dinilai"}) detected!`,
           data: payload,
         }),
         redirect: "error",

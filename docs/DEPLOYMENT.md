@@ -54,7 +54,7 @@ Deployment ke server mandiri adalah opsi paling direkomendasikan karena basis da
 
 ## ⚡ 2. Deployment demo ke Vercel (Serverless)
 
-Vercel dapat menjalankan UI dan route Next.js InfoCVE. Neon (`DATABASE_URL` atau `POSTGRES_URL`) menyimpan riwayat pemindai dan sampel NVD yang digunakan untuk statistik beranda/dashboard. File SQLite untuk katalog sinkronisasi, cache terjemahan, dan status sinkronisasi tetap bersifat lokal-sementara di serverless; data itu tidak dibagi antar function instance. Pencarian dan detail CVE mengambil NVD API secara langsung.
+Vercel menjalankan UI, API, sinkronisasi, dan Cron. Neon (`DATABASE_URL` atau `POSTGRES_URL`) menyimpan katalog CVE bersama, status sinkronisasi, antrean terjemahan, rate limit, serta riwayat scanner. Pencarian/facet/statistik membaca katalog Neon; detail mencoba Neon lalu NVD live.
 
 ### Langkah-langkah:
 
@@ -67,15 +67,16 @@ Vercel dapat menjalankan UI dan route Next.js InfoCVE. Neon (`DATABASE_URL` atau
    - Buat project PostgreSQL di Neon, atau pasang integrasi Neon dari Vercel Marketplace.
    - Salin pooled connection string untuk project tersebut.
    - Untuk menguji koneksi dari lokal, buat Neon branch/database uji terpisah dari produksi, isi `TEST_DATABASE_URL` di `.env.local`, lalu jalankan `npm run test:neon`. Test menguji penyimpanan, pembacaan, token akses, hubungan scan ulang, dan retensi. Jangan arahkan test ke database produksi karena pemeriksaan retensi menghapus record yang sudah kedaluwarsa.
-   - Di Vercel → **Settings → Environment Variables**, tambahkan `DATABASE_URL` (Production; tambahkan Preview jika dipakai untuk demo). URL yang sama dipakai untuk riwayat scan dan cache sampel NVD.
-   - Jangan menaruh URL database pada kode, `NEXT_PUBLIC_*`, atau commit git. Tabel riwayat scan dan cache NVD dibuat otomatis saat pertama diperlukan.
+   - Di Vercel → **Settings → Environment Variables**, tambahkan `DATABASE_URL` (Production; tambahkan Preview jika dipakai). URL dipakai oleh katalog CVE dan scanner.
+   - Jangan menaruh URL database pada kode, `NEXT_PUBLIC_*`, atau commit git. Tabel aplikasi dibuat otomatis saat pertama diakses.
 
 3. **Pengaturan Environment Variables lainnya**:
    Di tab **Environment Variables**, tambahkan:
    - `NEXT_PUBLIC_SITE_URL` = `https://nama-proyek-anda.vercel.app` (atau domain kustom Anda).
    - `NVD_API_KEY` (disarankan untuk mengurangi dampak rate limit NVD).
-   - `ADMIN_SECRET` (wajib jika sinkronisasi dipicu melalui endpoint `/api/sync`).
-   - Pilih runtime Node.js `22.x` atau lebih baru; InfoCVE membutuhkan Node.js `22.5+` untuk `node:sqlite`.
+   - `ADMIN_SECRET` untuk sinkronisasi manual melalui `POST /api/sync`.
+   - `CRON_SECRET` untuk mengotorisasi Vercel Cron yang memanggil `GET /api/sync` dan `GET /api/translations`.
+   - Runtime Node.js `22.x` atau lebih baru.
 
 4. **Deploy dan isi data demo**:
    - Klik tombol **Deploy**.
@@ -86,17 +87,19 @@ Vercel dapat menjalankan UI dan route Next.js InfoCVE. Neon (`DATABASE_URL` atau
      ```
      `ADMIN_SECRET` lokal harus sama dengan nilai di Vercel. `NVD_API_KEY` dibaca oleh function dari Environment Variables Vercel.
    - Buka URL production, jalankan pemindai dari halaman **Cari CVE**, lalu muat ulang hasil scan untuk memastikan laporan bisa dibaca kembali. Token akses hasil scan disimpan di browser yang membuatnya.
-   - Sync CVE di `/api/sync` tetap menulis ke SQLite sementara. Karena itu, jangan menganggap katalog CVE yang disinkronkan dari satu function akan terlihat oleh function lain. Pencarian/detail CVE memakai NVD API; statistik ringkasan memakai sampel maksimal 100 CVE dalam jendela publikasi 120 hari yang di-cache di Neon selama 7 hari. Tanpa cache dan saat NVD gagal, beranda menampilkan `—` untuk menandai data belum tersedia.
+   - Cron terjadwal berjalan harian. Sinkronisasi awal membackfill 120 hari terakhir; proses melanjutkan cursor jika belum selesai. Untuk mengisi segera, kirim `POST /api/sync` dengan `Authorization: Bearer <ADMIN_SECRET>`.
    - Video pemindaian yang sudah direkam tetap berguna sebagai cadangan jika layanan advisori eksternal sedang bermasalah.
 
 ### Memastikan data CVE tampil
 
-1. Pastikan `DATABASE_URL` (atau `POSTGRES_URL`) dan `NVD_API_KEY` terpasang untuk environment **Production**, lalu redeploy setelah mengubah environment variable.
-2. Buka `https://domain-anda.vercel.app/api/health`. Respons sehat harus mencantumkan `status: healthy`, `database: Neon Postgres`, dan `cveData: NVD API with persistent Neon facet cache`.
-3. Buka beranda. Kartu statistik merangkum sampel 100 CVE, bukan seluruh jumlah CVE NVD. Pencarian dapat menampilkan total hasil query yang lebih besar.
-4. Jika kartu masih menunjukkan `—`, periksa Runtime Logs deployment untuk kegagalan koneksi Neon atau respons NVD. API key meningkatkan kuota NVD; `DATABASE_URL` menyediakan cache persisten lintas instance. Keduanya menyelesaikan masalah yang berbeda.
+1. Pastikan `DATABASE_URL` (atau `POSTGRES_URL`), `NVD_API_KEY`, dan `CRON_SECRET` terpasang di environment **Production**. `ADMIN_SECRET` diperlukan jika menjalankan sync manual.
+2. Buka `/api/health`; respons sehat mencantumkan `database: Neon Postgres`, statistik katalog, dan cursor sinkronisasi.
+3. Jalankan sinkronisasi manual atau tunggu Cron. Cek `sync.backfillCompletedAt` dan `sync.lastModifiedAt`; backfill pertama membatasi rentang publikasi pada 120 hari terakhir.
+4. Jika katalog belum terisi, cek Runtime Logs untuk `/api/sync`, koneksi Neon, dan rate limit NVD. Data yang gagal diambil tidak boleh dianggap sebagai hasil kosong tervalidasi.
 
-Route `/api/sync` memakai Node.js runtime dan batas eksekusi 60 detik supaya sinkronisasi yang lebih lama dari default singkat tidak langsung timeout. Sinkronisasi otomatis melalui Vercel Cron tidak diperlukan untuk demo; Cron tidak membuat SQLite menjadi persisten.
+Route `/api/sync` dan `/api/translations` memakai Node.js runtime dan `maxDuration: 60`. Sinkronisasi NVD menyimpan maksimal satu halaman (2.000 entri) per invokasi; EPSS dibatasi 5 request paralel, dan fallback metadata CNA mengerjakan maksimal 16 CVE dengan timeout 3 detik per lookup. Route terjemahan membatasi kerja aktif 42 detik, mengklaim sampai 512 deskripsi per putaran, membagi teks ke request LibreTranslate maksimum 32 deskripsi/60.000 karakter sumber, serta menjalankan maksimal 8 request serentak dengan timeout 4 detik dan satu retry. Jumlah batch disesuaikan berdasarkan estimasi timeout dan retry; deskripsi yang belum masuk budget dikembalikan ke antrean. Respons route menampilkan jumlah batch, request, hasil, waktu, dan antrean tersisa.
+
+Kedua Cron dijadwalkan harian pada jam berbeda (`0 5 * * *` dan `0 6 * * *`). Paket Vercel Hobby membatasi tiap cron agar berjalan sekali sehari; frekuensi lebih sering memerlukan paket Pro. Karena jadwal Hobby bisa bergeser hingga satu jam, jangan menganggap job berjalan tepat pada menit yang tertulis. Lihat [Vercel Cron usage and pricing](https://vercel.com/docs/cron-jobs/usage-and-pricing) dan [mengelola Cron](https://vercel.com/docs/cron-jobs/manage-cron-jobs).
 
 ---
 

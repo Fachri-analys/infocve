@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { neon } from "@neondatabase/serverless";
 import { getDb } from "@/lib/db";
 import { CveRepository } from "@/lib/db/cve-repository";
+import { getNeonStats, getNeonSyncState } from "@/lib/db/neon-cve-repository";
 
 export const dynamic = "force-dynamic";
 
@@ -17,12 +18,19 @@ export async function GET() {
       }
 
       await neon(connectionString).query("SELECT 1");
+      const [stats, syncState] = await Promise.all([getNeonStats(), getNeonSyncState()]);
       return NextResponse.json({
         status: "healthy",
         timestamp: new Date().toISOString(),
         version: "0.1.0",
         database: "Neon Postgres",
-        cveData: "NVD API with persistent Neon facet cache",
+        cveData: "NVD incremental sync with persistent Neon catalog",
+        stats,
+        sync: {
+          lastModifiedAt: syncState.last_modified_at,
+          backfillCompletedAt: syncState.backfill_completed_at,
+          inProgress: Boolean(syncState.lease_owner),
+        },
       });
     }
 

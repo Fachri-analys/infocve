@@ -12,7 +12,13 @@ if (!databaseUrl) {
   process.exit(1);
 }
 
-const result = spawnSync(process.execPath, ["node_modules/vitest/vitest.mjs", "run", "__tests__/scan-repository.neon.test.ts", "__tests__/nvd-facet-cache.neon.test.ts"], {
+const productionUrls = [process.env.DATABASE_URL, process.env.POSTGRES_URL].filter(Boolean);
+if (productionUrls.includes(databaseUrl)) {
+  console.error("Refusing Neon integration tests: TEST_DATABASE_URL matches a configured application database URL.");
+  process.exit(1);
+}
+
+const result = spawnSync(process.execPath, ["node_modules/vitest/vitest.mjs", "run", "__tests__/scan-repository.neon.test.ts", "__tests__/neon-catalog.integration.test.ts"], {
   stdio: "inherit",
   env: { ...process.env, TEST_DATABASE_URL: databaseUrl },
 });

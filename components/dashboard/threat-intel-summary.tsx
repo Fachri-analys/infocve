@@ -36,7 +36,7 @@ export function ThreatIntelSummary({ cisaKevStats, epssStats }: ThreatIntelSumma
         <CardContent className="space-y-4 pt-1">
           <div className="grid grid-cols-2 gap-3 border-y border-border bg-background-raised/30 p-3">
             <div>
-              <p className="text-xs text-muted-foreground">Di Sampel 120 Hari</p>
+              <p className="text-xs text-muted-foreground">Dalam Katalog Tersinkron</p>
               <div className="mt-1 flex items-baseline gap-1">
                 <span className="font-mono text-2xl font-bold text-red-500">
                   {formatNumberId(cisaKevStats.sampleInKev)}
@@ -130,7 +130,7 @@ export function ThreatIntelSummary({ cisaKevStats, epssStats }: ThreatIntelSumma
           </div>
 
           <div>
-            <h5 className="text-xs font-medium text-foreground">Kerentanan Sampel dengan EPSS Tertinggi:</h5>
+            <h5 className="text-xs font-medium text-foreground">CVE dengan EPSS Tertinggi di Katalog:</h5>
             {epssStats.topEpssCves.length > 0 ? (
               <div className="mt-2 space-y-2">
                 {epssStats.topEpssCves.map((item) => (

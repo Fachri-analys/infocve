@@ -1,642 +1,184 @@
 import "server-only";
 
-import type { CVE, CVECategory, PaginatedResult, SearchCVEParams } from "@/types/cve";
+import type { CVE, PaginatedResult, SearchCVEParams } from "@/types/cve";
 import type { SecurityCategory } from "@/types";
-import type { NvdCveRecord, NvdQueryParams } from "@/lib/nvd-types";
 import { fetchNvd, NvdApiError } from "@/lib/nvd-client";
+import type { NvdCveRecord } from "@/lib/nvd-types";
 import { normalizeNvdCve } from "@/lib/nvd-normalize";
-import { readNvdFacetSample, writeNvdFacetSample, type CachedFacetSample } from "@/lib/nvd-facet-cache";
+import { fillMissingCveEntities } from "@/lib/cve/cna-fallback";
 import { CveRepository } from "@/lib/db/cve-repository";
+import {
+  getNeonCveById,
+  getNeonCveClient,
+  getNeonCategoryCounts,
+  getNeonFacetCounts,
+  getNeonLatestCves,
+  getNeonStats,
+  isNeonCveConfigured,
+  searchNeonCves,
+} from "@/lib/db/neon-cve-repository";
+import { getCweName } from "@/lib/cwe-catalog";
 import { CATEGORY_META, DEFAULT_PAGE_SIZE } from "@/utils/constants";
-
-/**
- * Public data-service layer for CVE records — a thin orchestration layer
- * over `lib/nvd-client.ts` (HTTP transport) and `lib/nvd-normalize.ts`
- * (raw NVD -> internal `CVE` mapping). This is the ONLY file the rest of the
- * app imports from; nothing above this layer (pages, components) ever sees
- * a raw NVD response or touches `fetch` directly.
- *
- * -- Why split across three files instead of one -------------------------
- * HTTP transport, response-shape mapping, and public orchestration are
- * different concerns that change for different reasons (NVD tweaking rate
- * limits vs. NVD adding a field vs. this app adding a new convenience
- * function). Keeping them separate is what makes each piece testable and
- * change-safe on its own -- this file's exports and signatures are exactly
- * what they were before, so no page or component needed to change.
- *
- * -- Why some functions never throw ---------------------------------------
- * `getCVEById` distinguishes "confirmed not found" (-> `null`, existing
- * `notFound()` call sites keep working unchanged) from "couldn't reach NVD"
- * (-> throws `NvdApiError`, caught by `app/error.tsx`). Every *list*-shaped
- * function (search, latest, critical, facets, stats, ...) instead swallows
- * failures and returns an empty/zeroed result: a partial or unreachable NVD
- * response should degrade a list to "nothing to show" (which the existing
- * `EmptyState` UI already handles) rather than take down a whole page --
- * including at build time, since several of these run during static
- * generation and an uncaught throw there fails the build, not just the
- * request. The real error is still logged server-side either way.
- *
- * -- Query planning against a real, rate-limited, non-aggregating API ----
- * NVD's `cvssV3Severity` and `cweId` params only accept ONE value each,
- * `pubStartDate/pubEndDate` and `lastModStartDate/lastModEndDate` cannot
- * both be used in the same request, any date range is capped at 120 days,
- * and there is no "vendor"/"product"/"year" parameter or facet/aggregation
- * endpoint at all. `searchCVEs` below sends whatever filters map cleanly
- * onto real NVD parameters (shrinking what has to be fetched), then re-runs
- * the *complete* filter pipeline client-side on the normalized results
- * regardless -- re-applying a filter NVD already satisfied is harmless, and
- * it means correctness never depends on the native/client split being
- * exactly right. `getVendors`/`getProducts`/`getCategories`/`getAvailableYears`/
- * `getAvailableCWEs`/`getStats` derive from one shared, longer-cached
- * "recent sample" fetch (NVD has no facet endpoint to ask directly) -- see
- * `docs/API_INTEGRATION.md` for the full reasoning and its limitations.
- */
-
-const REVALIDATE = {
-  detail: 21_600, // 6h -- an individual CVE record changes rarely once published
-  search: 3_600, // 1h -- reasonably fresh without hammering the API
-  facetSample: 604_800, // 7d -- persistent recent sample cache for serverless deployments
-} as const;
-
-const CLIENT_REFINE_BATCH_SIZE = 200;
-const FACET_SAMPLE_SIZE = 100; // One compact NVD response keeps cold serverless renders within budget.
-const LATEST_CVE_SAMPLE_SIZE = 100;
-const MAX_DATE_RANGE_DAYS = 120; // NVD's documented hard limit on any date-range param
-const LOCAL_FALLBACK_SAMPLE_SIZE = 2000;
-
-function isNvdSyncedRecord(cve: CVE): boolean {
-  return cve.sources?.some((source) => source === "NVD" || source === "BATCH_SYNC") ?? false;
-}
-
-function logAndFallback(context: string, error: unknown): void {
-  const message = error instanceof NvdApiError ? `[${error.kind}] ${error.message}` : String(error);
-  console.error(`[lib/nvd] ${context} failed, degrading to empty result: ${message}`);
-}
-
-function getSyncedCves(params: SearchCVEParams, limit = LOCAL_FALLBACK_SAMPLE_SIZE): CVE[] {
-  // Vercel's function filesystem is ephemeral/read-only; Neon holds the shared
-  // CVE sample there, while SQLite remains the local development fallback.
-  if (process.env.VERCEL) return [];
-
-  try {
-    const result = CveRepository.search({ ...params, page: 1, pageSize: limit });
-    return applyFilters(result.results.filter(isNvdSyncedRecord), params);
-  } catch (error) {
-    console.error("[lib/nvd] Local NVD fallback failed:", error);
-    return [];
-  }
-}
-
-function getRecentPublishedRange(days = MAX_DATE_RANGE_DAYS): { start: string; end: string } {
-  const end = new Date();
-  const start = new Date(end.getTime() - days * 24 * 60 * 60 * 1000);
-  return { start: start.toISOString(), end: end.toISOString() };
-}
-
-function localSearchFallback(params: SearchCVEParams, pageSize: number, page: number): PaginatedResult<CVE> {
-  const synced = getSyncedCves(params);
-  const filtered = sortCVEs(synced, params.sortBy ?? "publishedDate", params.sortOrder ?? "desc");
-  return paginate(filtered, page, pageSize);
-}
-
-function daysBetween(fromIso: string, toIso: string): number {
-  return Math.abs(new Date(toIso).getTime() - new Date(fromIso).getTime()) / (1000 * 60 * 60 * 24);
-}
-
-function toIsoRangeBounds(fromDate: string, toDate: string): { start: string; end: string } {
-  return { start: `${fromDate}T00:00:00.000`, end: `${toDate}T23:59:59.999` };
-}
-
-// ---------------------------------------------------------------------------
-// Client-side filter/sort/paginate pipeline (re-run on every fetched batch --
-// see the "query planning" note above for why this is always safe to do).
-// ---------------------------------------------------------------------------
-
-function matchesQuery(cve: CVE, query: string): boolean {
-  const q = query.trim().toLowerCase();
-  if (!q) return true;
-  return (
-    cve.id.toLowerCase().includes(q) ||
-    cve.title.toLowerCase().includes(q) ||
-    cve.vendor.toLowerCase().includes(q) ||
-    cve.product.toLowerCase().includes(q) ||
-    cve.descriptionEn.toLowerCase().includes(q) ||
-    cve.cwe.some((c) => c.id.toLowerCase().includes(q) || c.name.toLowerCase().includes(q))
-  );
-}
-
-function inDateRange(dateIso: string, from?: string, to?: string): boolean {
-  const time = new Date(dateIso).getTime();
-  if (from && time < new Date(from).getTime()) return false;
-  if (to && time > new Date(`${to}T23:59:59.999`).getTime()) return false;
-  return true;
-}
-
-function applyFilters(cves: CVE[], params: SearchCVEParams): CVE[] {
-  let filtered = cves.filter((c) => matchesQuery(c, params.query ?? ""));
-
-  const { severity, year, vendor, product, cwe } = params;
-  if (severity?.length) filtered = filtered.filter((c) => severity.includes(c.cvss.severity));
-  if (year?.length) filtered = filtered.filter((c) => year.includes(c.year));
-  if (vendor?.length) filtered = filtered.filter((c) => vendor.includes(c.vendor));
-  if (product?.length) filtered = filtered.filter((c) => product.includes(c.product));
-  if (cwe?.length) filtered = filtered.filter((c) => c.cwe.some((w) => cwe.includes(w.id)));
-
-  if (params.category) filtered = filtered.filter((c) => c.category === params.category);
-  if (params.publishedFrom || params.publishedTo) {
-    filtered = filtered.filter((c) => inDateRange(c.publishedDate, params.publishedFrom, params.publishedTo));
-  }
-  if (params.modifiedFrom || params.modifiedTo) {
-    filtered = filtered.filter((c) => inDateRange(c.lastModifiedDate, params.modifiedFrom, params.modifiedTo));
-  }
-  return filtered;
-}
-
-function sortCVEs(cves: CVE[], sortBy: SearchCVEParams["sortBy"], sortOrder: SearchCVEParams["sortOrder"]): CVE[] {
-  const order = sortOrder === "asc" ? 1 : -1;
-  return [...cves].sort((a, b) => {
-    switch (sortBy) {
-      case "baseScore":
-        return (a.cvss.baseScore - b.cvss.baseScore) * order;
-      case "lastModifiedDate":
-        return (new Date(a.lastModifiedDate).getTime() - new Date(b.lastModifiedDate).getTime()) * order;
-      case "publishedDate":
-      default:
-        return (new Date(a.publishedDate).getTime() - new Date(b.publishedDate).getTime()) * order;
-    }
-  });
-}
-
-function paginate(cves: CVE[], page: number, pageSize: number): PaginatedResult<CVE> {
-  const total = cves.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const safePage = Math.min(Math.max(1, Math.floor(page) || 1), totalPages);
-  const start = (safePage - 1) * pageSize;
-  return { results: cves.slice(start, start + pageSize), total, page: safePage, pageSize, totalPages };
-}
-
-// ---------------------------------------------------------------------------
-// Query planning -- decide what can be asked of NVD natively
-// ---------------------------------------------------------------------------
-
-function buildNativeParams(params: SearchCVEParams): NvdQueryParams {
-  const native: NvdQueryParams = {};
-
-  const keyword = params.query?.trim() || params.vendor?.[0] || params.product?.[0];
-  if (keyword) native.keywordSearch = keyword;
-
-  if (params.severity?.length === 1 && params.severity[0] !== "NONE") {
-    native.cvssV3Severity = params.severity[0] as "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
-  }
-
-  if (params.cwe?.length === 1) native.cweId = params.cwe[0];
-
-  // pubDate and lastModDate ranges can't both be sent in one request, and
-  // NVD requires both bounds together with a span no longer than 120 days.
-  // Published range wins when both are present and eligible.
-  if (params.publishedFrom && params.publishedTo) {
-    const { start, end } = toIsoRangeBounds(params.publishedFrom, params.publishedTo);
-    if (daysBetween(start, end) <= MAX_DATE_RANGE_DAYS) {
-      native.pubStartDate = start;
-      native.pubEndDate = end;
-    }
-  } else if (params.modifiedFrom && params.modifiedTo) {
-    const { start, end } = toIsoRangeBounds(params.modifiedFrom, params.modifiedTo);
-    if (daysBetween(start, end) <= MAX_DATE_RANGE_DAYS) {
-      native.lastModStartDate = start;
-      native.lastModEndDate = end;
-    }
-  }
-
-  return native;
-}
-
-/** True when every requested filter maps exactly onto what was sent natively -- safe to trust NVD's own pagination/total. */
-function isFullyNative(params: SearchCVEParams, native: NvdQueryParams): boolean {
-  const severityHandledNatively = !params.severity?.length || (params.severity.length === 1 && !!native.cvssV3Severity);
-  const cweHandledNatively = !params.cwe?.length || (params.cwe.length === 1 && !!native.cweId);
-  const noYearOrCategory = !params.year?.length && !params.category;
-  // Vendor/product have no real native NVD parameter — buildNativeParams only
-  // ever approximates them via a keywordSearch fallback, and only when there's
-  // no `query` to take priority over it (see buildNativeParams above). Treating
-  // that approximation as "fully native" would trust NVD's own pagination/total
-  // and skip applyFilters below entirely, silently dropping the exact vendor/
-  // product match. So any vendor or product filter always forces the
-  // fetch-then-filter path instead.
-  const noVendorOrProduct = !params.vendor?.length && !params.product?.length;
-  const dateRangeHandled =
-    (!params.publishedFrom && !params.publishedTo && !params.modifiedFrom && !params.modifiedTo) ||
-    (!!native.pubStartDate && !params.modifiedFrom) ||
-    (!!native.lastModStartDate && !params.publishedFrom);
-
-  return severityHandledNatively && cweHandledNatively && noYearOrCategory && noVendorOrProduct && dateRangeHandled;
-}
-
-async function fetchNormalized(params: NvdQueryParams, revalidateSeconds: number, tags?: string[]) {
-  const response = await fetchNvd(params, { revalidateSeconds, tags });
-  return {
-    cves: response.vulnerabilities.map((wrapper) => normalizeNvdCve(wrapper.cve)),
-    totalResults: response.totalResults,
-  };
-}
-
-async function fetchNewestWindow(
-  params: NvdQueryParams,
-  pageSize: number,
-  revalidateSeconds: number,
-  tags: string[] | undefined,
-  sortBy: SearchCVEParams["sortBy"]
-): Promise<CVE[]> {
-  const firstPage = await fetchNormalized({ ...params, resultsPerPage: pageSize }, revalidateSeconds, tags);
-  if (firstPage.totalResults <= firstPage.cves.length) {
-    return sortCVEs(firstPage.cves, sortBy, "desc");
-  }
-
-  // NVD can return old records first when a large update gives many CVEs the
-  // same modified timestamp. Include both ends of the result window, then sort
-  // locally so a recent publication is not hidden behind that tie ordering.
-  const lastPage = await fetchNormalized(
-    { ...params, resultsPerPage: pageSize, startIndex: Math.max(0, firstPage.totalResults - pageSize) },
-    revalidateSeconds,
-    tags
-  );
-  const merged = new Map(firstPage.cves.map((cve) => [cve.id, cve]));
-  for (const cve of lastPage.cves) merged.set(cve.id, cve);
-  return sortCVEs([...merged.values()], sortBy, "desc");
-}
-
-// ---------------------------------------------------------------------------
-// Required public API
-// ---------------------------------------------------------------------------
-
-/** Most recently *published* CVEs. Powers the homepage's "CVE Terbaru" section and the ticker. */
-export async function getLatestCVEs(limit = 6, preferSynced = false): Promise<CVE[]> {
-  const recentRange = getRecentPublishedRange();
-  if (preferSynced) {
-    const synced = getSyncedCves({ publishedFrom: recentRange.start.slice(0, 10), publishedTo: recentRange.end.slice(0, 10) });
-    if (synced.length > 0) return sortCVEs(synced, "publishedDate", "desc").slice(0, limit);
-  }
-
-  try {
-    for (const days of [7, 14, 30, 60, MAX_DATE_RANGE_DAYS]) {
-      const { start, end } = getRecentPublishedRange(days);
-      const latest = await fetchNewestWindow(
-        { pubStartDate: start, pubEndDate: end },
-        LATEST_CVE_SAMPLE_SIZE,
-        REVALIDATE.search,
-        ["nvd:latest"],
-        "publishedDate"
-      );
-      if (latest.length >= limit || days === MAX_DATE_RANGE_DAYS) return latest.slice(0, limit);
-    }
-    return [];
-  } catch (error) {
-    logAndFallback("getLatestCVEs", error);
-    const cachedSample = await getFacetSample();
-    if (cachedSample.length > 0) {
-      return sortCVEs(cachedSample, "publishedDate", "desc").slice(0, limit);
-    }
-    return sortCVEs(getSyncedCves({ publishedFrom: recentRange.start.slice(0, 10), publishedTo: recentRange.end.slice(0, 10) }), "publishedDate", "desc").slice(0, limit);
-  }
-}
-
-/** Shorthand for `searchCVEs({ severity: ["CRITICAL"] })`, newest first. */
-export async function getCriticalCVEs(limit = 4): Promise<CVE[]> {
-  const sample = await getFacetSample();
-  return sortCVEs(sample.filter((cve) => cve.cvss.severity === "CRITICAL"), "publishedDate", "desc").slice(0, limit);
-}
-
-/** Shorthand for `searchCVEs({ severity: ["HIGH"] })`, newest first. */
-export async function getHighCVEs(limit = 4): Promise<CVE[]> {
-  const sample = await getFacetSample();
-  return sortCVEs(sample.filter((cve) => cve.cvss.severity === "HIGH"), "publishedDate", "desc").slice(0, limit);
-}
-
-/**
- * Most recently *modified* CVEs -- distinct from `getLatestCVEs` (published).
- * Useful for surfacing records NVD has just re-analyzed, rescored, or
- * corrected, which is one of the NVD API's own canonical use cases for the
- * `lastModStartDate`/`lastModEndDate` parameters.
- */
-export async function getRecentCVEs(limit = 6): Promise<CVE[]> {
-  try {
-    const end = new Date();
-    const start = new Date(end.getTime() - MAX_DATE_RANGE_DAYS * 24 * 60 * 60 * 1000);
-    const cves = await fetchNewestWindow(
-      {
-        lastModStartDate: start.toISOString(),
-        lastModEndDate: end.toISOString(),
-      },
-      Math.max(limit, 50),
-      REVALIDATE.search,
-      ["nvd:recent"],
-      "lastModifiedDate"
-    );
-    return cves.slice(0, limit);
-  } catch (error) {
-    logAndFallback("getRecentCVEs", error);
-    return [];
-  }
-}
-
-/**
- * A single CVE by its exact ID.
- * - Returns `null` only when NVD confirms the ID doesn't exist (0 results) --
- *   callers keep using this for `notFound()` exactly as before.
- * - Throws `NvdApiError` for anything else (network/timeout/server/rate
- *   limit), letting `app/error.tsx` show a distinguishable "try again"
- *   message instead of a false 404. Safe to throw here specifically because
- *   this route has no `generateStaticParams` -- it only ever renders
- *   on-demand, never during `next build`.
- */
-export async function getCVEById(id: string): Promise<CVE | null> {
-  const normalizedId = id.trim().toUpperCase();
-  if (!/^CVE-\d{4}-\d{4,}$/.test(normalizedId)) return null;
-
-  try {
-    const response = await fetchNvd({ cveId: normalizedId }, { revalidateSeconds: REVALIDATE.detail, tags: [`nvd:cve:${normalizedId}`] });
-    const record: NvdCveRecord | undefined = response.vulnerabilities[0]?.cve;
-    if (!record) return null;
-    return {
-      ...normalizeNvdCve(record),
-      sourceObservations: [{
-        sourceId: "NVD",
-        recordUrl: `https://nvd.nist.gov/vuln/detail/${encodeURIComponent(normalizedId)}`,
-        accessedAt: new Date().toISOString(),
-      }],
-    };
-  } catch (error) {
-    const synced = process.env.VERCEL ? null : CveRepository.getById(normalizedId);
-    if (synced && isNvdSyncedRecord(synced)) {
-      logAndFallback(`getCVEById(${normalizedId})`, error);
-      return synced;
-    }
-    throw error;
-  }
-}
-
-/** The full filter + sort + paginate pipeline backing the search page. */
-export async function searchCVEs(params: SearchCVEParams = {}): Promise<PaginatedResult<CVE>> {
-  const pageSize = Math.max(1, Math.floor(params.pageSize ?? DEFAULT_PAGE_SIZE) || DEFAULT_PAGE_SIZE);
-  const page = Math.max(1, Math.floor(params.page ?? 1) || 1);
-
-  try {
-    const native = buildNativeParams(params);
-    const fullyNative = isFullyNative(params, native);
-
-    if (fullyNative) {
-      const { cves, totalResults } = await fetchNormalized(
-        { ...native, resultsPerPage: pageSize, startIndex: (page - 1) * pageSize },
-        REVALIDATE.search,
-        ["nvd:search"]
-      );
-      const sorted = sortCVEs(cves, params.sortBy ?? "publishedDate", params.sortOrder ?? "desc");
-      const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
-      return { results: sorted, total: totalResults, page: Math.min(Math.max(1, page), totalPages), pageSize, totalPages };
-    }
-
-    const { cves } = await fetchNormalized(
-      { ...native, resultsPerPage: CLIENT_REFINE_BATCH_SIZE, startIndex: 0 },
-      REVALIDATE.search,
-      ["nvd:search"]
-    );
-    const filtered = applyFilters(cves, params);
-    const sorted = sortCVEs(filtered, params.sortBy ?? "publishedDate", params.sortOrder ?? "desc");
-    return paginate(sorted, page, pageSize);
-  } catch (error) {
-    logAndFallback("searchCVEs", error);
-    return localSearchFallback(params, pageSize, page);
-  }
-}
-
-/** All CVEs attributed to a given vendor, newest first. */
-export async function getCVEsByVendor(vendorName: string, limit?: number): Promise<CVE[]> {
-  const result = await searchCVEs({ vendor: [vendorName], pageSize: limit ?? CLIENT_REFINE_BATCH_SIZE });
-  return result.results;
-}
-
-/** All CVEs for a given product, newest first. */
-export async function getCVEsByProduct(productName: string, limit?: number): Promise<CVE[]> {
-  const result = await searchCVEs({ product: [productName], pageSize: limit ?? CLIENT_REFINE_BATCH_SIZE });
-  return result.results;
-}
-
-/**
- * All CVEs published in a given year, newest first.
- *
- * A single year always exceeds NVD's 120-day range cap, so this issues up
- * to four ~91-day windows in parallel and merges them -- more requests than
- * the generic `searchCVEs({ year: [...] })` path (which treats `year` as a
- * client-side-only signal over one smaller batch, see `buildNativeParams`),
- * but accurate for the whole year rather than an approximation. Worth the
- * extra calls since this is a deliberate, named lookup rather than
- * something combined with several other filters at once.
- */
-export async function getCVEsByYear(year: number, limit = 50): Promise<CVE[]> {
-  try {
-    const yearStart = new Date(Date.UTC(year, 0, 1));
-    const yearEnd = new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999));
-    const windowMs = MAX_DATE_RANGE_DAYS * 24 * 60 * 60 * 1000 * 0.75; // ~91 days, safely under the cap
-
-    const windows: { start: Date; end: Date }[] = [];
-    for (let cursor = yearStart.getTime(); cursor <= yearEnd.getTime(); cursor += windowMs) {
-      const windowEnd = Math.min(cursor + windowMs, yearEnd.getTime());
-      windows.push({ start: new Date(cursor), end: new Date(windowEnd) });
-    }
-
-    const batches = await Promise.all(
-      windows.map(({ start, end }) =>
-        fetchNormalized(
-          { pubStartDate: start.toISOString(), pubEndDate: end.toISOString(), resultsPerPage: 500 },
-          REVALIDATE.search,
-          [`nvd:year:${year}`]
-        ).catch((error) => {
-          logAndFallback(`getCVEsByYear(${year}) window ${start.toISOString()}`, error);
-          return { cves: [] as CVE[], totalResults: 0 };
-        })
-      )
-    );
-
-    const merged = new Map<string, CVE>();
-    for (const batch of batches) for (const cve of batch.cves) merged.set(cve.id, cve);
-
-    return sortCVEs([...merged.values()], "publishedDate", "desc").slice(0, limit);
-  } catch (error) {
-    logAndFallback(`getCVEsByYear(${year})`, error);
-    return [];
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Facets & stats -- NVD has no aggregation endpoint, so these all derive
-// from one shared, longer-cached "recent sample" fetch (deduplicated
-// automatically by Next.js's fetch cache, since every call below uses the
-// same URL/params/revalidate window). See docs/API_INTEGRATION.md for the
-// accuracy tradeoff this implies versus a true global count.
-// ---------------------------------------------------------------------------
-
-let inMemoryFacetSample: CVE[] | null = null;
-let facetSampleFetchedAt = 0;
-let inFlightFacetSample: Promise<CVE[]> | null = null;
-const FACET_SAMPLE_CACHE_TTL_MS = REVALIDATE.facetSample * 1000;
-
-/** For testing or cache invalidation */
-export function clearFacetSampleCache(): void {
-  inMemoryFacetSample = null;
-  facetSampleFetchedAt = 0;
-  inFlightFacetSample = null;
-}
-
-export async function getFacetSample(): Promise<CVE[]> {
-  const now = Date.now();
-  if (inMemoryFacetSample && now - facetSampleFetchedAt < FACET_SAMPLE_CACHE_TTL_MS) {
-    return inMemoryFacetSample;
-  }
-
-  if (inFlightFacetSample) {
-    return inFlightFacetSample;
-  }
-
-  inFlightFacetSample = (async () => {
-    let persistedSample: CachedFacetSample | null = null;
-    try {
-      try {
-        persistedSample = await readNvdFacetSample();
-        if (persistedSample) {
-          inMemoryFacetSample = persistedSample.cves;
-          facetSampleFetchedAt = persistedSample.fetchedAt;
-          if (now - persistedSample.fetchedAt < FACET_SAMPLE_CACHE_TTL_MS) {
-            return persistedSample.cves;
-          }
-        }
-      } catch (error) {
-        console.error("[lib/nvd] Persistent facet cache read failed:", error instanceof Error ? error.message : String(error));
-      }
-
-      const { start, end } = getRecentPublishedRange();
-      const synced = getSyncedCves({ publishedFrom: start.slice(0, 10), publishedTo: end.slice(0, 10) });
-      if (synced.length > 0) {
-        inMemoryFacetSample = synced;
-        facetSampleFetchedAt = now;
-        return synced;
-      }
-
-      // Facets are explicitly a sample, so fetch one page only. The generic
-      // newest-window helper fetches both ends of a larger result set, which
-      // adds a second sequential NVD request on a cold Vercel render and can
-      // exhaust the function budget before the homepage stats resolve.
-      const response = await fetchNormalized(
-        { pubStartDate: start, pubEndDate: end, resultsPerPage: FACET_SAMPLE_SIZE },
-        REVALIDATE.facetSample,
-        ["nvd:facet-sample"]
-      );
-      const cves = sortCVEs(response.cves, "publishedDate", "desc");
-      inMemoryFacetSample = cves;
-      facetSampleFetchedAt = Date.now();
-      try {
-        await writeNvdFacetSample(cves);
-      } catch (error) {
-        console.error("[lib/nvd] Persistent facet cache write failed:", error instanceof Error ? error.message : String(error));
-      }
-      return cves;
-    } catch (error) {
-      logAndFallback("getFacetSample", error);
-      if (persistedSample) return persistedSample.cves;
-      if (inMemoryFacetSample) return inMemoryFacetSample;
-      const { start } = getRecentPublishedRange();
-      return getSyncedCves({ publishedFrom: start.slice(0, 10) });
-    } finally {
-      inFlightFacetSample = null;
-    }
-  })();
-
-  return inFlightFacetSample;
-}
+import { unavailableSearchResult } from "@/lib/search/result-state";
 
 export interface FacetCount {
   value: string;
   count: number;
 }
 
-function countBy<T>(items: T[], keyOf: (item: T) => string): FacetCount[] {
-  const counts = new Map<string, number>();
-  for (const item of items) counts.set(keyOf(item), (counts.get(keyOf(item)) ?? 0) + 1);
-  return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([value, count]) => ({ value, count }));
+function logReadFailure(context: string, error: unknown): void {
+  const message = error instanceof NvdApiError ? `[${error.kind}] ${error.message}` : String(error);
+  console.error(`[lib/nvd] ${context} failed: ${message}`);
 }
 
-/** Vendors present in the recent sample, most-represented first. */
-export async function getVendors(limit?: number): Promise<FacetCount[]> {
+function localSearch(params: SearchCVEParams): PaginatedResult<CVE> {
   try {
-    const sorted = countBy(await getFacetSample(), (c) => c.vendor);
-    return limit ? sorted.slice(0, limit) : sorted;
+    return CveRepository.search(params);
   } catch (error) {
-    logAndFallback("getVendors", error);
-    return [];
+    logReadFailure("SQLite catalog search", error);
+    const pageSize = Math.max(1, params.pageSize ?? DEFAULT_PAGE_SIZE);
+    return unavailableSearchResult(pageSize, params.page);
   }
 }
 
-/** Products present in the recent sample, most-represented first. */
-export async function getProducts(limit?: number): Promise<FacetCount[]> {
-  try {
-    const sorted = countBy(await getFacetSample(), (c) => c.product);
-    return limit ? sorted.slice(0, limit) : sorted;
-  } catch (error) {
-    logAndFallback("getProducts", error);
-    return [];
+export async function getLatestCVEs(limit = 6, _preferSynced = false): Promise<CVE[]> {
+  void _preferSynced;
+  if (isNeonCveConfigured()) {
+    try { return await getNeonLatestCves(limit); }
+    catch (error) { logReadFailure("Neon latest CVEs", error); return []; }
   }
+  return localSearch({ page: 1, pageSize: limit, sortBy: "publishedDate", sortOrder: "desc" }).results;
 }
 
-/** Years present in the recent sample, most recent first. */
-export async function getAvailableYears(): Promise<number[]> {
-  try {
-    const sample = await getFacetSample();
-    return [...new Set(sample.map((c) => c.year))].sort((a, b) => b - a);
-  } catch (error) {
-    logAndFallback("getAvailableYears", error);
-    return [];
+export async function getCriticalCVEs(limit = 4): Promise<CVE[]> {
+  if (isNeonCveConfigured()) {
+    try { return await getNeonLatestCves(limit, "CRITICAL"); }
+    catch (error) { logReadFailure("Neon critical CVEs", error); return []; }
   }
+  return localSearch({ severity: ["CRITICAL"], page: 1, pageSize: limit }).results;
 }
 
-/** CWEs present in the recent sample. */
-export async function getAvailableCWEs(): Promise<{ id: string; name: string }[]> {
-  try {
-    const sample = await getFacetSample();
-    const map = new Map<string, string>();
-    for (const cve of sample) for (const w of cve.cwe) map.set(w.id, w.name);
-    return [...map.entries()].map(([id, name]) => ({ id, name })).sort((a, b) => a.id.localeCompare(b.id));
-  } catch (error) {
-    logAndFallback("getAvailableCWEs", error);
-    return [];
+export async function getHighCVEs(limit = 4): Promise<CVE[]> {
+  if (isNeonCveConfigured()) {
+    try { return await getNeonLatestCves(limit, "HIGH"); }
+    catch (error) { logReadFailure("Neon high CVEs", error); return []; }
   }
+  return localSearch({ severity: ["HIGH"], page: 1, pageSize: limit }).results;
 }
 
-/** Categories present in the recent sample, with counts -- powers the homepage. Only non-empty categories are returned. */
-export async function getCategories(): Promise<(SecurityCategory & { count: number })[]> {
-  try {
-    const sample = await getFacetSample();
-    const counts = new Map<CVECategory, number>();
-    for (const cve of sample) counts.set(cve.category, (counts.get(cve.category) ?? 0) + 1);
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([slug, count]) => ({ slug, count, ...CATEGORY_META[slug] }));
-  } catch (error) {
-    logAndFallback("getCategories", error);
-    return [];
+export async function getRecentCVEs(limit = 6): Promise<CVE[]> {
+  if (isNeonCveConfigured()) {
+    try {
+      const sql = getNeonCveClient();
+      if (!sql) return [];
+      const rows = await sql.query("SELECT payload FROM infocve_cves WHERE vuln_status <> 'Rejected' ORDER BY last_modified_date DESC LIMIT $1", [limit]) as Array<{ payload: CVE }>;
+      return rows.map((row) => row.payload);
+    } catch (error) { logReadFailure("Neon recently modified CVEs", error); return []; }
   }
+  return localSearch({ page: 1, pageSize: limit, sortBy: "lastModifiedDate", sortOrder: "desc" }).results;
 }
 
-/** Aggregate counts used in the hero's small stats row -- derived from the same recent sample, so "total" means "in the last 120 days", not "all of NVD history". */
+/** Look in the persistent catalog first. Only exact-ID detail requests fall back to NVD live. */
+export async function getCVEById(id: string): Promise<CVE | null> {
+  const normalizedId = id.trim().toUpperCase();
+  if (!/^CVE-\d{4}-\d{4,}$/.test(normalizedId)) return null;
+  try {
+    const stored = isNeonCveConfigured() ? await getNeonCveById(normalizedId) : CveRepository.getById(normalizedId);
+    if (stored) return stored;
+  } catch (error) {
+    logReadFailure(`catalog detail ${normalizedId}`, error);
+  }
+
+  const response = await fetchNvd({ cveId: normalizedId }, { revalidateSeconds: 6 * 60 * 60, tags: [`nvd:cve:${normalizedId}`] });
+  const record: NvdCveRecord | undefined = response.vulnerabilities[0]?.cve;
+  if (!record) return null;
+  return fillMissingCveEntities({
+    ...normalizeNvdCve(record),
+    sourceObservations: [{
+      sourceId: "NVD",
+      recordUrl: `https://nvd.nist.gov/vuln/detail/${encodeURIComponent(normalizedId)}`,
+      accessedAt: new Date().toISOString(),
+    }],
+  });
+}
+
+export async function searchCVEs(params: SearchCVEParams = {}): Promise<PaginatedResult<CVE>> {
+  if (isNeonCveConfigured()) {
+    try { return await searchNeonCves(params); }
+    catch (error) {
+      logReadFailure("Neon search", error);
+      const pageSize = Math.max(1, params.pageSize ?? DEFAULT_PAGE_SIZE);
+      return unavailableSearchResult(pageSize, params.page);
+    }
+  }
+  return localSearch(params);
+}
+
+export async function getCVEsByVendor(vendorName: string, limit?: number): Promise<CVE[]> {
+  return (await searchCVEs({ vendor: [vendorName], pageSize: limit ?? 100 })).results;
+}
+
+export async function getCVEsByProduct(productName: string, limit?: number): Promise<CVE[]> {
+  return (await searchCVEs({ product: [productName], pageSize: limit ?? 100 })).results;
+}
+
+export async function getCVEsByYear(year: number, limit = 50): Promise<CVE[]> {
+  return (await searchCVEs({ year: [year], pageSize: Math.min(limit, 100) })).results;
+}
+
+export async function getVendors(limit?: number, params: SearchCVEParams = {}): Promise<FacetCount[]> {
+  try {
+    const values = isNeonCveConfigured()
+      ? (await getNeonFacetCounts(params)).vendors
+      : CveRepository.getFacetCounts(params).vendors;
+    return limit ? values.slice(0, limit) : values;
+  } catch (error) { logReadFailure("vendor facets", error); return []; }
+}
+
+export async function getProducts(limit?: number, params: SearchCVEParams = {}): Promise<FacetCount[]> {
+  try {
+    const values = isNeonCveConfigured()
+      ? (await getNeonFacetCounts(params)).products
+      : CveRepository.getFacetCounts(params).products;
+    return limit ? values.slice(0, limit) : values;
+  } catch (error) { logReadFailure("product facets", error); return []; }
+}
+
+export async function getAvailableYears(params: SearchCVEParams = {}): Promise<number[]> {
+  try {
+    return isNeonCveConfigured()
+      ? (await getNeonFacetCounts(params)).years
+      : CveRepository.getFacetCounts(params).years;
+  } catch (error) { logReadFailure("year facets", error); return []; }
+}
+
+export async function getAvailableCWEs(params: SearchCVEParams = {}): Promise<{ id: string; name: string }[]> {
+  try {
+    const values = isNeonCveConfigured()
+      ? (await getNeonFacetCounts(params)).cwes
+      : CveRepository.getFacetCounts(params).cwes;
+    return values.map(({ id, name }) => ({ id, name: name || getCweName(id) }));
+  } catch (error) { logReadFailure("CWE facets", error); return []; }
+}
+
+export async function getCategories(params: SearchCVEParams = {}): Promise<(SecurityCategory & { count: number })[]> {
+  try {
+    const rows = isNeonCveConfigured()
+      ? await getNeonCategoryCounts(params)
+      : CveRepository.getFacetCounts(params).categories;
+    return rows.flatMap(({ slug, count }) => {
+      const meta = CATEGORY_META[slug as keyof typeof CATEGORY_META];
+      return meta ? [{ slug: slug as keyof typeof CATEGORY_META, count, ...meta }] : [];
+    });
+  } catch (error) { logReadFailure("category facets", error); return []; }
+}
+
 export async function getStats(): Promise<{ total: number; critical: number; high: number; vendors: number; available: boolean }> {
   try {
-    const sample = await getFacetSample();
-    if (sample.length === 0) return { total: 0, critical: 0, high: 0, vendors: 0, available: false };
-    return {
-      total: sample.length,
-      critical: sample.filter((c) => c.cvss.severity === "CRITICAL").length,
-      high: sample.filter((c) => c.cvss.severity === "HIGH").length,
-      vendors: new Set(sample.map((c) => c.vendor)).size,
-      available: true,
-    };
+    const stats = isNeonCveConfigured() ? await getNeonStats() : CveRepository.getStats();
+    return { total: stats.total, critical: stats.critical, high: stats.high, vendors: stats.vendors, available: stats.total > 0 };
   } catch (error) {
-    logAndFallback("getStats", error);
+    logReadFailure("catalog stats", error);
     return { total: 0, critical: 0, high: 0, vendors: 0, available: false };
   }
 }

@@ -1,13 +1,15 @@
 import "server-only";
 
 import type { CVE, EPSSScore, Severity } from "@/types/cve";
-import { getFacetSample } from "@/lib/nvd";
+import { getNeonDashboardAggregates, isNeonCveConfigured } from "@/lib/db/neon-cve-repository";
+import { CveRepository } from "@/lib/db/cve-repository";
 import { CisaKevSourceAdapter, type CisaKevEntry } from "@/lib/sources/cisa-kev";
 import { EpssSourceAdapter } from "@/lib/sources/epss";
+import { PocClassifier } from "@/lib/sources/poc";
 import { calculatePriority } from "@/lib/priority";
 
 export interface SeverityCount {
-  severity: Severity | "UNKNOWN";
+  severity: Severity;
   labelId: string;
   count: number;
   percentage: number;
@@ -49,7 +51,7 @@ export interface EpssStats {
 }
 
 export interface PriorityTierCount {
-  tier: "P1" | "P2" | "P3" | "P4";
+  tier: "P1" | "P2" | "P3" | "P4" | "NA";
   labelId: string;
   actionGuidance: string;
   count: number;
@@ -101,8 +103,34 @@ export interface DashboardData {
   };
 }
 
+export function attachDashboardThreatSignals(
+  cves: CVE[],
+  cisaCatalog: Map<string, CisaKevEntry>,
+  epssScores: Map<string, EPSSScore>
+): void {
+  for (const cve of cves) {
+    const kevEntry = cisaCatalog.get(cve.id.toUpperCase());
+    if (kevEntry) {
+      cve.cisaKev = {
+        isKev: true,
+        dateAdded: kevEntry.dateAdded,
+        dueDate: kevEntry.dueDate,
+        requiredAction: kevEntry.requiredAction,
+        notes: kevEntry.notes,
+      };
+    }
+
+    const hasExploitReference = cve.references.some((reference) =>
+      reference.tags?.some((tag) => tag.toLowerCase() === "exploit")
+    );
+    cve.hasPoc = Boolean(cve.hasPoc || hasExploitReference || PocClassifier.enrichReferences(cve.references).hasPoc);
+    const epss = epssScores.get(cve.id.toUpperCase());
+    if (epss) cve.epss = epss;
+  }
+}
+
 const SEVERITY_CONFIG: Record<
-  Severity | "UNKNOWN",
+  Severity,
   { labelId: string; color: string; bgClass: string; sortOrder: number }
 > = {
   CRITICAL: {
@@ -135,7 +163,7 @@ const SEVERITY_CONFIG: Record<
     bgClass: "bg-zinc-400",
     sortOrder: 5,
   },
-  UNKNOWN: {
+  UNRATED: {
     labelId: "Belum Dinilai",
     color: "#6b7280",
     bgClass: "bg-zinc-500",
@@ -145,25 +173,21 @@ const SEVERITY_CONFIG: Record<
 
 export function computeSeverityDistribution(cves: CVE[]): SeverityCount[] {
   const total = cves.length;
-  const counts: Record<Severity | "UNKNOWN", number> = {
+  const counts: Record<Severity, number> = {
     CRITICAL: 0,
     HIGH: 0,
     MEDIUM: 0,
     LOW: 0,
     NONE: 0,
-    UNKNOWN: 0,
+    UNRATED: 0,
   };
 
   for (const cve of cves) {
     const sev = cve.cvss?.severity;
-    if (sev && sev in counts) {
-      counts[sev]++;
-    } else {
-      counts.UNKNOWN++;
-    }
+    counts[sev && sev in counts ? sev : "UNRATED"]++;
   }
 
-  return (Object.keys(counts) as (Severity | "UNKNOWN")[])
+  return (Object.keys(counts) as Severity[])
     .sort((a, b) => SEVERITY_CONFIG[a].sortOrder - SEVERITY_CONFIG[b].sortOrder)
     .map((sev) => {
       const count = counts[sev];
@@ -187,20 +211,22 @@ export function computeCvssStats(cves: CVE[]): CvssStats {
   let bHigh = 0;
   let bMedium = 0;
   let bLow = 0;
+  let bNone = 0;
   let bUnrated = 0;
 
   for (const cve of cves) {
     const score = cve.cvss?.baseScore;
     const version = cve.cvss?.version;
 
-    if (typeof score === "number" && score > 0) {
+    if (typeof score === "number") {
       scores.push(score);
 
       if (version) {
         versionMap.set(version, (versionMap.get(version) ?? 0) + 1);
       }
 
-      if (score >= 9.0) bCritical++;
+      if (score === 0) bNone++;
+      else if (score >= 9.0) bCritical++;
       else if (score >= 7.0) bHigh++;
       else if (score >= 4.0) bMedium++;
       else bLow++;
@@ -235,6 +261,7 @@ export function computeCvssStats(cves: CVE[]): CvssStats {
     { range: "7.0 - 8.9", label: "Tinggi", count: bHigh, percentage: toPercent(bHigh) },
     { range: "4.0 - 6.9", label: "Sedang", count: bMedium, percentage: toPercent(bMedium) },
     { range: "0.1 - 3.9", label: "Rendah", count: bLow, percentage: toPercent(bLow) },
+    { range: "0.0", label: "Tidak Berdampak", count: bNone, percentage: toPercent(bNone) },
     { range: "N/A", label: "Belum Dinilai", count: bUnrated, percentage: toPercent(bUnrated) },
   ];
 
@@ -254,16 +281,17 @@ export function computeCvssStats(cves: CVE[]): CvssStats {
 }
 
 export function computeTopItems<T>(items: T[], keyFn: (item: T) => string, limit = 10): TopRankItem[] {
-  const total = items.length;
-  if (total === 0) return [];
+  if (items.length === 0) return [];
 
   const counts = new Map<string, number>();
   for (const item of items) {
     const key = keyFn(item)?.trim();
-    if (key && key.toLowerCase() !== "unknown" && key.toLowerCase() !== "n/a") {
-      counts.set(key, (counts.get(key) ?? 0) + 1);
-    }
+    if (!key || /^(unknown( vendor| product)?|n\/a)$/i.test(key)) continue;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
   }
+
+  const validTotal = [...counts.values()].reduce((sum, count) => sum + count, 0);
+  if (validTotal === 0) return [];
 
   return [...counts.entries()]
     .sort((a, b) => b[1] - a[1])
@@ -271,7 +299,7 @@ export function computeTopItems<T>(items: T[], keyFn: (item: T) => string, limit
     .map(([name, count]) => ({
       name,
       count,
-      percentage: Math.round((count / total) * 1000) / 10,
+      percentage: Math.round((count / validTotal) * 1000) / 10,
     }));
 }
 
@@ -355,11 +383,12 @@ export function computeTrend(cves: CVE[]): TrendDataPoint[] {
 
 export function computePriorityBreakdown(cves: CVE[]): PriorityTierCount[] {
   const total = cves.length;
-  const counts: Record<"P1" | "P2" | "P3" | "P4", number> = {
+  const counts: Record<"P1" | "P2" | "P3" | "P4" | "NA", number> = {
     P1: 0,
     P2: 0,
     P3: 0,
     P4: 0,
+    NA: 0,
   };
 
   for (const cve of cves) {
@@ -367,10 +396,17 @@ export function computePriorityBreakdown(cves: CVE[]): PriorityTierCount[] {
     if (priority?.tier && priority.tier in counts) {
       counts[priority.tier]++;
     } else {
-      counts.P4++;
+      counts.NA++;
     }
   }
 
+  return buildPriorityBreakdownFromCounts(counts, total);
+}
+
+export function buildPriorityBreakdownFromCounts(
+  counts: Record<"P1" | "P2" | "P3" | "P4" | "NA", number>,
+  total: number
+): PriorityTierCount[] {
   const toPercent = (n: number) => (total > 0 ? Math.round((n / total) * 1000) / 10 : 0);
 
   return [
@@ -386,7 +422,7 @@ export function computePriorityBreakdown(cves: CVE[]): PriorityTierCount[] {
     {
       tier: "P2",
       labelId: "Prioritas Tinggi (P2)",
-      actionGuidance: "Remediasi terencana siklus cepat (7-14 hari). Kerentanan CVSS Kritis atau High dengan bukti eksploitasi publik (PoC).",
+      actionGuidance: "Remediasi terencana cepat. CVSS Kritis, atau CVSS High dengan CISA KEV, PoC, atau EPSS tinggi.",
       count: counts.P2,
       percentage: toPercent(counts.P2),
       colorClass: "text-orange-500",
@@ -395,7 +431,7 @@ export function computePriorityBreakdown(cves: CVE[]): PriorityTierCount[] {
     {
       tier: "P3",
       labelId: "Perhatian Sedang (P3)",
-      actionGuidance: "Jadwalkan dalam siklus patch reguler bulanan. Kerentanan dengan dampak moderat atau memiliki probabilitas eksploitasi menengah.",
+      actionGuidance: "Jadwalkan patch reguler. Termasuk CVSS High tanpa bukti tambahan P2, dampak moderat, atau probabilitas eksploitasi menengah.",
       count: counts.P3,
       percentage: toPercent(counts.P3),
       colorClass: "text-amber-500",
@@ -409,6 +445,15 @@ export function computePriorityBreakdown(cves: CVE[]): PriorityTierCount[] {
       percentage: toPercent(counts.P4),
       colorClass: "text-emerald-500",
       bgClass: "bg-emerald-500",
+    },
+    {
+      tier: "NA",
+      labelId: "Belum Dinilai (NA)",
+      actionGuidance: "CVSS belum tersedia. Tinjau advisori dan perbarui prioritas setelah NVD menyelesaikan analisis.",
+      count: counts.NA,
+      percentage: toPercent(counts.NA),
+      colorClass: "text-zinc-500",
+      bgClass: "bg-zinc-500",
     },
   ];
 }
@@ -491,57 +536,43 @@ export async function getDashboardData(): Promise<DashboardData> {
   const epssAdapter = new EpssSourceAdapter();
 
   try {
-    const [sampleCves, cisaCatalog] = await Promise.all([
-      getFacetSample().catch(() => [] as CVE[]),
+    if (isNeonCveConfigured()) {
+      const [aggregates, cisaCatalog] = await Promise.all([
+        getNeonDashboardAggregates(),
+        cisaKevAdapter.fetchCatalog().catch(() => new Map<string, CisaKevEntry>()),
+      ]);
+      return buildNeonDashboardData(aggregates, cisaCatalog);
+    }
+
+    const [localResult, cisaCatalog] = await Promise.all([
+      Promise.resolve(CveRepository.search({ page: 1, pageSize: 100_000 })),
       cisaKevAdapter.fetchCatalog().catch(() => new Map<string, CisaKevEntry>()),
     ]);
-
-    for (const cve of sampleCves) {
-      const kevEntry = cisaCatalog.get(cve.id.toUpperCase());
-      if (kevEntry) {
-        cve.cisaKev = {
-          isKev: true,
-          dateAdded: kevEntry.dateAdded,
-          dueDate: kevEntry.dueDate,
-          requiredAction: kevEntry.requiredAction,
-          notes: kevEntry.notes,
-        };
-      }
+    const localCves = localResult.results;
+    const epssMap = new Map<string, EPSSScore>();
+    for (let offset = 0; offset < localCves.length; offset += 100) {
+      const batch = await epssAdapter.fetchBatch(localCves.slice(offset, offset + 100).map((cve) => cve.id)).catch(() => new Map<string, EPSSScore>());
+      for (const [id, score] of batch) epssMap.set(id, score);
     }
+    attachDashboardThreatSignals(localCves, cisaCatalog, epssMap);
 
-    const priorityCandidates = sampleCves
-      .filter((c) => c.cvss?.severity === "CRITICAL" || c.cisaKev?.isKev)
-      .slice(0, 100);
-
-    const candidateIds = priorityCandidates.map((c) => c.id);
-    const epssMap = candidateIds.length > 0
-      ? await epssAdapter.fetchBatch(candidateIds).catch(() => new Map<string, EPSSScore>())
-      : new Map<string, EPSSScore>();
-
-    for (const cve of priorityCandidates) {
-      const score = epssMap.get(cve.id.toUpperCase());
-      if (score) {
-        cve.epss = score;
-      }
-    }
-
-    const severityDistribution = computeSeverityDistribution(sampleCves);
-    const cvssStats = computeCvssStats(sampleCves);
-    const cisaKevStats = computeCisaKevStats(sampleCves, cisaCatalog);
-    const epssStats = computeEpssStats(priorityCandidates, epssMap);
-    const priorityStats = computePriorityBreakdown(sampleCves);
-    const topVendors = computeTopItems(sampleCves, (c) => c.vendor, 8);
-    const topProducts = computeTopItems(sampleCves, (c) => c.product, 8);
-    const topCwes = computeTopCwes(sampleCves, 8);
-    const trend = computeTrend(sampleCves);
+    const severityDistribution = computeSeverityDistribution(localCves);
+    const cvssStats = computeCvssStats(localCves);
+    const cisaKevStats = computeCisaKevStats(localCves, cisaCatalog);
+    const epssStats = computeEpssStats(localCves, epssMap);
+    const priorityStats = computePriorityBreakdown(localCves);
+    const topVendors = computeTopItems(localCves, (c) => c.vendor, 8);
+    const topProducts = computeTopItems(localCves, (c) => c.product, 8);
+    const topCwes = computeTopCwes(localCves, 8);
+    const trend = computeTrend(localCves);
 
     const criticalCount = severityDistribution.find((s) => s.severity === "CRITICAL")?.count ?? 0;
     const urgentCount = priorityStats.find((p) => p.tier === "P1")?.count ?? 0;
 
     return {
-      dataAvailable: sampleCves.length > 0,
-      totalSampleCves: sampleCves.length,
-      sampleTimeRangeDays: 120,
+      dataAvailable: localCves.length > 0,
+      totalSampleCves: localCves.length,
+      sampleTimeRangeDays: 0,
       generatedAt: new Date().toISOString(),
       severityDistribution,
       cvssStats,
@@ -595,4 +626,98 @@ export async function getDashboardData(): Promise<DashboardData> {
       },
     };
   }
+}
+
+function buildNeonDashboardData(
+  aggregates: Awaited<ReturnType<typeof getNeonDashboardAggregates>>,
+  cisaCatalog: Map<string, CisaKevEntry>
+): DashboardData {
+  const total = aggregates.total;
+  const toPercent = (count: number) => total > 0 ? Math.round(count / total * 1000) / 10 : 0;
+  const severityCounts = new Map(aggregates.severity.map(({ severity, count }) => [severity, count]));
+  const severityDistribution = (Object.keys(SEVERITY_CONFIG) as Severity[])
+    .sort((a, b) => SEVERITY_CONFIG[a].sortOrder - SEVERITY_CONFIG[b].sortOrder)
+    .map((severity) => ({
+      severity,
+      labelId: SEVERITY_CONFIG[severity].labelId,
+      count: severityCounts.get(severity) ?? 0,
+      percentage: toPercent(severityCounts.get(severity) ?? 0),
+      color: SEVERITY_CONFIG[severity].color,
+      bgClass: SEVERITY_CONFIG[severity].bgClass,
+    }));
+  const bucketCounts = new Map(aggregates.cvss.buckets.map(({ severity, count }) => [severity, count]));
+  const cvssStats: CvssStats = {
+    averageScore: Math.round(aggregates.cvss.average * 10) / 10,
+    medianScore: Math.round(aggregates.cvss.median * 10) / 10,
+    maxScore: aggregates.cvss.max,
+    ratedCount: aggregates.cvss.ratedCount,
+    unratedCount: aggregates.cvss.unratedCount,
+    brackets: [
+      { range: "9.0 - 10.0", label: "Kritis", count: bucketCounts.get("CRITICAL") ?? 0, percentage: toPercent(bucketCounts.get("CRITICAL") ?? 0) },
+      { range: "7.0 - 8.9", label: "Tinggi", count: bucketCounts.get("HIGH") ?? 0, percentage: toPercent(bucketCounts.get("HIGH") ?? 0) },
+      { range: "4.0 - 6.9", label: "Sedang", count: bucketCounts.get("MEDIUM") ?? 0, percentage: toPercent(bucketCounts.get("MEDIUM") ?? 0) },
+      { range: "0.1 - 3.9", label: "Rendah", count: bucketCounts.get("LOW") ?? 0, percentage: toPercent(bucketCounts.get("LOW") ?? 0) },
+      { range: "0.0", label: "Tidak Berdampak", count: bucketCounts.get("NONE") ?? 0, percentage: toPercent(bucketCounts.get("NONE") ?? 0) },
+      { range: "N/A", label: "Belum Dinilai", count: aggregates.cvss.unratedCount, percentage: toPercent(aggregates.cvss.unratedCount) },
+    ],
+    versionDistribution: aggregates.versions,
+  };
+  const localKevStats = computeCisaKevStats([], cisaCatalog);
+  const cisaKevStats: CisaKevStats = {
+    ...localKevStats,
+    sampleInKev: aggregates.kev.count,
+    sampleInKevPercentage: toPercent(aggregates.kev.count),
+  };
+  const epssStats: EpssStats = {
+    evaluatedCount: aggregates.epss.count,
+    highRiskCount: aggregates.epss.high,
+    criticalRiskCount: aggregates.epss.critical,
+    averageProbability: Math.round(aggregates.epss.average * 1000) / 10,
+    topEpssCves: aggregates.epss.top,
+  };
+  const priorityCounts = Object.fromEntries(aggregates.priorities.map(({ tier, count }) => [tier, count])) as Record<"P1" | "P2" | "P3" | "P4" | "NA", number>;
+  const priorityStats = buildPriorityBreakdownFromCounts({
+    P1: priorityCounts.P1 ?? 0,
+    P2: priorityCounts.P2 ?? 0,
+    P3: priorityCounts.P3 ?? 0,
+    P4: priorityCounts.P4 ?? 0,
+    NA: priorityCounts.NA ?? 0,
+  }, total);
+  const topVendors = buildSqlRankItems(aggregates.vendors, aggregates.vendors.reduce((sum, item) => sum + item.count, 0));
+  const topProducts = buildSqlRankItems(aggregates.products, aggregates.products.reduce((sum, item) => sum + item.count, 0));
+  const topCwes = aggregates.cwes.map(({ id, name, count }) => ({ id, name, count, percentage: toPercent(count) }));
+  const trend = aggregates.trend.map((point) => ({
+    ...point,
+    label: formatTrendLabel(point.periodKey),
+  }));
+  return {
+    dataAvailable: total > 0,
+    totalSampleCves: total,
+    sampleTimeRangeDays: 0,
+    generatedAt: new Date().toISOString(),
+    severityDistribution,
+    cvssStats,
+    cisaKevStats,
+    epssStats,
+    priorityStats,
+    topVendors,
+    topProducts,
+    topCwes,
+    trend,
+    highlights: {
+      urgentCount: priorityCounts.P1 ?? 0,
+      cisaKevCount: aggregates.kev.count,
+      criticalCount: severityCounts.get("CRITICAL") ?? 0,
+      epssHighThreatCount: aggregates.epss.high + aggregates.epss.critical,
+    },
+  };
+}
+
+function buildSqlRankItems(items: Array<{ name: string; count: number }>, denominator: number): TopRankItem[] {
+  return items.map(({ name, count }) => ({ name, count, percentage: denominator ? Math.round(count / denominator * 1000) / 10 : 0 }));
+}
+
+function formatTrendLabel(periodKey: string): string {
+  const date = new Date(`${periodKey}T00:00:00Z`);
+  return new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", timeZone: "UTC" }).format(date);
 }

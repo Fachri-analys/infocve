@@ -14,8 +14,7 @@ import { TopRankings } from "@/components/dashboard/top-rankings";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Stream the static dashboard shell while analytics load. Data fetches keep
-// their own cache windows (the NVD facet sample is cached for 6 hours).
+// Stream the dashboard shell while aggregated catalog data loads.
 export const revalidate = 0;
 
 export const metadata: Metadata = buildPageMetadata({
@@ -48,9 +47,9 @@ export default function DashboardPage() {
         <div className="flex gap-4 border-t border-border pt-4 sm:items-center lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <Calendar className="mt-1 size-4 shrink-0 text-accent" />
           <div>
-            <p className="eyebrow text-[10px]">Rentang Analisis</p>
-            <p className="data-tag mt-2 text-lg font-medium text-foreground">120 hari terakhir</p>
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Sampel NVD untuk ringkasan metrik.</p>
+            <p className="eyebrow text-[10px]">Sumber Analisis</p>
+            <p className="data-tag mt-2 text-lg font-medium text-foreground">Katalog tersinkron</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">Backfill awal 120 hari, dilanjutkan pembaruan inkremental NVD.</p>
           </div>
         </div>
       </header>
@@ -68,9 +67,9 @@ async function DashboardContent() {
     return (
       <section role="status" className="navy-panel border border-border p-6 sm:p-8">
         <p className="eyebrow text-[10px] text-accent">Data analitik belum tersedia</p>
-        <h2 className="mt-3 font-display text-2xl font-medium text-foreground">Menunggu respons NVD</h2>
+        <h2 className="mt-3 font-display text-2xl font-medium text-foreground">Katalog CVE belum tersedia</h2>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-          Ringkasan statistik tidak ditampilkan sebagai nol karena sampel CVE belum berhasil dimuat. Coba muat ulang beberapa saat lagi atau buka pencarian CVE.
+          Ringkasan statistik belum dapat dihitung karena katalog kosong atau belum bisa diakses. Periksa status sinkronisasi dan koneksi database, lalu coba lagi.
         </p>
         <Link href="/search" className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-accent underline-offset-4 hover:underline">
           Buka pencarian CVE <ArrowRight className="size-4" />

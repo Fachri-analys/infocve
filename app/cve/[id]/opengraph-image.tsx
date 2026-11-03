@@ -27,8 +27,8 @@ export default async function OpengraphImage({ params }: OpengraphImageProps) {
 
   const cve = await getCVEById(id).catch(() => null);
 
-  const severity = cve?.cvss?.severity ?? "UNKNOWN";
-  const score = cve?.cvss?.baseScore ? cve.cvss.baseScore.toFixed(1) : "-";
+  const severity = cve?.cvss?.severity ?? (cve?.vulnStatus === "Rejected" ? "DITOLAK" : "MENUNGGU ANALISIS");
+  const score = cve?.cvss ? cve.cvss.baseScore.toFixed(1) : "—";
   const title = cve?.title || "Informasi Kerentanan Keamanan Siber";
   const vendor = cve?.vendor || "";
   const product = cve?.product || "";

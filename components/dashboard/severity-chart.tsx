@@ -17,7 +17,7 @@ export function SeverityChart({ severityDistribution, brackets, totalCves }: Sev
           <div>
             <CardTitle className="text-base font-semibold">Distribusi Tingkat Keparahan (CVSS Severity)</CardTitle>
             <p className="text-xs text-muted-foreground">
-              Proporsi tingkat keparahan berdasarkan metriks standar CVSS dari {formatNumberId(totalCves)} sampel kerentanan
+              Proporsi tingkat keparahan berdasarkan metriks standar CVSS dari {formatNumberId(totalCves)} CVE tersinkron
             </p>
           </div>
         </div>
@@ -39,7 +39,7 @@ export function SeverityChart({ severityDistribution, brackets, totalCves }: Sev
             })}
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {severityDistribution.map((item) => (
               <div key={item.severity} className="flex flex-col">
                 <div className="flex items-center gap-1.5">
@@ -52,7 +52,7 @@ export function SeverityChart({ severityDistribution, brackets, totalCves }: Sev
                   </span>
                   <span className="text-xs text-muted-foreground">({item.percentage}%)</span>
                 </div>
-                {item.severity !== "UNKNOWN" && (
+                {item.severity !== "UNRATED" && (
                   <Link
                     href={`/search?severity=${item.severity}`}
                     className="mt-1 text-[11px] text-accent underline-offset-2 hover:underline"

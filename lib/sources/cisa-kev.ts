@@ -73,9 +73,9 @@ export class CisaKevSourceAdapter extends BaseVulnerabilitySource<CisaKevRespons
     CisaKevSourceAdapter.pendingPromise = (async () => {
       try {
         const feedUrl = this.config.baseUrl || CisaKevSourceAdapter.FEED_URL;
-        const data = await this.fetchHttp<unknown>(feedUrl, {
-          next: { revalidate: this.config.cacheTtlSeconds, tags: ["cisa-kev"] },
-        });
+        // The full catalog is >2 MB; keep it in this adapter's bounded
+        // in-memory cache instead of Next's data cache size limit.
+        const data = await this.fetchHttp<unknown>(feedUrl, { cache: "no-store" });
 
         if (
           !data ||

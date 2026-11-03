@@ -159,10 +159,10 @@ describe("CisaKevSourceAdapter", () => {
     expect(enriched.sources).toContain("NVD");
 
     // CVSS and NVD fields must remain completely intact
-    expect(enriched.cvss.baseScore).toBe(mockCve.cvss.baseScore);
-    expect(enriched.cvss.severity).toBe(mockCve.cvss.severity);
-    expect(enriched.cvss.vectorString).toBe(mockCve.cvss.vectorString);
-    expect(enriched.cvss.scope).toBe(mockCve.cvss.scope);
+    expect(enriched.cvss!.baseScore).toBe(mockCve.cvss!.baseScore);
+    expect(enriched.cvss!.severity).toBe(mockCve.cvss!.severity);
+    expect(enriched.cvss!.vectorString).toBe(mockCve.cvss!.vectorString);
+    expect(enriched.cvss!.scope).toBe(mockCve.cvss!.scope);
     expect(enriched.descriptionEn).toBe(mockCve.descriptionEn);
     expect(enriched.descriptionId).toBe(mockCve.descriptionId);
     expect(enriched.affected).toEqual(mockCve.affected);

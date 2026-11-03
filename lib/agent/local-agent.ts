@@ -17,7 +17,7 @@ export interface SbomScanMatch {
 
 export interface ThreatIntelligenceReport {
   cveId: string;
-  cvssScore: number;
+  cvssScore?: number;
   severity: string;
   epssProbability?: number;
   cisaKevActive: boolean;
@@ -59,14 +59,14 @@ export class InfoCveLocalAgent {
     let recommendedAction = "Terapkan pembaruan perangkat lunak versi terbaru yang telah dipatch.";
     if (cve.cisaKev?.isKev) {
       recommendedAction = `🚨 Prioritas Kritis (CISA KEV): ${cve.cisaKev.requiredAction || "Segera mitigasi atau putuskan sistem dari jaringan jika belum ditambal."}`;
-    } else if (cve.cvss.severity === "CRITICAL" && (cve.hasPoc || (cve.epss?.score && cve.epss.score > 0.5))) {
+    } else if (cve.cvss?.severity === "CRITICAL" && (cve.hasPoc || (cve.epss?.score && cve.epss.score > 0.5))) {
       recommendedAction = "Prioritas Sangat Tinggi: Kerentanan kritis dengan exploit aktif/probabilitas tinggi tersedia.";
     }
 
     return {
       cveId: cve.id,
-      cvssScore: cve.cvss.baseScore,
-      severity: cve.cvss.severity,
+      cvssScore: cve.cvss?.baseScore,
+      severity: cve.cvss?.severity ?? "UNRATED",
       epssProbability: cve.epss?.score,
       cisaKevActive: cve.cisaKev?.isKev ?? false,
       hasPublicPoc: cve.hasPoc ?? false,
@@ -91,7 +91,7 @@ export class InfoCveLocalAgent {
         results.push({
           package: pkg,
           cves: searchRes.results,
-          highestSeverity: searchRes.results[0]?.cvss.severity,
+          highestSeverity: searchRes.results[0]?.cvss?.severity,
         });
       }
     }

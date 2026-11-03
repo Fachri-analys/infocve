@@ -2,6 +2,16 @@ import { describe, it, expect } from "vitest";
 import { calculatePriority } from "@/lib/priority";
 
 describe("InfoCVE Priority Assessment", () => {
+  it("keeps unexploited high CVSS at P3 and reserves P2 for added exploit evidence", () => {
+    expect(calculatePriority({ cvss: { baseScore: 7.5, severity: "HIGH" } }).tier).toBe("P3");
+    expect(calculatePriority({ cvss: { baseScore: 7.5, severity: "HIGH" }, hasPoc: true }).tier).toBe("P2");
+  });
+
+  it("uses NA for CVEs without a CVSS assessment unless KEV confirms exploitation", () => {
+    expect(calculatePriority({ cvss: null }).tier).toBe("NA");
+    expect(calculatePriority({ cvss: null, cisaKev: { isKev: true } }).tier).toBe("P1");
+  });
+
   it("1. P1: assigns Critical / P1 when vulnerability is listed in CISA KEV", () => {
     const assessment = calculatePriority({
       cvss: { baseScore: 7.5, severity: "HIGH" },

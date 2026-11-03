@@ -1,7 +1,7 @@
 import type { Severity } from "@/types/cve";
 
 /** Canonical ordering, most severe first — drives sorting and filter layout. */
-export const SEVERITY_ORDER: Severity[] = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "NONE"];
+export const SEVERITY_ORDER: Severity[] = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "NONE", "UNRATED"];
 
 export const SEVERITY_LABEL_ID: Record<Severity, string> = {
   CRITICAL: "Kritis",
@@ -9,6 +9,7 @@ export const SEVERITY_LABEL_ID: Record<Severity, string> = {
   MEDIUM: "Sedang",
   LOW: "Rendah",
   NONE: "Tidak Ada",
+  UNRATED: "Belum dinilai",
 };
 
 /**
@@ -49,6 +50,12 @@ export const SEVERITY_CLASSES: Record<Severity, { text: string; bg: string; bord
     bg: "bg-severity-none/12",
     border: "border-severity-none/30",
     dot: "bg-severity-none",
+  },
+  UNRATED: {
+    text: "text-muted-foreground",
+    bg: "bg-muted/50",
+    border: "border-border",
+    dot: "bg-muted-foreground",
   },
 };
 

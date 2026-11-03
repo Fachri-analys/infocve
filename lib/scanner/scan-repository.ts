@@ -19,7 +19,6 @@ export async function saveDependencyScan(report: DependencyScanReport, accessTok
     return;
   }
 
-  pruneExpiredScansSqlite();
   const db = getDb();
   db.prepare(`
     INSERT INTO dependency_scans (id, parent_scan_id, access_token_hash, scanned_at, status, report_json, created_at)

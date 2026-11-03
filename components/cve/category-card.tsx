@@ -2,7 +2,9 @@ import Link from "next/link";
 import {
   Building2,
   Cloud,
+  Cpu,
   Globe,
+  HelpCircle,
   Layers,
   Network,
   Server,
@@ -18,6 +20,8 @@ const CATEGORY_ICONS: Record<CVECategory, LucideIcon> = {
   "framework-library": Layers,
   "enterprise-software": Building2,
   "cloud-infrastructure": Cloud,
+  hardware: Cpu,
+  unclassified: HelpCircle,
 };
 
 interface CategoryCardProps {

@@ -10,7 +10,16 @@
  * what it can't derive directly from NVD (title, category).
  */
 
-export type Severity = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "NONE";
+export type Severity = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "NONE" | "UNRATED";
+
+export type CVEVulnerabilityStatus =
+  | "Analyzed"
+  | "Awaiting Analysis"
+  | "Undergoing Analysis"
+  | "Modified"
+  | "Deferred"
+  | "Rejected"
+  | "Received";
 
 export type AttackVector = "NETWORK" | "ADJACENT_NETWORK" | "LOCAL" | "PHYSICAL";
 export type AttackComplexity = "LOW" | "HIGH";
@@ -68,7 +77,9 @@ export type CVECategory =
   | "operating-system"
   | "framework-library"
   | "enterprise-software"
-  | "cloud-infrastructure";
+  | "cloud-infrastructure"
+  | "hardware"
+  | "unclassified";
 
 export interface EPSSScore {
   score: number; // 0.0 - 1.0 (e.g. 0.975 = 97.5% probability)
@@ -92,11 +103,11 @@ export interface CveSourceObservation {
   accessedAt: string;
 }
 
-export type PriorityLevel = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+export type PriorityLevel = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "UNRATED";
 
 export interface PriorityAssessment {
   level: PriorityLevel;
-  tier: "P1" | "P2" | "P3" | "P4";
+  tier: "P1" | "P2" | "P3" | "P4" | "NA";
   labelId: string;
   reasons: string[];
   factors: {
@@ -119,7 +130,8 @@ export interface CVE {
   descriptionEn: string;
   descriptionId: string;
   translationStatus?: "PENDING" | "TRANSLATED" | "FAILED" | "UNTRANSLATED";
-  cvss: CVSSMetrics;
+  cvss: CVSSMetrics | null;
+  vulnStatus?: CVEVulnerabilityStatus;
   cwe: CWEReference[];
   vendor: string;
   product: string;
@@ -140,6 +152,8 @@ export interface PaginatedResult<T> {
   page: number;
   pageSize: number;
   totalPages: number;
+  /** False means the catalog query failed; an empty result is not a verified no-match. */
+  available?: boolean;
 }
 
 export interface SearchCVEParams {

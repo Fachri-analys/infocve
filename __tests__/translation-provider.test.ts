@@ -1,11 +1,47 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createLibreTranslateProvider, protectTechnicalIdentifiers, translateProtectedText, translateWithRetry } from "@/lib/translation/provider";
+import { createLibreTranslateBatchProvider, createLibreTranslateProvider, protectTechnicalIdentifiers, translateBatchWithRetry, translateProtectedBatch, translateProtectedText, translateWithRetry } from "@/lib/translation/provider";
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
 describe("CVE translation provider", () => {
+  it("translates a batch and restores each description's protected identifiers", async () => {
+    const fetchMock = vi.fn(async (_url: URL, init: RequestInit) => {
+      const body = JSON.parse(String(init.body)) as { q: string[] };
+      return Response.json({ translatedText: body.q.map((text) => text.replace(" vuln ", " kerentanan ")) });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const provider = createLibreTranslateBatchProvider({ endpoint: "https://translate.example/translate", timeoutMs: 1000 });
+
+    await expect(translateProtectedBatch([
+      { text: "VendorOne vuln CVE-2024-1234", identifiers: ["VendorOne"] },
+      { text: "VendorTwo vuln CWE-79", identifiers: ["VendorTwo"] },
+    ], provider)).resolves.toEqual([
+      "VendorOne kerentanan CVE-2024-1234",
+      "VendorTwo kerentanan CWE-79",
+    ]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1].body)) as { q: string[] };
+    expect(body.q).toHaveLength(2);
+  });
+
+  it("fails the whole batch if the provider changes a protected marker", async () => {
+    await expect(translateProtectedBatch([{ text: "CVE-2024-1234" }], async () => ["tanpa marker"]))
+      .rejects.toThrow(/protected technical identifiers/);
+  });
+
+  it("retries a transient failure for the batch as one unit", async () => {
+    let attempts = 0;
+    const translated = await translateBatchWithRetry([{ text: "CVE-2024-1234" }], async (texts) => {
+      attempts += 1;
+      if (attempts === 1) throw Object.assign(new Error("temporarily unavailable"), { retryable: true });
+      return texts;
+    }, { attempts: 2, delayMs: 0 });
+    expect(attempts).toBe(2);
+    expect(translated).toEqual(["CVE-2024-1234"]);
+  });
+
   it("retries transient provider failures and returns the Indonesian text", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(new Response("busy", { status: 503 }))
@@ -54,6 +90,12 @@ describe("CVE translation provider", () => {
     expect(translated).toContain("Apache Log4j");
     expect(translated).toContain("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H");
     expect(translated).toContain("https://example.com/advisory");
+  });
+
+  it("restores protected text containing JavaScript replacement tokens literally", async () => {
+    const text = "Product $& and $' are literal package names.";
+    const restored = await translateProtectedText(text, async (masked) => masked, ["$&", "$'"]);
+    expect(restored).toBe(text);
   });
 
   it("rejects a translation that drops, duplicates, or mutates a protected technical token", async () => {

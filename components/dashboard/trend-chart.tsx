@@ -21,7 +21,7 @@ export function TrendChart({ trend }: TrendChartProps) {
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp className="size-4 text-accent" />
-            <CardTitle className="text-base font-semibold">Tren Publikasi Kerentanan (120 Hari Terakhir)</CardTitle>
+            <CardTitle className="text-base font-semibold">Tren Publikasi Kerentanan (24 Minggu)</CardTitle>
           </div>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">

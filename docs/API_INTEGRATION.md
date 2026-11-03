@@ -60,80 +60,39 @@ respons NVD secara langsung; semuanya lewat `lib/nvd.ts`.
 - **Tidak ada endpoint agregasi/facet.** NVD tidak menyediakan cara untuk
   bertanya "vendor apa saja yang ada" atau "berapa total CVE per tahun" —
   hanya daftar record CVE per permintaan.
-- **Lisensi data:** domain publik (produk pemerintah AS).
+- **Ketentuan data:** ikuti [NVD Terms of Use](https://nvd.nist.gov/developers/terms-of-use) dan [CVE Program Terms of Use](https://www.cve.org/Legal/TermsOfUse); data publik tidak otomatis berarti semua field bebas didistribusikan ulang tanpa syarat.
 - **Dokumentasi resmi:** <https://nvd.nist.gov/developers/vulnerabilities>
 
 ## 4. Strategi query — kenapa perlu "perencanaan"
 
-UI pencarian aplikasi ini mendukung hal-hal yang **tidak bisa** langsung
-dipetakan ke satu permintaan NVD: multi-pilih tingkat keparahan, filter
-tahun, kategori (konsep buatan aplikasi ini, NVD tidak mengenalnya), dan
-rentang tanggal yang mungkin lebih dari 120 hari.
+UI pencarian mendukung filter gabungan yang tidak tersedia sebagai satu query
+NVD. Filter pencarian dijalankan di katalog InfoCVE setelah proses sync.
 
-`searchCVEs()` di `lib/nvd.ts` menanganinya dengan dua jalur:
+Pada Vercel, `searchCVEs()` membaca seluruh katalog `infocve_cves` dari Neon.
+Query teks dan filter menggunakan parameter SQL, total halaman dihitung dari
+`COUNT(*)`, lalu sorting dan offset diterapkan pada katalog yang sama. SQLite
+lokal menjalankan filter melalui repository lokal. Daftar tidak menampilkan
+CVE berstatus `Rejected`.
 
-1. **Jalur native-penuh** — jika semua filter yang diminta bisa dipetakan
-   langsung ke parameter NVD (severity tunggal, CWE tunggal, satu rentang
-   tanggal ≤120 hari, tanpa `year`/`category`), permintaan dikirim dengan
-   `resultsPerPage`/`startIndex` yang sudah pas dengan halaman yang diminta,
-   dan `totalResults` dari NVD dipakai apa adanya untuk paginasi — akurat
-   dan efisien.
-2. **Jalur ambil-lalu-saring** — jika ada filter yang NVD tidak bisa
-   terapkan secara native (multi-severity, `year`, `category`, rentang
-   tanggal ganda/terlalu lebar), aplikasi mengambil satu batch yang cukup
-   besar (200 hasil) memakai parameter native apa pun yang tersedia,
-   lalu menjalankan **pipeline filter lengkap yang sama** (query, severity,
-   year, vendor, product, cwe, category, rentang tanggal) di memori —
-   termasuk filter yang sebenarnya sudah diterapkan NVD, karena menerapkan
-   ulang filter yang sudah benar tidak mengubah hasil dan menghindari bug
-   dari salah menandai "sudah ditangani NVD".
-
-Konsekuensinya: pada kombinasi filter yang kompleks, hasil pencarian
-mencerminkan batch hingga 200 CVE dari NVD untuk permintaan itu, bukan
-seluruh sejarah NVD. Ini batas query client-side yang dipakai untuk filter
-yang tidak tersedia secara native; tabel cache Neon untuk sampel dashboard
-bukan katalog pencarian penuh. Filter yang NVD dukung secara native tetap
-menggunakan `totalResults` NVD untuk paginasi.
-
-`getCVEsByYear(year)` adalah pengecualian yang disengaja: karena ini fungsi
-bernama eksplisit (bukan bagian dari filter gabungan), ia memecah satu
-tahun menjadi ~4 jendela ±91 hari dan mengirim keempatnya paralel lewat
-`Promise.all`, lalu menggabungkan hasilnya — lebih banyak permintaan
-daripada filter `year` generik di `searchCVEs()`, tapi akurat untuk
-keseluruhan tahun, bukan perkiraan dari satu batch.
+NVD menjadi sumber sinkronisasi, bukan query langsung untuk setiap halaman.
+Rentang NVD dibatasi maksimal 120 hari dan setiap halaman berisi maksimal
+2.000 record. Cursor di `infocve_sync_state` memungkinkan backfill dan sync
+inkremental berlanjut pada eksekusi berikut. Detail CVE mencoba Neon lebih dulu
+dan memakai NVD live jika record tidak ditemukan.
 
 ## 5. Facet (vendor/produk/kategori/tahun/CWE) & statistik beranda
 
-`getVendors`, `getProducts`, `getCategories`, `getAvailableYears`,
-`getAvailableCWEs`, dan `getStats` memakai satu sampel bersama dari
-`getFacetSample()` di `lib/nvd.ts`. Sampel tersebut meminta **maksimal 100
-CVE** dalam jendela publikasi 120 hari terakhir melalui satu halaman NVD.
-Ini sengaja dibatasi untuk menjaga cold render pada function serverless tetap
-ringan; jangan gunakan sampel ini sebagai indeks pencarian penuh.
+Facet vendor, produk, kategori, tahun, dan CWE memakai query agregat dari
+katalog yang sama dengan pencarian. Filter aktif dipertahankan, kecuali filter
+facet yang sedang dihitung dihilangkan; vendor dan produk null diabaikan.
+Beranda dan dashboard memakai agregat katalog Neon penuh, bukan sampel.
+NVD tidak menyediakan endpoint agregasi global, jadi metrik dihitung dari
+record yang telah tersinkron.
 
-Di Vercel, `lib/nvd-facet-cache.ts` menyimpan sampel terakhir yang berhasil
-ke tabel Neon `infocve_nvd_facet_cache`. Sampel dipakai ulang selama 7 hari,
-termasuk lintas function instance dan deployment. Jika belum ada sampel,
-aplikasi meminta satu halaman kecil dari NVD lalu menyimpan respons sukses.
-Jika permintaan NVD gagal, cache lama tetap dipakai bila tersedia. Cache
-Neon memerlukan `DATABASE_URL` atau `POSTGRES_URL`; tanpa konfigurasi itu,
-Vercel tetap mencoba NVD langsung tetapi tidak memiliki cache bersama.
-Pengembangan lokal dapat memakai SQLite sebagai fallback.
-
-Angka kartu beranda seperti "CVE terbaru", jumlah kritis, dan vendor
-merangkum sampel ini, bukan seluruh katalog NVD. Setelah cache diperbarui,
-total sampel paling banyak 100. Cache dari versi sebelumnya dapat tetap
-digunakan sampai masa 7 harinya berakhir. Jumlah hasil pencarian biasa berasal dari
-`totalResults` untuk query tersebut dan bukan angka sampel statistik.
-NVD tidak menyediakan endpoint agregasi global untuk menghitung seluruh
-vendor atau kategori.
-
-Jika belum ada cache dan NVD tidak dapat dihubungi, `getStats()` menandai
-data sebagai tidak tersedia; beranda menampilkan `—`, bukan angka nol yang
-menyesatkan. Periksa `/api/health` untuk memastikan koneksi Neon sehat dan
-lihat log runtime Vercel untuk kegagalan NVD/cache. `NVD_API_KEY` menaikkan
-kuota request NVD, sedangkan `DATABASE_URL`/`POSTGRES_URL` menyediakan
-penyimpanan cache bersama; keduanya memiliki fungsi berbeda.
+Jika katalog kosong, periksa `sync.backfillCompletedAt` dan
+`sync.lastModifiedAt` di `/api/health`, lalu tinjau log route sync. Neon
+memerlukan `DATABASE_URL` atau `POSTGRES_URL`; `NVD_API_KEY` meningkatkan
+kuota NVD sedangkan Neon memberi penyimpanan bersama.
 
 ## 6. Normalisasi — hal-hal yang tidak disediakan NVD secara langsung
 
@@ -151,9 +110,9 @@ pernah muncul di data mock:
   dari segmen CPE lalu dirapikan (mis. `log4j` → `Log4j`) — heuristik
   sederhana, bukan kamus CPE resmi, jadi sesekali bisa kurang sempurna
   untuk nama vendor yang tidak umum.
-- **Nama CWE** — NVD hanya memberi ID (`CWE-79`), tidak pernah nama. Dicari
-  di `lib/cwe-catalog.ts` (~70 CWE umum); ID yang tidak dikenal tetap
-  tampil dengan label generik, bukan error.
+- **Nama CWE** — NVD hanya memberi ID (`CWE-79`), tidak pernah nama. Nama
+  dicari di katalog penuh CWE dari MITRE. Jika ID belum dikenal, UI
+  menampilkan ID tersebut tanpa label generik.
 - **Kategori** (`web-application`, `network`, dst.) — konsep buatan
   aplikasi ini sepenuhnya; NVD tidak memiliki taksonomi ini. Diperkirakan
   dari kombinasi `part` CPE (`o`=sistem operasi, `h`=perangkat keras,
@@ -165,25 +124,21 @@ pernah muncul di data mock:
   diturunkan dari ~100 karakter pertama deskripsi (setelah membuang akhiran
   "This CVE ID is unique from..." yang kadang ditambahkan NVD), bukan
   informasi yang benar-benar disediakan NVD.
-- **Penjelasan Indonesia (`descriptionId`)** — ini paling penting untuk
-  dipahami: kamus istilah (`lib/dictionary.ts`) **tidak bisa** menerjemahkan
-  kalimat bebas berbahasa Inggris apa pun (itu bukan tugas kamus istilah
-  tetap, dan proyek ini secara eksplisit melarang terjemahan AI). Yang
-  dilakukan sebagai gantinya: memindai deskripsi resmi untuk istilah yang
-  dikenali kamus (mis. "SQL Injection", "XSS") dan menyajikan penjelasan
-  Indonesia untuk istilah-istilah itu secara jujur, bukan berpura-pura
-  menerjemahkan seluruh paragraf. Kalau tidak ada istilah yang dikenali,
-  pesannya mengatakan demikian secara terbuka dan mengarahkan ke halaman
-  Glosarium.
+- **Penjelasan Indonesia (`descriptionId`)** — teks Inggris selalu disimpan
+  bersama status terjemahan. Jika provider LibreTranslate-compatible
+  dikonfigurasi, antrean persisten menerjemahkan berdasarkan hash sumber,
+  mencoba ulang kegagalan, dan mempertahankan identifier teknis. Bila provider
+  gagal atau tidak diatur, halaman menampilkan deskripsi Inggris; UI menyediakan
+  status terjemahan dan opsi deskripsi asli.
 
 ## 7. Penanganan error
 
-- **Fungsi bertipe daftar** (`searchCVEs`, `getLatestCVEs`, `getVendors`,
-  dst.) **tidak pernah throw**. Kegagalan apa pun (jaringan, timeout, rate
-  limit, respons tidak terduga) ditangkap secara internal, dicatat lewat
-  `console.error`, dan mengembalikan hasil kosong/nol — supaya halaman yang
-  memanggilnya (termasuk saat prerendering statis di `next build`) selalu
-  bisa dirender lewat `<EmptyState>` yang sudah ada, bukan gagal total.
+- **Fungsi bertipe daftar** menangkap kegagalan provider/database agar route
+  dapat dirender. `searchCVEs` menandai `available: false` saat query gagal;
+  halaman pencarian menampilkan status katalog tidak tersedia dan tidak
+  menyebutnya sebagai pencarian tanpa hasil. Facet dan daftar ringkas mencatat
+  kegagalan di log server. Dashboard juga menampilkan keadaan data belum
+  tersedia, bukan angka nol yang dianggap hasil valid.
 - **`getCVEById`** membedakan dua kondisi: NVD memastikan ID tidak ada
   (0 hasil) → mengembalikan `null`, alur `notFound()` yang sudah ada di
   `app/cve/[id]/page.tsx` tetap bekerja tanpa perubahan. Kegagalan lain
@@ -203,30 +158,27 @@ pernah muncul di data mock:
   lingkungan produksi sungguhan seperti Vercel), penanganan eksplisit ini
   tetap aman untuk dipertahankan sebagai lapisan cadangan.
 
-## 8. Caching & revalidasi
+## 8. Sinkronisasi terjadwal dan cache
 
-Semua permintaan memakai `fetch` bawaan Next.js dengan
-`next: { revalidate, tags }`, bukan `no-store` — inilah pertahanan utama
-terhadap rate limit di trafik nyata, di atas retry logic:
+Vercel Cron memanggil `GET /api/sync` harian dengan `Authorization: Bearer
+<CRON_SECRET>`. Sinkronisasi manual memakai `POST /api/sync` dan
+`ADMIN_SECRET`. Kedua jalur gagal tertutup bila secret hilang atau salah.
+Rate pacing NVD hanya berjalan pada job sinkronisasi.
 
-| Jenis data | Revalidasi |
-|---|---|
-| Detail satu CVE (`getCVEById`) | 6 jam |
-| Pencarian & daftar (`searchCVEs`, `getLatestCVEs`, dst.) | 1 jam |
-| Sampel facet di cache fetch NVD | 7 hari |
+Antrean terjemahan berjalan melalui Cron terpisah pada `GET /api/translations`.
+Route mengklaim hingga 512 deskripsi per putaran dengan maksimal 32 teks dan
+60.000 karakter sumber per request. Ia membatasi maksimal 8 request serentak,
+timeout provider 4 detik, satu retry, dan budget kerja 42 detik; job yang tidak
+masuk estimasi waktu dikembalikan ke antrean. Job `RUNNING` yang stale diklaim
+kembali. Respons mencakup batch/request, waktu proses, antrean tersisa, dan status peringatan.
 
-Di samping cache fetch Next.js, Vercel menyimpan respons sampel yang berhasil
-di Neon selama 7 hari. Cache database menjadi fallback bersama untuk render
-serverless dan tetap dapat dipakai ketika request NVD berikutnya gagal.
+Katalog disimpan di Neon, bukan Next.js Data Cache. Feed CISA KEV besar
+diambil dengan `no-store`. Cache antrean terjemahan berdasarkan hash deskripsi
+disimpan di Neon dan diproses ulang dengan retry; deskripsi sumber tetap ada.
 
-Angka-angka ini konstanta biasa (`REVALIDATE` di `lib/nvd.ts`) — ubah
-sesuai kebutuhan tanpa menyentuh logika lain.
+## 9. Sinkronisasi dan validasi operasional
 
-## 9. Yang tidak berubah
-
-Tipe di `types/cve.ts`, seluruh komponen di `components/`, dan struktur
-setiap halaman di `app/` tidak disentuh oleh migrasi ini — semuanya sudah
-bekerja terhadap bentuk `CVE` yang stabil, bukan terhadap sumber datanya.
-Satu-satunya perubahan di luar `lib/nvd*.ts` adalah pada bagaimana
-`app/cve/[id]/page.tsx` menentukan `generateStaticParams`/`dynamicParams`
-dan menangani error (lihat §7), dan `app/sitemap.ts` (lihat README).
+Gunakan `npm run typecheck`, `npm run lint`, `npm run test`, dan `npm run
+build` sebelum deploy. Untuk memastikan koneksi database, jalankan
+`npm run test:neon` hanya dengan `TEST_DATABASE_URL` yang menunjuk ke branch
+khusus pengujian. Jangan arahkan skrip integrasi ke database produksi.

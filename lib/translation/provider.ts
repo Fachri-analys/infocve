@@ -4,6 +4,7 @@ export interface TranslationProviderError extends Error {
 }
 
 export type TranslationProvider = (text: string) => Promise<string>;
+export type TranslationBatchProvider = (texts: string[]) => Promise<string[]>;
 
 export interface ProtectedTranslationText {
   maskedText: string;
@@ -65,8 +66,30 @@ export async function translateProtectedText(
     if (translated.split(marker).length !== 2) throw providerError("Translation provider changed protected technical identifiers.", false);
   }
   let restored = translated;
-  for (const { marker, value } of protectedText.markers) restored = restored.replace(marker, value);
+  for (const { marker, value } of protectedText.markers) restored = restored.replace(marker, () => value);
   return restored;
+}
+
+/** Batch translation preserves technical tokens independently for every description. */
+export async function translateProtectedBatch(
+  entries: Array<{ text: string; identifiers?: string[] }>,
+  provider: TranslationBatchProvider
+): Promise<string[]> {
+  if (entries.length === 0) return [];
+  const protectedEntries = entries.map(({ text, identifiers }) => protectTechnicalIdentifiers(text, identifiers));
+  const translated = await provider(protectedEntries.map((entry) => entry.maskedText));
+  if (translated.length !== protectedEntries.length) {
+    throw providerError("Translation provider returned a different number of batch results.", true);
+  }
+  return translated.map((text, index) => {
+    const original = protectedEntries[index]!;
+    for (const { marker } of original.markers) {
+      if (text.split(marker).length !== 2) throw providerError("Translation provider changed protected technical identifiers.", false);
+    }
+    let restored = text;
+    for (const { marker, value } of original.markers) restored = restored.replace(marker, () => value);
+    return restored;
+  });
 }
 
 interface LibreTranslateOptions {
@@ -123,6 +146,53 @@ export function createLibreTranslateProvider(options: LibreTranslateOptions): Tr
   };
 }
 
+/** LibreTranslate accepts an array in `q`, reducing one HTTP request per description to one per group. */
+export function createLibreTranslateBatchProvider(options: LibreTranslateOptions): TranslationBatchProvider {
+  return async (texts) => {
+    const endpoint = new URL(options.endpoint);
+    if (endpoint.protocol !== "https:" && endpoint.protocol !== "http:") {
+      throw providerError("Translation endpoint must use HTTP or HTTPS.", false);
+    }
+    if (texts.length === 0 || texts.length > 32 || texts.some((text) => text.length === 0 || text.length > 20_000)) {
+      throw providerError("Translation batch must contain 1–32 texts of at most 20,000 characters each.", false);
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 15_000);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          q: texts,
+          source: "en",
+          target: "id",
+          format: "text",
+          ...(options.apiKey ? { api_key: options.apiKey } : {}),
+        }),
+        signal: controller.signal,
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        throw providerError(`Translation provider returned HTTP ${response.status}.`, response.status === 429 || response.status >= 500);
+      }
+      const payload: unknown = await response.json();
+      const result = payload && typeof payload === "object" && "translatedText" in payload
+        ? (payload as { translatedText?: unknown }).translatedText
+        : undefined;
+      if (!Array.isArray(result) || result.length !== texts.length || result.some((text) => typeof text !== "string" || !text.trim())) {
+        throw providerError("Translation provider returned an invalid batch response.", true);
+      }
+      return result.map((text) => (text as string).trim());
+    } catch (error) {
+      if (isTranslationProviderError(error)) throw error;
+      throw providerError(error instanceof Error && error.name === "AbortError" ? "Translation provider timed out." : "Translation provider is unavailable.", true);
+    } finally {
+      clearTimeout(timeout);
+    }
+  };
+}
+
 export async function translateWithRetry(
   text: string,
   provider: TranslationProvider,
@@ -140,6 +210,29 @@ export async function translateWithRetry(
       if (!retryable || attempt === attempts) {
         if (error instanceof Error) throw Object.assign(error, { attempts: attempt });
         throw providerError("Translation provider failed.", false);
+      }
+      if (delayMs) await new Promise((resolve) => setTimeout(resolve, delayMs * 2 ** (attempt - 1)));
+    }
+  }
+  throw providerError("Translation attempts were exhausted.", false);
+}
+
+export async function translateBatchWithRetry(
+  entries: Array<{ text: string; identifiers?: string[] }>,
+  provider: TranslationBatchProvider,
+  options: { attempts?: number; delayMs?: number; onAttempt?: (attempt: number) => void } = {}
+): Promise<string[]> {
+  const attempts = Math.max(1, Math.min(options.attempts ?? 3, 5));
+  const delayMs = Math.max(0, options.delayMs ?? 400);
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      options.onAttempt?.(attempt);
+      return await translateProtectedBatch(entries, provider);
+    } catch (error) {
+      const retryable = isTranslationProviderError(error) ? error.retryable : true;
+      if (!retryable || attempt === attempts) {
+        if (error instanceof Error) throw Object.assign(error, { attempts: attempt });
+        throw providerError("Translation attempts were exhausted.", false);
       }
       if (delayMs) await new Promise((resolve) => setTimeout(resolve, delayMs * 2 ** (attempt - 1)));
     }

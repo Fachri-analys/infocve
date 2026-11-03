@@ -4,40 +4,9 @@ import type { NvdCveApiResponse, NvdErrorResponse, NvdQueryParams } from "@/lib/
 
 const NVD_BASE_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0";
 const DEFAULT_TIMEOUT_MS = 6_000;
-const MAX_ATTEMPTS = 2; // 1 initial try + 1 fast retry
+const MAX_ATTEMPTS = 3;
 const BASE_RETRY_DELAY_MS = 500;
 const MAX_RETRY_DELAY_MS = 2_000;
-
-class NvdRateLimiter {
-  private timestamps: number[] = [];
-
-  async acquire(hasApiKey: boolean): Promise<void> {
-    const maxRequests = hasApiKey ? 45 : 5;
-    const windowMs = 30_000;
-    const now = Date.now();
-
-    this.timestamps = this.timestamps.filter((t) => now - t < windowMs);
-
-    if (this.timestamps.length >= maxRequests) {
-      const oldest = this.timestamps[0] ?? now;
-      const waitTime = windowMs - (now - oldest) + 100;
-      if (waitTime > 0) {
-        // Never freeze the server-side render thread for tens of seconds.
-        // If the upstream quota is full, throw rate-limit immediately so
-        // caller falls back to local SQLite/cached data instantly.
-        if (waitTime > 1_500) {
-          throw new NvdApiError("rate-limit", 429, "NVD rate limit window full; fast fallback to local cache");
-        }
-        await sleep(waitTime);
-      }
-      return this.acquire(hasApiKey);
-    }
-
-    this.timestamps.push(Date.now());
-  }
-}
-
-const nvdRateLimiter = new NvdRateLimiter();
 
 export type NvdErrorKind =
   | "timeout"
@@ -141,6 +110,8 @@ interface FetchNvdOptions {
   revalidateSeconds?: number;
   /** Extra cache tags, for future on-demand revalidation. */
   tags?: string[];
+  /** Avoid Next data cache for the scheduled sync pipeline. */
+  noStore?: boolean;
 }
 
 /**
@@ -174,8 +145,6 @@ export async function fetchNvd(params: NvdQueryParams, options: FetchNvdOptions 
   };
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    await nvdRateLimiter.acquire(Boolean(apiKey));
-
     const controller = new AbortController();
     const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -183,7 +152,7 @@ export async function fetchNvd(params: NvdQueryParams, options: FetchNvdOptions 
       const response = await fetch(url, {
         headers,
         signal: controller.signal,
-        next: { revalidate, tags: ["nvd", ...(options.tags ?? [])] },
+        ...(options.noStore ? { cache: "no-store" as const } : { next: { revalidate, tags: ["nvd", ...(options.tags ?? [])] } }),
       });
 
       if (response.ok) {

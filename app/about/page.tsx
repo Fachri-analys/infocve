@@ -76,9 +76,9 @@ export default function AboutPage() {
             </a>{" "}
             lewat REST API v2.0 resmi mereka — bukan data contoh, dan bukan hasil scraping. Beberapa hal tetap
             perlu diketahui: judul dan kategori setiap CVE disusun otomatis dari data NVD (NVD sendiri tidak
-            menyediakan keduanya), penjelasan Bahasa Indonesia menyoroti istilah yang dikenali kamus kami alih-alih
-            menerjemahkan penuh (sesuai prinsip tanpa terjemahan AI), dan statistik ringkas seperti jumlah
-            vendor/kategori di beranda dihitung dari sampel CVE 120 hari terakhir, bukan seluruh sejarah NVD.
+            menyediakan keduanya). Deskripsi Bahasa Indonesia tersedia jika antrean penerjemahan otomatis berhasil;
+            teks resmi berbahasa Inggris tetap bisa dibuka. Statistik dihitung dari katalog InfoCVE yang telah
+            disinkronkan. Backfill awal mencakup 120 hari, lalu perubahan NVD masuk lewat sinkronisasi inkremental.
           </p>
           <p>
             InfoCVE <strong className="text-foreground">tidak berafiliasi</strong> dengan MITRE, NVD, atau CVE

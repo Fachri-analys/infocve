@@ -13,9 +13,9 @@ export function KpiCards({ data }: KpiCardsProps) {
 
   const cards = [
     {
-      label: "Total Kerentanan (120 Hari)",
+      label: "CVE Tersinkron",
       value: formatNumberId(totalSampleCves),
-      subtext: "Sampel publikasi terkini NVD NIST",
+      subtext: "Data yang tersimpan di katalog InfoCVE",
       icon: Database,
       iconColor: "text-accent",
       bgColor: "bg-accent/10",
@@ -24,7 +24,7 @@ export function KpiCards({ data }: KpiCardsProps) {
     {
       label: "Keparahan Kritis (CVSS >= 9.0)",
       value: formatNumberId(highlights.criticalCount),
-      subtext: `${data.severityDistribution.find((s) => s.severity === "CRITICAL")?.percentage ?? 0}% dari total sampel`,
+      subtext: `${data.severityDistribution.find((s) => s.severity === "CRITICAL")?.percentage ?? 0}% dari katalog tersinkron`,
       icon: AlertTriangle,
       iconColor: "text-severity-critical-fg",
       bgColor: "bg-severity-critical/10",

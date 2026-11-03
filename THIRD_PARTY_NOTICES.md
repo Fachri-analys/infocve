@@ -1,5 +1,9 @@
 # Third-party notices
 
+## MITRE CWE catalog
+
+`lib/cwe-catalog.json` is generated from the MITRE Common Weakness Enumeration (CWE) Comprehensive View CSV, version 5.0, downloaded from [MITRE CWE Downloads](https://cwe.mitre.org/data/downloads.html) (source file: `2000.csv`). The generated names remain MITRE content; InfoCVE does not claim ownership. Regenerate with `node scripts/gen-cwe.mjs <path-to-2000.csv> [output.json]`. CWE-74 has a display suffix added by InfoCVE to clarify the parenthetical injection category. Review [MITRE CWE Terms of Use](https://cwe.mitre.org/about/termsofuse.html) when redistributing updated source data.
+
 Inventaris ini dibuat dari `package-lock.json` (lockfile v3) dan metadata paket yang tersedia di `node_modules`. Versi pada kolom adalah versi terkunci yang tepat. Jalankan `node scripts/generate-third-party-notices.mjs` setelah mengubah lockfile atau memasang ulang dependency untuk memperbaruinya.
 
 Kolom author menyalin deklarasi author/contributor dari metadata paket. Kolom copyright menyalin baris copyright dari file LICENSE/NOTICE jika tersedia; keduanya adalah pernyataan upstream, bukan verifikasi independen bahwa orang/organisasi tersebut memegang seluruh hak. Repository, lisensi, atau pemberitahuan pemegang hak yang tidak ditemukan ditandai **Needs Review**. Halaman npm hanya link metadata/artifact, bukan pengganti repository resmi. Paket platform yang tidak terpasang lokal memerlukan pemeriksaan upstream untuk file notice lengkap.

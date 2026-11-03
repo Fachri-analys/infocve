@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cache } from "react";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Building2, CalendarDays, Info, Package } from "lucide-react";
@@ -22,6 +23,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCVEById } from "@/lib/nvd";
 import { ThreatIntelligenceAggregator } from "@/lib/sources/aggregator";
+import { getCveMetaDescription } from "@/lib/cve-metadata";
 import { formatDateId, safeJsonLdStringify } from "@/utils/format";
 
 // `generateMetadata` and the page component below both need the same CVE.
@@ -55,8 +57,10 @@ export async function generateMetadata({ params }: CVEPageProps): Promise<Metada
     if (!cve) return { title: "CVE Tidak Ditemukan" };
 
     const pageTitle = `${cve.id} — ${cve.title}`;
-    const pageDesc = cve.descriptionId.slice(0, 160);
-    const ogTitle = `${cve.id} (Skor CVSS ${cve.cvss.baseScore.toFixed(1)} - ${cve.cvss.severity})`;
+    const pageDesc = getCveMetaDescription(cve);
+    const ogTitle = cve.cvss
+      ? `${cve.id} (Skor CVSS ${cve.cvss.baseScore.toFixed(1)} - ${cve.cvss.severity})`
+      : `${cve.id} (${cve.vulnStatus === "Rejected" ? "Ditolak" : "Menunggu analisis CVSS"})`;
 
     return {
       title: pageTitle,
@@ -71,7 +75,7 @@ export async function generateMetadata({ params }: CVEPageProps): Promise<Metada
         publishedTime: cve.publishedDate,
         modifiedTime: cve.lastModifiedDate,
         authors: ["InfoCVE"],
-        tags: [cve.id, cve.vendor, cve.product, cve.cvss.severity, ...cve.cwe.map((w) => w.id)],
+        tags: [cve.id, cve.vendor, cve.product, ...(cve.cvss ? [cve.cvss.severity] : []), ...cve.cwe.map((w) => w.id)],
       },
       twitter: {
         card: "summary_large_image",
@@ -85,6 +89,7 @@ export async function generateMetadata({ params }: CVEPageProps): Promise<Metada
 }
 
 export default async function CVEDetailPage({ params }: CVEPageProps) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const { id } = await params;
 
   let cve;
@@ -107,7 +112,7 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
     name: cve.id,
     datePublished: cve.publishedDate,
     dateModified: cve.lastModifiedDate,
-    description: cve.descriptionId,
+    description: getCveMetaDescription(cve),
     mainEntityOfPage: `${siteUrl}/cve/${cve.id}`,
     author: {
       "@type": "Organization",
@@ -157,8 +162,8 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12 lg:px-8 animate-fade-in">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(techArticleJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(breadcrumbJsonLd) }} />
+      <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(techArticleJsonLd) }} />
+      <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(breadcrumbJsonLd) }} />
 
       <Breadcrumb items={[{ label: "Cari CVE", href: "/search" }, { label: cve.id }]} />
 
@@ -179,13 +184,25 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
             <SourceBadge sources={cve.sources} className="mt-4" />
           </div>
           <div className="flex items-center gap-3 border-t border-border pt-4 sm:flex-col sm:items-end sm:border-t-0 sm:pt-7">
-            <div className="sm:text-right">
-              <p className="eyebrow text-[10px]">Skor CVSS {cve.cvss.version}</p>
-              <p className="data-tag mt-1 text-3xl font-medium leading-none text-foreground sm:text-4xl">
-                {cve.cvss.baseScore.toFixed(1)}
-              </p>
-            </div>
-            <SeverityBadge severity={cve.cvss.severity} size="md" />
+            {cve.cvss ? (
+              <>
+                <div className="sm:text-right">
+                  <p className="eyebrow text-[10px]">Skor CVSS {cve.cvss.version}</p>
+                  <p className="data-tag mt-1 text-3xl font-medium leading-none text-foreground sm:text-4xl">
+                    {cve.cvss.baseScore.toFixed(1)}
+                  </p>
+                </div>
+                <SeverityBadge severity={cve.cvss.severity} size="md" />
+              </>
+            ) : (
+              <div className="sm:text-right">
+                <p className="eyebrow text-[10px]">Skor CVSS</p>
+                <p className="mt-1 text-sm font-medium text-muted-foreground">
+                  {cve.vulnStatus === "Rejected" ? "Ditolak" : cve.vulnStatus === "Awaiting Analysis" || cve.vulnStatus === "Undergoing Analysis" ? "Menunggu analisis" : "Belum dinilai"}
+                </p>
+                <SeverityBadge severity="UNRATED" size="md" />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -255,7 +272,7 @@ export default async function CVEDetailPage({ params }: CVEPageProps) {
           </Card>
 
           <PriorityCard priority={cve.priority} />
-          <CVSSCard cvss={cve.cvss} />
+          {cve.cvss && <CVSSCard cvss={cve.cvss} />}
           <EPSSCard epss={cve.epss} />
         </div>
 

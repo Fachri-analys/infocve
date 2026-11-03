@@ -12,6 +12,7 @@ const TIER_ICONS = {
   P2: AlertTriangle,
   P3: Clock,
   P4: CheckCircle,
+  NA: Info,
 };
 
 export function PriorityBreakdown({ priorityStats }: PriorityBreakdownProps) {
@@ -28,7 +29,7 @@ export function PriorityBreakdown({ priorityStats }: PriorityBreakdownProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4 pt-1">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
           {priorityStats.map((item) => {
             const Icon = TIER_ICONS[item.tier];
             return (

@@ -7,7 +7,7 @@ export interface PriorityInput {
   cvss?: {
     baseScore?: number;
     severity?: Severity;
-  };
+  } | null;
   epss?: {
     score?: number;
     percentile?: number;
@@ -64,7 +64,7 @@ export function calculatePriority(cve: PriorityInput): PriorityAssessment {
         : false;
 
   let level: PriorityLevel;
-  let tier: "P1" | "P2" | "P3" | "P4";
+  let tier: "P1" | "P2" | "P3" | "P4" | "NA";
   let labelId: string;
 
   // Deterministic Decision Tree
@@ -122,26 +122,23 @@ export function calculatePriority(cve: PriorityInput): PriorityAssessment {
       reasons.push("Tersedia bukti konsep eksploitasi (PoC) pada referensi publik.");
     }
     reasons.push("Belum tercantum dalam katalog eksploitasi CISA KEV.");
-  } else if (isCvssHigh) {
-    level = "HIGH";
-    tier = "P2";
-    labelId = "Prioritas Tinggi (P2)";
-    reasons.push(`Dampak teknis CVSS tergolong tinggi (${cvssScore !== undefined ? cvssScore.toFixed(1) : "HIGH"}).`);
-    if (epssScore !== undefined) {
-      reasons.push(`Probabilitas eksploitasi EPSS relatif rendah (${(epssScore * 100).toFixed(2)}%).`);
-    } else {
-      reasons.push("Data EPSS belum tersedia saat evaluasi.");
-    }
-    reasons.push("Tidak ada catatan eksploitasi di CISA KEV dan belum ada PoC publik yang terkonfirmasi.");
+  } else if (cvssScore === undefined) {
+    level = "UNRATED";
+    tier = "NA";
+    labelId = "Belum Dinilai (NA)";
+    reasons.push("NVD belum menyediakan penilaian CVSS; prioritas teknis belum dapat ditetapkan.");
+    if (epssScore !== undefined) reasons.push(`Probabilitas eksploitasi EPSS ${(epssScore * 100).toFixed(2)}%.`);
+    if (hasPoc) reasons.push("Terdapat referensi PoC publik, tetapi CVSS belum dinilai.");
   }
   // Tier 3: P3 - Prioritas Menengah
-  else if (isCvssMedium || isEpssModerate || hasPoc) {
+  else if (isCvssHigh || isCvssMedium || isEpssModerate || hasPoc) {
     level = "MEDIUM";
     tier = "P3";
     labelId = "Prioritas Menengah (P3)";
     if (cvssScore !== undefined) {
-      reasons.push(`Dampak teknis CVSS tergolong menengah (${cvssScore.toFixed(1)}).`);
+      reasons.push(`Dampak teknis CVSS tergolong ${isCvssHigh ? "tinggi" : "menengah"} (${cvssScore.toFixed(1)}).`);
     }
+    if (isCvssHigh) reasons.push("Tidak ada bukti tambahan yang memenuhi ambang P2 (CISA KEV, PoC, atau EPSS tinggi).");
     if (isEpssModerate) {
       reasons.push(`Probabilitas eksploitasi EPSS berada di kisaran menengah (${(epssScore! * 100).toFixed(2)}%).`);
     }

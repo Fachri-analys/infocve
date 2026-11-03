@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { isValidCalendarDate } from "@/app/search/page";
+import { unavailableSearchResult } from "@/lib/search/result-state";
 import type { CVE } from "@/types/cve";
 
 describe("Search & Date Validation", () => {
+  it("marks catalog failures separately from a verified empty search", () => {
+    expect(unavailableSearchResult(12, 3)).toEqual({
+      results: [], total: 0, page: 3, pageSize: 12, totalPages: 1, available: false,
+    });
+  });
+
   describe("isValidCalendarDate", () => {
     it("validates valid dates correctly", () => {
       expect(isValidCalendarDate("2024-02-29")).toBe(true); // Leap year
@@ -83,7 +90,7 @@ describe("Search & Date Validation", () => {
     ];
 
     it("sorts by baseScore descending", () => {
-      const sorted = [...mockCVEs].sort((a, b) => b.cvss.baseScore - a.cvss.baseScore);
+      const sorted = [...mockCVEs].sort((a, b) => b.cvss!.baseScore - a.cvss!.baseScore);
       expect(sorted[0]?.id).toBe("CVE-2024-0001");
       expect(sorted[1]?.id).toBe("CVE-2024-0002");
     });

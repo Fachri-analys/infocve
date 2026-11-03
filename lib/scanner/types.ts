@@ -81,7 +81,7 @@ export interface DependencyFinding {
   direct: boolean;
   transitive: boolean;
   locations: string[];
-  priority: "P1" | "P2" | "P3" | "P4";
+  priority: "P1" | "P2" | "P3" | "P4" | "NA";
   prioritySource: string;
   priorityReasons: string[];
   severity: string | null;

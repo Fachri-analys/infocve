@@ -21,7 +21,7 @@ export function TopRankings({ topVendors, topProducts, topCwes }: TopRankingsPro
             <CardTitle className="text-base font-semibold">Top Vendor Terdampak</CardTitle>
           </div>
           <p className="text-xs text-muted-foreground">
-            Vendor dengan frekuensi kemunculan kerentanan terbanyak dalam sampel 120 hari.
+            Vendor dengan frekuensi kemunculan kerentanan terbanyak dalam katalog tersinkron.
           </p>
         </CardHeader>
         <CardContent className="pt-1 flex-1">

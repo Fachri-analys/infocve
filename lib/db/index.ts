@@ -65,6 +65,7 @@ export function getDb(): DatabaseSyncInstance {
 
   // Run schema initialization
   db.exec(CREATE_TABLES_SQL);
+  ensureColumn(db, "cves", "vuln_status", "TEXT NOT NULL DEFAULT 'Analyzed'");
   ensureColumn(db, "cves", "translation_status", "TEXT NOT NULL DEFAULT 'UNTRANSLATED'");
   ensureColumn(db, "cves", "translation_source_hash", "TEXT");
   db.exec(`
